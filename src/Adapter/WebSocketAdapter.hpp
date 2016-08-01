@@ -9,7 +9,9 @@ class WebSocketAdapter : public Adapter
 
 public:
 
-   WebSocketAdapter(String id);
+   WebSocketAdapter(
+      const String& id,
+      Protocol* protocol);
 
    virtual void setup();
 
@@ -20,17 +22,16 @@ public:
 
 private:
 
-   static JsonProtocol protocol;
-
    WiFiServer server;
 
    WebSocketServer webSocketServer;
 
 };
 
-inline WebSocketAdapter::WebSocketAdapter(String id) :
-   Adapter(id),
-   server(81)
+inline WebSocketAdapter::WebSocketAdapter(
+   const String& id,
+   Protocol* protocol) : Adapter(id, protocol),
+                         server(81)
 {
 
 }

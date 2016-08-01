@@ -1,36 +1,45 @@
-#include "WebSocketAdapter.hpp"
+#include "IpServerAdapter.hpp"
 #include "Messaging.h"
 
-void WebSocketAdapter::setup()
+void IpServerAdapter::setup()
 {
 }
 
-bool WebSocketAdapter::sendRemoteMessage(
+bool IpServerAdapter::sendRemoteMessage(
    MessagePtr message)
 {
    bool isSuccess = false;
 
-   uint8_t num = 0;
    String serializedMessage = protocol->serialize(message);
 
    if (serializedMessage != "")
    {
-      webSocketServer.sendData(serializedMessage);
-      isSuccess = true;
+      WiFiClient client = server.available();
+
+      if (client && client.connected())
+      {
+         client.write(serializedMessage.c_str(), serializedMessage.length());
+         isSuccess = true;
+      }
    }
 
    return (isSuccess);
 }
 
-MessagePtr WebSocketAdapter::getRemoteMessage()
+MessagePtr IpServerAdapter::getRemoteMessage()
 {
    MessagePtr message = 0;
 
+   String serializedMessage = "";
+
    WiFiClient client = server.available();
 
-   if (client.connected() && webSocketServer.handshake(client))
+   if (client)
    {
-      String serializedMessage = webSocketServer.getData();
+      while (client.available() > 0)
+      {
+         serializedMessage += client.read();
+      }
 
       if (serializedMessage.length() > 0)
       {

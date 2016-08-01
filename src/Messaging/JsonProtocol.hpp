@@ -19,19 +19,10 @@ public:
 
 private:
 
-   struct Parameter
-   {
-      String name;
-
-      String value;
-
-      bool operator==(const Parameter& rhs) const
-      {
-         return ((name == rhs.name) && (value == rhs.value));
-      }
-   };
-
    typedef Set<Parameter, MAX_PARAMETERS> ParameterSet;
+
+   String serializeParameters(
+      MessagePtr message) const;
 
    static bool parseParameters(
       const String& parameterString,
@@ -41,15 +32,29 @@ private:
       const String& parameterString,
       Parameter& parameter);
 
+   static ParameterType getType(
+      const String& value);
+
    static bool validName(
       const String& name);
 
    static bool validValue(
       const String& value);
 
-   static void stripQuotes(
+   static String stripQuotes(
       const String& value);
 
    static void stripWhitespace(
       const String& value);
+
+   static String wrap(
+      const String& value,
+      const char& c);
 };
+
+inline String JsonProtocol::wrap(
+   const String& value,
+   const char& c)
+{
+   return (String(c) + value + String(c));
+}
