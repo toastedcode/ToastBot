@@ -1,4 +1,5 @@
 #include "JsonProtocol.hpp"
+//#include "Logger.hpp"
 #include "StringUtils.hpp"
 
 const int JsonProtocol::MAX_PARAMETERS;
@@ -12,14 +13,15 @@ bool JsonProtocol::parse(
    String remainingString = messageString;
    ParameterSet parameters;
 
-   // Strip braces, quotes, and whitespace.
-   remainingString = StringUtils::removeAll(remainingString, " \n\r\t{}\"\'");
+   Logger::logDebug("JsonProtocol::parse: Parsing: \"" + remainingString + "\"\n");
+
+   // Strip braces and whitespace.
+   remainingString = StringUtils::removeAll(remainingString, " \n\r\t{}");
 
    // Parse parameters.
    if (parseParameters(remainingString, parameters) == false)
    {
-      // TODO: Logging.
-      printf("Failed to parse parameters.\n");
+      Logger::logDebug("JsonProtocol::parse: Failed to parse parameters.\n");
    }
    else
    {
@@ -28,7 +30,7 @@ bool JsonProtocol::parse(
       {
          Parameter parameter = parameters.item(i)->value;
 
-         message->set(parameter.name, parameter.value);
+         message->setParameter(parameter);
       }
 
       isSuccess = true;
@@ -38,7 +40,43 @@ bool JsonProtocol::parse(
 String JsonProtocol::serialize(
    MessagePtr message) const
 {
-   return ("");
+   String serializedMessage = "";
+
+   serializedMessage += "{";
+
+   serializedMessage += serializeParameters(message);
+
+   serializedMessage += "}";
+
+   return (serializedMessage);
+}
+
+String JsonProtocol::serializeParameters(
+   MessagePtr message) const
+{
+   String serializedParameters = "";
+
+   for (int i = 0; i < message->getParameterCount(); i++)
+   {
+      Parameter parameter = message->getParameter(i);
+
+      String parameterValue = parameter.value;
+
+      if ((parameter.type == STRING) ||
+          (parameter.type == CHAR))
+      {
+         parameterValue = wrap(parameterValue, '\"');
+      }
+
+      serializedParameters += (wrap(parameter.name, '\"') + ":" + parameterValue);
+
+      if (i < (message->getParameterCount() - 1))
+      {
+         serializedParameters += ", ";
+      }
+   }
+
+   return (serializedParameters);
 }
 
 bool JsonProtocol::parseParameters(
@@ -76,18 +114,55 @@ bool JsonProtocol::parseParameter(
 
    if (validName(name) && validValue(value))
    {
-      parameter.name = name;
-      parameter.value = value;
-
+      parameter.type = getType(value);
+      parameter.name = stripQuotes(name);
+      parameter.value = stripQuotes(value);
       isSuccess = true;
    }
    else
    {
-      // TODO: Logging.
-      printf("Failed to parse parameter: %s\n", parameterString.c_str());
+      //Logger::logDebug("JsonProtocol::parse: Failed to parse parameter: \"" + parameterString + "\"\n");
    }
 
    return (isSuccess);
+}
+
+ParameterType JsonProtocol::getType(
+   const String& value)
+{
+   ParameterType type = STRING;
+
+   String lowerCase = value;
+   lowerCase.toLowerCase();
+
+   if ((value.charAt(0) == '\"') &&
+       (value.charAt(value.length() - 1) == '\"'))
+   {
+      if (value.length() == 3)
+      {
+         type = CHAR;
+      }
+      else
+      {
+         type = STRING;
+      }
+   }
+   else if (StringUtils::findFirstNotOf(value, "123456789.-") == -1)
+   {
+      // TODO: Parse numeric types.
+      type = INT;
+   }
+   else if ((lowerCase == "true") ||
+            (lowerCase == "false"))
+   {
+      type = BOOL;
+   }
+   else
+   {
+      Logger::logDebug("JsonProtocol::getType: Treating unquoted value [" + value + "] as STRING\n");
+   }
+
+   return (type);
 }
 
 bool JsonProtocol::validName(
@@ -102,4 +177,10 @@ bool JsonProtocol::validValue(
 {
    // TODO: More
    return (value != "");
+}
+
+inline String JsonProtocol::stripQuotes(
+   const String& value)
+{
+   return (StringUtils::removeAll(value, "\"\'"));
 }
