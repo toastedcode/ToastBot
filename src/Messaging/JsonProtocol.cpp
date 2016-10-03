@@ -1,5 +1,5 @@
 #include "JsonProtocol.hpp"
-//#include "Logger.hpp"
+#include "Logger.h"
 #include "StringUtils.hpp"
 
 const int JsonProtocol::MAX_PARAMETERS;

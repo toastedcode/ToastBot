@@ -1,0 +1,59 @@
+#include "IpClientAdapter.hpp"
+#include "Logger.h"
+#include "PubSubClient.h"
+#include "PubSubListener.h"
+#include "StaticMessageQueue.h"
+
+class MqttClientAdapter : public IpClientAdapter, PubSubListener
+{
+
+public:
+
+   MqttClientAdapter(
+      const String& id,
+      Protocol* protocol,
+      const String& host,
+      const int& port,
+      const String& user,
+      const String& password);
+
+   virtual void setup();
+
+   virtual bool sendRemoteMessage(
+      MessagePtr message);
+
+   virtual MessagePtr getRemoteMessage();
+
+   virtual void callback(
+      char* topic,
+      unsigned char* payload,
+      unsigned int length);
+
+protected:
+
+   virtual bool connect();
+
+   virtual bool disconnect();
+
+   PubSubClient* mqttClient;
+
+   String user;
+
+   String password;
+
+   MessageQueue* messageQueue;
+};
+
+inline MqttClientAdapter::MqttClientAdapter(
+   const String& id,
+   Protocol* protocol,
+   const String& host,
+   const int& port,
+   const String& user,
+   const String& password) : IpClientAdapter(id, protocol, host, port),
+                             user(user),
+                             password(password)
+{
+   messageQueue = new StaticMessageQueue(10);
+   mqttClient = new PubSubClient(client);
+}

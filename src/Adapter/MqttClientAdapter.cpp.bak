@@ -1,0 +1,88 @@
+#include "MqttClientAdapter.hpp"
+#include "Messaging.h"
+
+void MqttClientAdapter::setup()
+{
+   mqttClient->setServer(host, port);
+   mqttClient->setCallback(this);
+
+   connect();
+}
+
+bool MqttClientAdapter::sendRemoteMessage(
+   MessagePtr message)
+{
+   bool isSuccess = false;
+
+   String serializedMessage = protocol->serialize(message);
+
+   if (serializedMessage != "")
+   {
+      if (mqttClient->connected())
+      {
+         mqttClient->publish(message->getString("topic"), serializedMessage);
+         isSuccess = true;
+      }
+   }
+
+   return (isSuccess);
+}
+
+MessagePtr MqttClientAdapter::getRemoteMessage()
+{
+   return (messageQueue->dequeue());
+}
+
+void MqttClientAdapter::callback(
+   char* topic,
+   unsigned char* payload,
+   unsigned int length)
+{
+   Message* message = 0;
+
+   String serializedMessage(payload, length);
+
+   if (serializedMessage.length() > 0)
+   {
+      // Create a new message.
+      message = Messaging::newMessage();
+
+      // Parse the message from the message string.
+      if (protocol->parse(serializedMessage, message) == true)
+      {
+         // Parse was successful.
+         message->setSource(getAddress());
+         message->set("topic", String(topic));
+
+         messageQueue->enqueue(message);
+      }
+      else
+      {
+         // Parse failed.  Set the message free.
+         message->setFree();
+         message = 0;
+      }
+   }
+}
+
+bool MqttClientAdapter::connect()
+{
+   bool success = client->connect(user);
+
+   if (!success)
+   {
+      retryTime = millis() + RETRY_DELAY;
+   }
+   else
+   {
+      retryTime = 0;
+   }
+
+   return (success);
+}
+
+bool MqttClientAdapter::disconnect()
+{
+   // TODO
+   return (false);
+}
