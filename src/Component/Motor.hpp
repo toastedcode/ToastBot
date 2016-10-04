@@ -22,9 +22,9 @@ public:
       // A unique identifer for this sensor.
       const String& id,
       // The GPIO pin that will be used to set the motor direction.
-      const int& directionPinId,
+      const int& directionPin,
       // The GPIO pin that will be used to set the motor speed.
-      const int& speedPinId);
+      const int& speedPin);
 
    // Destructor.
    virtual ~Motor();

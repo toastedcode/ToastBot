@@ -48,8 +48,6 @@ void Motor::loop()
 void Motor::handleMessage(
    MessagePtr message)
 {
-   bool handled = true;
-
    // MOTOR_CONFIG
    if (message->getMessageId() == "setSpeed")
    {
