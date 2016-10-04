@@ -22,6 +22,8 @@ public:
 protected:
 
    WiFiServer server;
+
+   WiFiClient client;
 };
 
 inline IpServerAdapter::IpServerAdapter(

@@ -16,12 +16,25 @@ public:
 
    virtual void handleMessage(MessagePtr message)
    {
-      // Format: {"variable1":"", "variable2":""}
-      Logger::logDebug("Received message: " + 
-                       message->getMessageId() + 
-                       " (variable1 = " + 
-                       message->getString("variable1") + 
-                       ")");
+      Logger::logDebug("Received message: " + message->getMessageId() + "\n");
+
+      if (message->getMessageId() == "ping")
+      {
+         Logger::logDebug("Received: ping\n");
+        
+         MessagePtr reply = Messaging::newMessage();
+         if (reply)
+         {
+            reply->setMessageId("pong");
+            reply->setDestination(message->getSource());
+            reply->setSource(getAddress());
+            Messaging::send(reply); 
+         }
+      }
+      else
+      {
+        Logger::logDebug("Unhandled message: " + message->getMessageId() + "\n");
+      }
    }
 };
 
@@ -39,7 +52,7 @@ void setup()
       // If the ESP8266 fails to connect with the stored credentials, we'll create an AP to allow for wifi config.
       Esp8266::getInstance()->startAccessPoint("TOASTBOT", "");
    } 
-  
+
    ToastBot::setup("myMachine");
 
    ToastBot::add(new MyComponent("component1"));
@@ -51,11 +64,12 @@ void setup()
    ToastBot::add(motor2);
    ToastBot::add(new MotorPair("motorPair", motor1, motor2));
    
-   ToastBot::add(new WebSocketAdapter("adapter1", new JsonProtocol()));
+   //ToastBot::add(new WebSocketAdapter("adapter1", new JsonProtocol()));
 
+   // TODO: Must call ToastBot::setup() after register, must must setup MessageRouter with id before adding.  Catch-22!
    ToastBot::add(new IpServerAdapter("adapter2", new JsonProtocol(), 80));
 
-   ToastBot::add(new IpClientAdapter("adapter3", new JsonProtocol(), "10.4.41.179", 5000));
+   //ToastBot::add(new IpClientAdapter("adapter3", new JsonProtocol(), "10.4.41.179", 5000));
 }
 
 void loop()

@@ -47,7 +47,7 @@ bool ToastBot::remove(
 void ToastBot::setup(
    const String& id)
 {
-   Messaging::setup<BasicMessage>(id, 50);
+   Messaging::setup<BasicMessage>(id, 10);
 
    for (int i = 0; i < components.length(); i++)
    {

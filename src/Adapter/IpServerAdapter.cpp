@@ -3,6 +3,7 @@
 
 void IpServerAdapter::setup()
 {
+   server.begin();
 }
 
 bool IpServerAdapter::sendRemoteMessage(
@@ -14,12 +15,17 @@ bool IpServerAdapter::sendRemoteMessage(
 
    if (serializedMessage != "")
    {
-      WiFiClient client = server.available();
-
       if (client && client.connected())
       {
          client.write(serializedMessage.c_str(), serializedMessage.length());
+
+         printf("Sent\n");
+
          isSuccess = true;
+      }
+      else
+      {
+         printf("Failed to send\n");
       }
    }
 
@@ -32,14 +38,14 @@ MessagePtr IpServerAdapter::getRemoteMessage()
 
    String serializedMessage = "";
 
-   WiFiClient client = server.available();
-
-   if (client)
+   if ((!client) || (!client.connected()))
    {
-      while (client.available() > 0)
-      {
-         serializedMessage += client.read();
-      }
+      client = server.available();
+   }
+
+   if ((client) && client.available())
+   {
+      serializedMessage = client.readStringUntil('\r');
 
       if (serializedMessage.length() > 0)
       {

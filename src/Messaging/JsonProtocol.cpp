@@ -35,6 +35,8 @@ bool JsonProtocol::parse(
 
       isSuccess = true;
    }
+
+   return (isSuccess);
 }
 
 String JsonProtocol::serialize(
@@ -47,6 +49,8 @@ String JsonProtocol::serialize(
    serializedMessage += serializeParameters(message);
 
    serializedMessage += "}";
+
+   Logger::logDebug("JsonProtocol::serialize: Serialized: \"" + serializedMessage + "\"\n");
 
    return (serializedMessage);
 }
