@@ -53,17 +53,18 @@ void setup()
       Esp8266::getInstance()->startAccessPoint("TOASTBOT", "");
    } 
 
+   ToastBot::setup("myMachine");
+
    ToastBot::add(new MyComponent("component1"));
 
    ToastBot::add(new Motor("motor1", 1, 2));
 
-   ToastBot::add(new WebSocketAdapter("adapter1", new JsonProtocol()));
+   //ToastBot::add(new WebSocketAdapter("adapter1", new JsonProtocol()));
 
+   // TODO: Must call ToastBot::setup() after register, must must setup MessageRouter with id before adding.  Catch-22!
    ToastBot::add(new IpServerAdapter("adapter2", new JsonProtocol(), 80));
 
-   ToastBot::add(new IpClientAdapter("adapter3", new JsonProtocol(), "10.4.41.179", 5000));
-   
-   ToastBot::setup("myMachine");
+   //ToastBot::add(new IpClientAdapter("adapter3", new JsonProtocol(), "10.4.41.179", 5000));
 }
 
 void loop()
