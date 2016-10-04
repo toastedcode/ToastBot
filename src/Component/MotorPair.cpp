@@ -57,7 +57,7 @@ void MotorPair::handleMessage(
 
       Message* reply = Messaging::newMessage();
       reply->setMessageId("pong");
-      reply->setSource(this->getAddress());
+      reply->setSource(getId());
       reply->setDestination(message->getSource());
       Messaging::send(reply);
    }

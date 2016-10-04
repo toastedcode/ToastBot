@@ -60,7 +60,7 @@ MessagePtr IpClientAdapter::getRemoteMessage()
       if (protocol->parse(serializedMessage, message) == true)
       {
          // Parse was successful.
-         message->setSource(getAddress());
+         message->setSource(getId());
       }
       else
       {

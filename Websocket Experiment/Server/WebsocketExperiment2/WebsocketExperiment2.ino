@@ -27,7 +27,7 @@ public:
          {
             reply->setMessageId("pong");
             reply->setDestination(message->getSource());
-            reply->setSource(getAddress());
+            reply->setSource(getId());
             Messaging::send(reply); 
          }
       }
@@ -53,8 +53,6 @@ void setup()
       Esp8266::getInstance()->startAccessPoint("TOASTBOT", "");
    } 
 
-   ToastBot::setup("myMachine");
-
    ToastBot::add(new MyComponent("component1"));
 
    Motor* motor1 = new Motor("motor1", 1, 2);
@@ -70,6 +68,8 @@ void setup()
    ToastBot::add(new IpServerAdapter("adapter2", new JsonProtocol(), 80));
 
    //ToastBot::add(new IpClientAdapter("adapter3", new JsonProtocol(), "10.4.41.179", 5000));
+
+   ToastBot::setup("myMachine");
 }
 
 void loop()
