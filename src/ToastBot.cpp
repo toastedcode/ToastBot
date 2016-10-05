@@ -9,10 +9,13 @@
 // *****************************************************************************
 
 #include "BasicMessage.hpp"
+#include "Logger.h"
 #include "Messaging.hpp"
 #include "ToastBot.hpp"
 
 const int ToastBot::MAX_COMPONENTS;
+
+String ToastBot::id;
 
 Set<Component*, ToastBot::MAX_COMPONENTS> ToastBot::components;
 
@@ -47,11 +50,15 @@ bool ToastBot::remove(
 void ToastBot::setup(
    const String& id)
 {
+   Logger::logDebug("ToastBot::setup\n");
+
+   setId(id);
+
    Messaging::setup<BasicMessage>(10);
 
    for (int i = 0; i < components.length(); i++)
    {
-      components.item(i)->value->setup();
+      //components.item(i)->value->setup();
    }
 }
 

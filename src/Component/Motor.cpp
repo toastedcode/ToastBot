@@ -9,8 +9,9 @@
 // *****************************************************************************
 
 #include "ESP8266.h"
-#include "Logger.h"
 #include "Motor.hpp"
+
+#include "Logger.h"
 #include "Messaging.hpp"
 
 const int Motor::MIN_SPEED;

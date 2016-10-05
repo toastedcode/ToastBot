@@ -1,4 +1,5 @@
 #include "JsonProtocol.hpp"
+
 #include "Logger.h"
 #include "StringUtils.hpp"
 
