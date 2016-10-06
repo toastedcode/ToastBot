@@ -41,11 +41,6 @@ void Motor::setup()
    pinMode(speedPin, OUTPUT);
 }
 
-void Motor::loop()
-{
-
-}
-
 void Motor::handleMessage(
    MessagePtr message)
 {

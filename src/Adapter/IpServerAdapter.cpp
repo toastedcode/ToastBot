@@ -1,8 +1,14 @@
 #include "IpServerAdapter.hpp"
+#include "Logger.h"
 #include "Messaging.h"
 
 void IpServerAdapter::setup()
 {
+   Logger::logDebug(
+      "IpServerAdapter::setup: IP Server Adapter [%s] is listening on port %d.",
+      getId().c_str(),
+      port);
+
    server.begin();
 }
 
@@ -18,8 +24,6 @@ bool IpServerAdapter::sendRemoteMessage(
       if (client && client.connected())
       {
          client.write(serializedMessage.c_str(), serializedMessage.length());
-
-         printf("Sent\n");
 
          isSuccess = true;
       }
@@ -38,9 +42,21 @@ MessagePtr IpServerAdapter::getRemoteMessage()
 
    String serializedMessage = "";
 
-   if ((!client) || (!client.connected()))
+   if (!client.connected())
    {
       client = server.available();
+   }
+
+   static bool isConnected = false;
+   bool wasConnected = isConnected;
+   isConnected = client.connected();
+   if (!wasConnected && isConnected)
+   {
+      Logger::logDebug("IP Server Adapter [%s] connected.", getId().c_str());
+   }
+   else if (wasConnected && !isConnected)
+   {
+      Logger::logDebug("IP Server Adapter [%s] disconnected.", getId().c_str());
    }
 
    if ((client) && client.available())
@@ -53,12 +69,7 @@ MessagePtr IpServerAdapter::getRemoteMessage()
          message = Messaging::newMessage();
 
          // Parse the message from the message string.
-         if (protocol->parse(serializedMessage, message) == true)
-         {
-            // Parse was successful.
-            message->setSource(getId());
-         }
-         else
+         if (protocol->parse(serializedMessage, message) == false)
          {
             // Parse failed.  Set the message free.
             message->setFree();

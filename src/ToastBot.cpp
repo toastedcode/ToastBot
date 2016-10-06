@@ -58,7 +58,7 @@ void ToastBot::setup(
 
    for (int i = 0; i < components.length(); i++)
    {
-      //components.item(i)->value->setup();
+      components.item(i)->value->setup();
    }
 }
 

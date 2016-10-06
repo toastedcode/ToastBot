@@ -46,8 +46,8 @@ void setup()
    Logger::setEnabled(true);
    
    // Connect to a network via the ESP8266 wifi adapter.
-   //if (Esp8266::getInstance()->connectWifi("NETGEAR69", "silentsky723", 15) == false)
-   if (Esp8266::getInstance()->connectWifi("compunetix-guest", "compunetix", 15) == false)
+   if (Esp8266::getInstance()->connectWifi("NETGEAR69", "silentsky723", 15) == false)
+   //if (Esp8266::getInstance()->connectWifi("compunetix-guest", "compunetix", 15) == false)
    {
       // If the ESP8266 fails to connect with the stored credentials, we'll create an AP to allow for wifi config.
       Esp8266::getInstance()->startAccessPoint("TOASTBOT", "");
@@ -57,12 +57,12 @@ void setup()
 
    ToastBot::add(new MyComponent("component1"));
 
-   Motor* motor1 = new Motor("motor1", 1, 2);
-   Motor* motor2 = new Motor("motor2", 3, 4);
+   Motor* motor1 = new Motor("motor1", 11, 12);
+   Motor* motor2 = new Motor("motor2", 13, 14);
    
-   ToastBot::add(motor1);
+   //ToastBot::add(motor1);
    ToastBot::add(motor2);
-   ToastBot::add(new MotorPair("motorPair", motor1, motor2));
+   //ToastBot::add(new MotorPair("motorPair", motor1, motor2));
    
    //ToastBot::add(new WebSocketAdapter("adapter1", new JsonProtocol()));
    ToastBot::add(new IpServerAdapter("adapter2", new JsonProtocol(), 80));

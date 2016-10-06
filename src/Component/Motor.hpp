@@ -40,8 +40,6 @@ public:
 
    virtual void setup();
 
-   virtual void loop();
-
    // This operation handles a message directed to this sensor.
    virtual void handleMessage(
       // The message to handle.

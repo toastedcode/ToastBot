@@ -21,6 +21,8 @@ public:
 
 protected:
 
+   int port;
+
    WiFiServer server;
 
    WiFiClient client;
@@ -30,6 +32,7 @@ inline IpServerAdapter::IpServerAdapter(
    const String& id,
    Protocol* protocol,
    const int& port) : Adapter(id, protocol),
+                      port(port),
                       server(port)
 {
 }
