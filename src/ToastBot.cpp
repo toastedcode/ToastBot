@@ -20,13 +20,14 @@ String ToastBot::id;
 Set<Component*, ToastBot::MAX_COMPONENTS> ToastBot::components;
 
 bool ToastBot::add(
-   Component* component)
+   Component* component,
+   const bool& setDefaultHandler)
 {
    bool isSuccess = false;
 
    if (components.add(component) == true)
    {
-      MessageRouter::registerHandler(component);
+      MessageRouter::registerHandler(component, setDefaultHandler);
       isSuccess = true;
    }
 

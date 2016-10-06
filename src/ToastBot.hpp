@@ -26,7 +26,8 @@ public:
    static String getId();
 
    static bool add(
-      Component* component);
+      Component* component,
+      const bool& setDefaultHandler = false);
 
    static bool remove(
       Component* component);

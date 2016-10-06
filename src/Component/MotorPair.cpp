@@ -53,13 +53,19 @@ void MotorPair::handleMessage(
 {
    if (message->getMessageId() == "ping")
    {
-      Logger::logDebug("Motor::handleMessage: ping()\n");
+      Logger::logDebug("MotorPair::handleMessage: ping()\n");
 
       Message* reply = Messaging::newMessage();
       reply->setMessageId("pong");
       reply->setSource(getId());
       reply->setDestination(message->getSource());
       Messaging::send(reply);
+   }
+   else if (message->getMessageId() == "motorPair")
+   {
+      Logger::logDebug("MotorPair::handleMessage: motorPair()\n");
+
+      drive(message->getInt("speed"), message->getInt("yaw"));
    }
    else
    {

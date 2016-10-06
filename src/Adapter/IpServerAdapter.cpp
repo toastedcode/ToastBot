@@ -29,7 +29,9 @@ bool IpServerAdapter::sendRemoteMessage(
       }
       else
       {
-         printf("Failed to send\n");
+         Logger::logDebug(
+            "IpServerAdapter::sendRemoteMessage: Failed to send message [%s] to remote host.",
+            message->getMessageId().c_str());
       }
    }
 
@@ -52,11 +54,11 @@ MessagePtr IpServerAdapter::getRemoteMessage()
    isConnected = client.connected();
    if (!wasConnected && isConnected)
    {
-      Logger::logDebug("IP Server Adapter [%s] connected.", getId().c_str());
+      Logger::logDebug("IpServerAdapter::getRemoteMessage: IP Server Adapter [%s] connected.", getId().c_str());
    }
    else if (wasConnected && !isConnected)
    {
-      Logger::logDebug("IP Server Adapter [%s] disconnected.", getId().c_str());
+      Logger::logDebug("IpServerAdapter::getRemoteMessage: IP Server Adapter [%s] disconnected.", getId().c_str());
    }
 
    if ((client) && client.available())
@@ -68,12 +70,15 @@ MessagePtr IpServerAdapter::getRemoteMessage()
          // Create a new message.
          message = Messaging::newMessage();
 
-         // Parse the message from the message string.
-         if (protocol->parse(serializedMessage, message) == false)
+         if (message)
          {
-            // Parse failed.  Set the message free.
-            message->setFree();
-            message = 0;
+            // Parse the message from the message string.
+            if (protocol->parse(serializedMessage, message) == false)
+            {
+               // Parse failed.  Set the message free.
+               message->setFree();
+               message = 0;
+            }
          }
       }
    }

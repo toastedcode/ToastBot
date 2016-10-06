@@ -11,9 +11,12 @@ public:
 
    WebSocketAdapter(
       const String& id,
-      Protocol* protocol);
+      Protocol* protocol,
+      const int& port);
 
    virtual void setup();
+
+   virtual void loop();
 
    virtual bool sendRemoteMessage(
       MessagePtr message);
@@ -22,16 +25,26 @@ public:
 
 private:
 
+   int port;
+
    WiFiServer server;
+
+   WiFiClient client;
 
    WebSocketServer webSocketServer;
 
+   bool isConnected;
+
+   bool isNegotiated;
 };
 
 inline WebSocketAdapter::WebSocketAdapter(
    const String& id,
-   Protocol* protocol) : Adapter(id, protocol),
-                         server(81)
+   Protocol* protocol,
+   const int& port) : Adapter(id, protocol),
+                      port(port),
+                      server(port),
+                      isConnected(false),
+                      isNegotiated(false)
 {
-
 }
