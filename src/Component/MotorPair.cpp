@@ -8,9 +8,11 @@
 // *****************************************************************************
 // *****************************************************************************
 
+#include "ESP8266.h"
 #include "Logger.h"
 #include "Messaging.hpp"
 #include "MotorPair.hpp"
+#include "ToastBot.hpp"
 
 const int MotorPair::MIN_SPEED;
 
@@ -19,6 +21,26 @@ const int MotorPair::MAX_SPEED;
 const int MotorPair::MIN_YAW;
 
 const int MotorPair::MAX_YAW;
+
+namespace
+{
+String toString(
+   const IPAddress& ipAddress)
+{
+   String string = "";
+
+   for (int octet = 0; octet < 4; octet++)
+   {
+      string += String(ipAddress[octet]);
+      if (octet < 3)
+      {
+         string += ".";
+      }
+   }
+
+   return (string);
+}
+}  // end namespace
 
 MotorPair::MotorPair(
    const String& id,
@@ -59,6 +81,8 @@ void MotorPair::handleMessage(
       reply->setMessageId("pong");
       reply->setSource(getId());
       reply->setDestination(message->getSource());
+      reply->set("deviceId", ToastBot::getId());
+      reply->set("ipAddress", toString(Esp8266::getInstance()->getIpAddress()));
       Messaging::send(reply);
    }
    else if (message->getMessageId() == "motorPair")

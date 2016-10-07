@@ -24,8 +24,8 @@ void setup()
 
    Logger::logDebug("Starting TOASTBOT");
 
-   Motor* motor1 = new Motor("motor1", 5, 4);
-   Motor* motor2 = new Motor("motor2", 3, 2);
+   Motor* motor1 = new Motor("motor1", 0, 5);
+   Motor* motor2 = new Motor("motor2", 2, 4);
    
    ToastBot::add(motor1);
    ToastBot::add(motor2);

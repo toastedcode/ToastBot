@@ -81,11 +81,11 @@ void Motor::updatePins()
    else if (speed > 0)
    {
       digitalWrite(directionPin, HIGH);
-      analogWrite(speedPin, (MAX_SPEED - speed));
+      analogWrite(speedPin, ((speed * MAX_SPEED) / 100));
    }
    else // if (speed < 0)
    {
       digitalWrite(directionPin, LOW);
-      analogWrite(speedPin, abs(speed));
+      analogWrite(speedPin, ((abs(speed) * MAX_SPEED) / 100));
    }
 }
