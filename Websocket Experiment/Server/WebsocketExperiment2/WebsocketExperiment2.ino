@@ -7,6 +7,48 @@
 #include <ToastBot.h>
 #include <WebSocketServer.h>
 
+class Robox : public Component
+{
+  
+public:
+  
+   // Constructor.
+   inline Robox() :
+      Component("robox") {}
+
+   // Destructor.
+   inline virtual ~Robox() {}
+
+   // This operation handles a message directed to this sensor.
+   virtual void handleMessage(
+      // The message to handle.
+      MessagePtr message);
+};
+
+void Robox::handleMessage(
+      MessagePtr message)
+{
+   //  ping
+   if (message->getMessageId() == "ping")
+   {
+      Message* reply = Messaging::newMessage();
+      
+      reply->setMessageId("pong");
+      reply->setSource(getId());
+      reply->setDestination(message->getSource());
+      reply->set("deviceId", ToastBot::getId());
+      reply->set("ipAddress", Esp8266::getInstance()->getIpAddress().toString().c_str());
+      
+      Messaging::send(reply);
+
+      message->setFree();   
+   }
+   else
+   {
+      Component::handleMessage(message);
+   }
+}
+
 void setup()
 {
    Serial.begin(9600);
@@ -24,12 +66,16 @@ void setup()
 
    Logger::logDebug("Starting TOASTBOT");
 
+   ToastBot::add(new Robox(), true);// <-- default handler
+
    Motor* motor1 = new Motor("motor1", 0, 5);
    Motor* motor2 = new Motor("motor2", 2, 4);
    
    ToastBot::add(motor1);
    ToastBot::add(motor2);
-   ToastBot::add(new MotorPair("motorPair1", motor1, motor2), true);  // <-- default handler
+   ToastBot::add(new MotorPair("motorPair1", motor1, motor2));
+
+   ToastBot::add(new ServoComponent("servo1", 6));  // TODO: Pick appropriate pin.
    
    ToastBot::add(new WebSocketAdapter("adapter1", new JsonProtocol(), 81));
    ToastBot::add(new IpServerAdapter("adapter2", new JsonProtocol(), 80));

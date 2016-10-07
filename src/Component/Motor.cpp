@@ -14,9 +14,17 @@
 #include "Logger.h"
 #include "Messaging.hpp"
 
+const int Motor::NO_SPEED;
+
 const int Motor::MIN_SPEED;
 
 const int Motor::MAX_SPEED;
+
+const int Motor::NO_PWM;
+
+const int Motor::MIN_PWM;
+
+const int Motor::MAX_PWM;
 
 Motor::Motor(
    const String& id,
@@ -30,7 +38,7 @@ Motor::Motor(
 void Motor::setSpeed(
    int speed)
 {
-   this->speed = speed;
+   this->speed = constrain(speed, MIN_SPEED, MAX_SPEED);
 
    updatePins();
 }
@@ -44,31 +52,17 @@ void Motor::setup()
 void Motor::handleMessage(
    MessagePtr message)
 {
-   // MOTOR_CONFIG
+   // setSpeed
    if (message->getMessageId() == "setSpeed")
    {
       int newSpeed = message->getInt("speed");
 
-      Logger::logDebug("Motor::handleMessage: setSpeed(" + String(newSpeed) +  ")\n");
+      Logger::logDebug("Motor::handleMessage: setSpeed(%d)", newSpeed);
 
       setSpeed(newSpeed);
    }
-   else if (message->getMessageId() == "ping")
-   {
-      Logger::logDebug("Motor::handleMessage: ping()\n");
 
-      Message* reply = Messaging::newMessage();
-      reply->setMessageId("pong");
-      reply->setSource(getId());
-      reply->setDestination(message->getSource());
-      Messaging::send(reply);
-   }
-   else
-   {
-      Logger::logDebug("Motor::handleMessage: Unhandled message \"" + message->getMessageId() + "\"\n");
-   }
-
-   message->setFree();
+   Component::handleMessage(message);
 }
 
 void Motor::updatePins()
@@ -76,16 +70,16 @@ void Motor::updatePins()
    if (speed == 0)
    {
       digitalWrite(directionPin, LOW);
-      analogWrite(speedPin, MIN_SPEED);
+      analogWrite(speedPin, NO_PWM);
    }
    else if (speed > 0)
    {
       digitalWrite(directionPin, HIGH);
-      analogWrite(speedPin, ((speed * MAX_SPEED) / 100));
+      analogWrite(speedPin, ((speed * (MAX_PWM - MIN_PWM)) / 100));
    }
    else // if (speed < 0)
    {
       digitalWrite(directionPin, LOW);
-      analogWrite(speedPin, ((abs(speed) * MAX_SPEED) / 100));
+      analogWrite(speedPin, ((abs(speed) * (MAX_PWM - MIN_PWM)) / 100));
    }
 }

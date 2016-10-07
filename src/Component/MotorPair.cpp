@@ -22,26 +22,6 @@ const int MotorPair::MIN_YAW;
 
 const int MotorPair::MAX_YAW;
 
-namespace
-{
-String toString(
-   const IPAddress& ipAddress)
-{
-   String string = "";
-
-   for (int octet = 0; octet < 4; octet++)
-   {
-      string += String(ipAddress[octet]);
-      if (octet < 3)
-      {
-         string += ".";
-      }
-   }
-
-   return (string);
-}
-}  // end namespace
-
 MotorPair::MotorPair(
    const String& id,
    Motor* leftMotor,
@@ -73,30 +53,17 @@ void MotorPair::run()
 void MotorPair::handleMessage(
    MessagePtr message)
 {
-   if (message->getMessageId() == "ping")
-   {
-      Logger::logDebug("MotorPair::handleMessage: ping()\n");
-
-      Message* reply = Messaging::newMessage();
-      reply->setMessageId("pong");
-      reply->setSource(getId());
-      reply->setDestination(message->getSource());
-      reply->set("deviceId", ToastBot::getId());
-      reply->set("ipAddress", toString(Esp8266::getInstance()->getIpAddress()));
-      Messaging::send(reply);
-   }
-   else if (message->getMessageId() == "motorPair")
+   // motorPair
+   // drive
+   if ((message->getMessageId() == "motorPair") ||
+       (message->getMessageId() == "drive"))
    {
       Logger::logDebug("MotorPair::handleMessage: motorPair()\n");
 
       drive(message->getInt("speed"), message->getInt("yaw"));
    }
-   else
-   {
-      Logger::logDebug("MotorPair::handleMessage: Unhandled message \"" + message->getMessageId() + "\"\n");
-   }
 
-   message->setFree();
+   Component::handleMessage(message);
 }
 
 void MotorPair::updateMotors()

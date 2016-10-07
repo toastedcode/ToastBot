@@ -3,5 +3,6 @@
 #include "Adapter\WebSocketAdapter.hpp"
 #include "Component\Motor.hpp"
 #include "Component\MotorPair.hpp"
+#include "Component\ServoComponent.hpp"
 #include "Messaging\JsonProtocol.hpp"
 #include "ToastBot.hpp"
