@@ -58,9 +58,15 @@ void MotorPair::handleMessage(
    if ((message->getMessageId() == "motorPair") ||
        (message->getMessageId() == "drive"))
    {
-      Logger::logDebug("MotorPair::handleMessage: motorPair()\n");
+      Logger::logDebug("MotorPair::handleMessage: drive()\n");
 
       drive(message->getInt("speed"), message->getInt("yaw"));
+
+      message->setFree();
+   }
+   else
+   {
+      Component::handleMessage(message);
    }
 
    Component::handleMessage(message);

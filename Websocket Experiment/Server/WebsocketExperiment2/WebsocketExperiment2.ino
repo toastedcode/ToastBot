@@ -76,7 +76,7 @@ void setup()
    ToastBot::add(motor2);
    ToastBot::add(new MotorPair("motorPair1", motor1, motor2));
 
-   ToastBot::add(new ServoComponent("servo1", 6));  // TODO: Pick appropriate pin.
+   //ToastBot::add(new ServoComponent("servo1", 6));  // TODO: Pick appropriate pin.
    
    ToastBot::add(new WebSocketAdapter("adapter1", new JsonProtocol(), 81));
    ToastBot::add(new IpServerAdapter("adapter2", new JsonProtocol(), 80));
