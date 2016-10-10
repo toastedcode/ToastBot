@@ -1,5 +1,4 @@
 #include "IpServerAdapter.hpp"
-#include "Logger.h"
 #include "Messaging.h"
 
 void IpServerAdapter::setup()

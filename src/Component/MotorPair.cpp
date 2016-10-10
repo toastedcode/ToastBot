@@ -9,7 +9,7 @@
 // *****************************************************************************
 
 #include "ESP8266.h"
-#include "Logger.h"
+#include "Logger.hpp"
 #include "Messaging.hpp"
 #include "MotorPair.hpp"
 #include "ToastBot.hpp"

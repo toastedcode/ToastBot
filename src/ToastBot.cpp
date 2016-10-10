@@ -9,7 +9,7 @@
 // *****************************************************************************
 
 #include "BasicMessage.hpp"
-#include "Logger.h"
+#include "Logger.hpp"
 #include "Messaging.hpp"
 #include "ToastBot.hpp"
 

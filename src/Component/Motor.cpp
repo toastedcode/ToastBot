@@ -11,7 +11,7 @@
 #include "ESP8266.h"
 #include "Motor.hpp"
 
-#include "Logger.h"
+#include "Logger.hpp"
 #include "Messaging.hpp"
 
 const int Motor::NO_SPEED;

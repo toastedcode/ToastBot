@@ -8,7 +8,7 @@
 // *****************************************************************************
 // *****************************************************************************
 
-#include "Logger.h"
+#include "Logger.hpp"
 #include "ServoComponent.hpp"
 
 const int ServoComponent::MIN_ANGLE;

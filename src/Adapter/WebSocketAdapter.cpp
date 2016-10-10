@@ -70,7 +70,6 @@ bool WebSocketAdapter::sendRemoteMessage(
 
    if (isConnected && isNegotiated)
    {
-      uint8_t num = 0;
       String serializedMessage = protocol->serialize(message);
 
       if (serializedMessage != "")

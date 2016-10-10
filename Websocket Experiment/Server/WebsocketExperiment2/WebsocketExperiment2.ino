@@ -3,7 +3,8 @@
 #include <ESP8266WiFi.h>
 #include <Common.h>
 #include <Messaging.h>
-#include <SerialLogger.h>
+#include <Logger.h>
+#include <PubSubClient.h>
 #include <ToastBot.h>
 #include <WebSocketServer.h>
 
@@ -53,8 +54,8 @@ void setup()
 {
    Serial.begin(9600);
     
-   Logger::setLogger(new SerialLogger());
-   Logger::setEnabled(true);
+   //Logger::setLogger(new SerialLogger());
+   //Logger::setEnabled(true);
    
    // Connect to a network via the ESP8266 wifi adapter.
    if (Esp8266::getInstance()->connectWifi("NETGEAR69", "silentsky723", 15) == false)
@@ -79,6 +80,9 @@ void setup()
    
    ToastBot::add(new WebSocketAdapter("adapter1", new JsonProtocol(), 81));
    ToastBot::add(new IpServerAdapter("adapter2", new JsonProtocol(), 80));
+   ToastBot::add(new MqttClientAdapter("adapter3", new JsonProtocol(), "test.mosquitto.org", 80, "", ""));
+
+   Logger::setLogger(new RemoteLogger("adapter1"));
 
    ToastBot::setup("myMachine");
 }

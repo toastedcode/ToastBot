@@ -1,5 +1,5 @@
 #include "Adapter.hpp"
-#include "Logger.h"
+#include "Logger.hpp"
 #include "ESP8266WiFi.h"
 
 class IpClientAdapter : public Adapter
