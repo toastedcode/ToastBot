@@ -36,7 +36,7 @@ void MotorPair::drive(
    int yaw)
 {
    this->speed = constrain(speed, MIN_SPEED, MAX_SPEED);
-   this->yaw = constrain(speed, MIN_YAW, MAX_YAW);
+   this->yaw = constrain(yaw, MIN_YAW, MAX_YAW);
 
    updateMotors();
 }

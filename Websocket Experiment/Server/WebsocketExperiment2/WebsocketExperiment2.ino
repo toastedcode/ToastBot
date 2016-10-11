@@ -58,8 +58,9 @@ void setup()
    Logger::setEnabled(true);
    
    // Connect to a network via the ESP8266 wifi adapter.
-   if (Esp8266::getInstance()->connectWifi("NETGEAR69", "silentsky723", 15) == false)
+   //if (Esp8266::getInstance()->connectWifi("NETGEAR69", "silentsky723", 15) == false)
    //if (Esp8266::getInstance()->connectWifi("compunetix-guest", "compunetix", 15) == false)
+   if (Esp8266::getInstance()->connectWifi("Massive", "getshitdone", 15) == false)
    {
       // If the ESP8266 fails to connect with the stored credentials, we'll create an AP to allow for wifi config.
       Esp8266::getInstance()->startAccessPoint("TOASTBOT", "");
