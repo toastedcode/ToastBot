@@ -51,7 +51,7 @@ bool ToastBot::remove(
 void ToastBot::setup(
    const String& id)
 {
-   Logger::logDebug("ToastBot::setup\n");
+   Logger::logDebug("ToastBot::setup.");
 
    setId(id);
 

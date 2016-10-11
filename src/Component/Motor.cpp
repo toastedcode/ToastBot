@@ -60,9 +60,13 @@ void Motor::handleMessage(
       Logger::logDebug("Motor::handleMessage: setSpeed(%d)", newSpeed);
 
       setSpeed(newSpeed);
-   }
 
-   Component::handleMessage(message);
+      message->setFree();
+   }
+   else
+   {
+      Component::handleMessage(message);
+   }
 }
 
 void Motor::updatePins()

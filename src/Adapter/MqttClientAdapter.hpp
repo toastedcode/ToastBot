@@ -1,8 +1,10 @@
+#pragma once
+
 #include "Adapter.hpp"
+#include "ESP8266WiFi.h"
 #include "Logger.hpp"
 #include "PubSubClient.h"
 #include "PubSubListener.h"
-#include "StaticMessageQueue.h"
 
 class MqttClientAdapter : public Adapter, PubSubListener
 {
@@ -14,8 +16,11 @@ public:
       Protocol* protocol,
       const String& host,
       const int& port,
-      const String& user,
+      const String& clientId,
+      const String& userId,
       const String& password);
+
+   ~MqttClientAdapter();
 
    virtual void setup();
    
@@ -31,15 +36,27 @@ public:
       unsigned char* payload,
       unsigned int length);
 
-protected:
+private:
 
-   String user;
+   static const int RETRY_DELAY;
+
+   bool connect();
+
+   String host;
+
+   int port;
+
+   String clientId;
+
+   String userId;
 
    String password;
    
    bool isConnected;
    
+   WiFiClient client;
+
    PubSubClient* mqttClient;
-   
-   MessageQueue* messageQueue;
+
+   long retryTime;
 };

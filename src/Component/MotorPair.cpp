@@ -68,8 +68,6 @@ void MotorPair::handleMessage(
    {
       Component::handleMessage(message);
    }
-
-   Component::handleMessage(message);
 }
 
 void MotorPair::updateMotors()
