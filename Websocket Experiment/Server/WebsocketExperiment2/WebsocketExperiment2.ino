@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <ESP8266.h>
+#include <Board.h>
 #include <ESP8266WiFi.h>
 #include <Common.h>
 #include <Messaging.h>
@@ -38,7 +38,12 @@ void Robox::handleMessage(
       reply->setSource(getId());
       reply->setDestination(message->getSource());
       reply->set("deviceId", ToastBot::getId());
-      reply->set("ipAddress", Esp8266::getInstance()->getIpAddress().toString().c_str());
+
+      if (WifiBoard::getBoard())
+      {
+        reply->set("macAddress", WifiBoard::getBoard()->getMacAddress());
+        reply->set("ipAddress", WifiBoard::getBoard()->getIpAddress());
+      }
       
       Messaging::send(reply);
 
@@ -56,15 +61,18 @@ void setup()
     
    Logger::setLogger(new SerialLogger());
    Logger::setEnabled(true);
+
+   WifiBoard* board = new Esp8266Board();
+   Board::setBoard(board);
    
-   // Connect to a network via the ESP8266 wifi adapter.
-   //if (Esp8266::getInstance()->connectWifi("NETGEAR69", "silentsky723", 15) == false)
-   //if (Esp8266::getInstance()->connectWifi("compunetix-guest", "compunetix", 15) == false)
-   if (Esp8266::getInstance()->connectWifi("Massive", "getshitdone", 15) == false)
+   // Connect to a known network.
+   //if (board->connectWifi("NETGEAR69", "silentsky723", 15) == false)
+   //if (board->connectWifi("compunetix-guest", "compunetix", 15) == false)
+   if (board->connectWifi("Massive", "getshitdone", 15) == false)
    {
       // If the ESP8266 fails to connect with the stored credentials, we'll create an AP to allow for wifi config.
-      Esp8266::getInstance()->startAccessPoint("TOASTBOT", "");
-   } 
+      board->startAccessPoint("TOASTBOT", "");
+   }
 
    Logger::logDebug("Starting TOASTBOT");
 
@@ -77,7 +85,8 @@ void setup()
    ToastBot::add(motor2);
    ToastBot::add(new MotorPair("motorPair1", motor1, motor2));
 
-   //ToastBot::add(new ServoComponent("servo1", 6));  // TODO: Pick appropriate pin.
+   ToastBot::add(new ServoComponent("servo1", 14));
+   ToastBot::add(new ServoComponent("servo2", 12));
    
    ToastBot::add(new WebSocketAdapter("adapter1", new JsonProtocol(), 81));
    ToastBot::add(new IpServerAdapter("adapter2", new JsonProtocol(), 80));

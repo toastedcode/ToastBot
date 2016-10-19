@@ -8,10 +8,9 @@
 // *****************************************************************************
 // *****************************************************************************
 
-#include "ESP8266.h"
-#include "Motor.hpp"
-
+#include "Board.hpp"
 #include "Logger.hpp"
+#include "Motor.hpp"
 #include "Messaging.hpp"
 
 const int Motor::NO_SPEED;
@@ -45,8 +44,11 @@ void Motor::setSpeed(
 
 void Motor::setup()
 {
-   pinMode(directionPin, OUTPUT);
-   pinMode(speedPin, OUTPUT);
+   if (Board::getBoard())
+   {
+      Board::getBoard()->pinMode(directionPin, OUTPUT);
+      Board::getBoard()->pinMode(speedPin, OUTPUT);
+   }
 }
 
 void Motor::handleMessage(
@@ -71,19 +73,22 @@ void Motor::handleMessage(
 
 void Motor::updatePins()
 {
-   if (speed == 0)
+   if (Board::getBoard())
    {
-      digitalWrite(directionPin, LOW);
-      analogWrite(speedPin, NO_PWM);
-   }
-   else if (speed > 0)
-   {
-      digitalWrite(directionPin, HIGH);
-      analogWrite(speedPin, ((speed * (MAX_PWM - MIN_PWM)) / 100));
-   }
-   else // if (speed < 0)
-   {
-      digitalWrite(directionPin, LOW);
-      analogWrite(speedPin, ((abs(speed) * (MAX_PWM - MIN_PWM)) / 100));
+      if (speed == 0)
+      {
+         Board::getBoard()->digitalWrite(directionPin, LOW);
+         Board::getBoard()->analogWrite(speedPin, NO_PWM);
+      }
+      else if (speed > 0)
+      {
+         Board::getBoard()->digitalWrite(directionPin, HIGH);
+         Board::getBoard()->analogWrite(speedPin, ((speed * (MAX_PWM - MIN_PWM)) / 100));
+      }
+      else // if (speed < 0)
+      {
+         Board::getBoard()->digitalWrite(directionPin, LOW);
+         Board::getBoard()->analogWrite(speedPin, ((abs(speed) * (MAX_PWM - MIN_PWM)) / 100));
+      }
    }
 }
