@@ -77,12 +77,12 @@ void MotorPair::updateMotors()
    if (yaw < 0)
    {
       // Cause the motor pair to yaw to the left by decreasing the speed of the left motor.
-      leftMotorSpeed = ((rightMotorSpeed * abs(yaw)) / 100);
+      leftMotorSpeed = ((speed * (MAX_YAW - abs(yaw))) / 100);
    }
    else if (yaw > 0)
    {
       // Cause the motor pair to yaw to the right by decreasing the speed of the right motor.
-      rightMotorSpeed = ((leftMotorSpeed * yaw) / 100);
+      rightMotorSpeed = ((speed * (MAX_YAW - yaw)) / 100);
    }
 
    leftMotor->setSpeed(leftMotorSpeed);

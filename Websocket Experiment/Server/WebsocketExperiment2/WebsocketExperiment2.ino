@@ -64,7 +64,7 @@ void setup()
 
    WifiBoard* board = new Esp8266Board();
    Board::setBoard(board);
-   
+
    // Connect to a known network.
    //if (board->connectWifi("NETGEAR69", "silentsky723", 15) == false)
    //if (board->connectWifi("compunetix-guest", "compunetix", 15) == false)
