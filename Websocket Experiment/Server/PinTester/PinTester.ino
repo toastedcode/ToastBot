@@ -1,11 +1,10 @@
 #include <Arduino.h>
-#include <Board.h>
+#include <ESP8266.h>
 #include <ESP8266WiFi.h>
 #include <Common.h>
 #include <Messaging.h>
 #include <Logger.h>
 #include <PubSubClient.h>
-#include <Timer.h>
 #include <ToastBot.h>
 #include <WebSocketServer.h>
 
@@ -39,16 +38,33 @@ void Robox::handleMessage(
       reply->setSource(getId());
       reply->setDestination(message->getSource());
       reply->set("deviceId", ToastBot::getId());
-
-      if (WifiBoard::getBoard())
-      {
-        reply->set("macAddress", WifiBoard::getBoard()->getMacAddress());
-        reply->set("ipAddress", WifiBoard::getBoard()->getIpAddress());
-      }
+      reply->set("ipAddress", Esp8266::getInstance()->getIpAddress().toString().c_str());
       
       Messaging::send(reply);
 
       message->setFree();   
+   }
+   else if (message->getMessageId() == "digitalWrite")
+   {
+      int pin = message->getInt("pin");
+      int value = message->getInt("value");
+      Logger::logDebug("digitalWrite(%d, %d)", pin, value);
+
+      pinMode(pin, OUTPUT);
+      digitalWrite(pin, value);
+      
+      message->setFree(); 
+   }
+   else if (message->getMessageId() == "analogWrite")
+   {
+      int pin = message->getInt("pin");
+      int value = message->getInt("value");
+      Logger::logDebug("analogWrite(%d, %d)", pin, value);
+
+      pinMode(pin, OUTPUT);
+      analogWrite(pin, value);
+
+      message->setFree(); 
    }
    else
    {
@@ -61,38 +77,23 @@ void setup()
    Serial.begin(9600);
     
    Logger::setLogger(new SerialLogger());
-
-   WifiBoard* board = new Esp8266Board();
-   Board::setBoard(board);
+   Logger::setEnabled(true);
    
-   // Connect to a known network.
-   //if (board->connectWifi("NETGEAR69", "silentsky723", 15) == false)
-   //if (board->connectWifi("compunetix-guest", "compunetix", 15) == false)
-   if (board->connectWifi("Massive", "getshitdone", 15) == false)
+   // Connect to a network via the ESP8266 wifi adapter.
+   if (Esp8266::getInstance()->connectWifi("NETGEAR69", "silentsky723", 15) == false)
    {
       // If the ESP8266 fails to connect with the stored credentials, we'll create an AP to allow for wifi config.
-      board->startAccessPoint("TOASTBOT", "");
-   }
+      Esp8266::getInstance()->startAccessPoint("TOASTBOT", "");
+   } 
 
-   Logger::logDebug("Starting TOASTBOT");
+   Logger::logDebug("Starting Pin Tester");
 
    ToastBot::add(new Robox(), true);// <-- default handler
-
-   Motor* motor1 = new Motor("motor1", 0, 5);
-   Motor* motor2 = new Motor("motor2", 2, 4);
    
-   ToastBot::add(motor1);
-   ToastBot::add(motor2);
-   ToastBot::add(new MotorPair("motorPair1", motor1, motor2));
+   //ToastBot::add(new MqttClientAdapter("adapter3", new JsonProtocol(), "broker.mqtt-dashboard.com", 1883, "toastbot1", "", ""));
+   ToastBot::add(new MqttClientAdapter("adapter3", new JsonProtocol(), "test.mosquitto.org", 1883, "toastbot1", "", ""));
 
-   ToastBot::add(new ServoComponent("servo1", 14));
-   ToastBot::add(new ServoComponent("servo2", 12));
-   
-   ToastBot::add(new WebSocketAdapter("adapter1", new JsonProtocol(), 81));
-   ToastBot::add(new IpServerAdapter("adapter2", new JsonProtocol(), 80));
-   ToastBot::add(new MqttClientAdapter("adapter3", new JsonProtocol(), "broker.mqtt-dashboard.com", 1883, "toastbot1", "", ""));
-
-   ToastBot::setup("myMachine");
+   ToastBot::setup("pinTester");
 }
 
 void loop()
