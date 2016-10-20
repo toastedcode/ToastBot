@@ -11,6 +11,7 @@
 #include "BasicMessage.hpp"
 #include "Logger.hpp"
 #include "Messaging.hpp"
+#include "Timer.hpp"
 #include "ToastBot.hpp"
 
 const int ToastBot::MAX_COMPONENTS;
@@ -51,8 +52,6 @@ bool ToastBot::remove(
 void ToastBot::setup(
    const String& id)
 {
-   Logger::logDebug("ToastBot::setup.");
-
    setId(id);
 
    Messaging::setup<BasicMessage>(10);
@@ -65,6 +64,8 @@ void ToastBot::setup(
 
 void ToastBot::loop()
 {
+   Timer::loop();
+
    for (int i = 0; i < components.length(); i++)
    {
       components.item(i)->value->loop();

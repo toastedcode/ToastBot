@@ -92,8 +92,6 @@ void setup()
    ToastBot::add(new IpServerAdapter("adapter2", new JsonProtocol(), 80));
    ToastBot::add(new MqttClientAdapter("adapter3", new JsonProtocol(), "broker.mqtt-dashboard.com", 1883, "toastbot1", "", ""));
 
-   //Logger::setLogger(new RemoteLogger("adapter1"));
-
    ToastBot::setup("myMachine");
 }
 
