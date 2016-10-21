@@ -1,18 +1,20 @@
 // *****************************************************************************
 // *****************************************************************************
-// AnalogInput.hpp
+// Sensor.hpp
 //
 // Author: Jason Tost
-// Date:   10.12.2016
+// Date:   10.20.2016
 //
 // *****************************************************************************
 // *****************************************************************************
 
 #pragma once
 
-#include "Messaging.hpp"
+#include "Component.hpp"
+#include "Timer.hpp"
+#include "TimerListener.hpp"
 
-class Sensor : public Component
+class Sensor : public Component, TimerListener
 {
 
 public:
@@ -20,31 +22,24 @@ public:
    // Constructor.
    Sensor(
       // A unique identifier for this sensor.
-      const String& id,
-      // The GPIO pin that will be used by this sensor.
-      const int& pinId);
+      const String& id);
 
    // Destructor.
    virtual ~Sensor();
 
-   // This operation should be called on startup to prepare the sensor for polling/updating.
-   virtual void setup() = 0;
+   virtual void timeout(
+      Timer* timer);
 
-   // This operation should be called continuously from within the main control loop.
-   virtual void run() = 0;
+   virtual int read() = 0;
 
-   // This operation retrieves the
-   virtual int read();
+   virtual int value() = 0;
 
    // This operation sets up automatic polling on the sensor.
    void poll(
       // The rate at which updates should be sent, in milliseconds.
-      const int& pollRate,
-      // The topic under which the sensor will send updates.
-      const String& topic);
+      const int& period);
 
-protected:
+private:
 
-   // The pin that will be used to for reading from the sensor.
-   int pinId;
+   Timer* pollTimer;
 };
