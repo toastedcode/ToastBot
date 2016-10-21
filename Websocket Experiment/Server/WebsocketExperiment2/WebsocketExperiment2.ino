@@ -3,6 +3,7 @@
 #include <ESP8266WiFi.h>
 #include <Common.h>
 #include <Messaging.h>
+#include <NewPing.h>
 #include <Logger.h>
 #include <PubSubClient.h>
 #include <Timer.h>
@@ -85,8 +86,14 @@ void setup()
    ToastBot::add(motor2);
    ToastBot::add(new MotorPair("motorPair1", motor1, motor2));
 
-   ToastBot::add(new ServoComponent("servo1", 14));
+   ServoComponent* servo1 = new ServoComponent("servo1", 14);
+   ToastBot::add(servo1);
    ToastBot::add(new ServoComponent("servo2", 12));
+
+   DistanceSensor* distance1 = new DistanceSensor("distance1", 13, 15, 100);
+   ToastBot::add(distance1);
+
+   ToastBot::add(new Scanner("scanner1", servo1, distance1));
    
    ToastBot::add(new WebSocketAdapter("adapter1", new JsonProtocol(), 81));
    ToastBot::add(new IpServerAdapter("adapter2", new JsonProtocol(), 80));
