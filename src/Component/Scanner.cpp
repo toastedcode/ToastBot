@@ -72,7 +72,7 @@ void Scanner::timeout(
    servo->rotate(getServoAngle(servoPosition));
 }
 
-inline void Scanner::read(
+void Scanner::read(
    ScannerReading& reading)
 {
    memcpy(reading, this->reading, sizeof(ScannerReading));

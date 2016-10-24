@@ -96,7 +96,7 @@ void FollowAI::getMinDistance(
 
    for (int i = 0; i < Scanner::SERVO_POSITIONS; i++)
    {
-      if ((scannerReading[0] != 0) &&
+      if ((scannerReading[i] != 0) &&
           ((minDistance == 0) ||
            (scannerReading[i] < minDistance)))
       {
