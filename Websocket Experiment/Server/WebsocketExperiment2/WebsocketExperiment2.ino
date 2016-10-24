@@ -67,9 +67,9 @@ void setup()
    Board::setBoard(board);
 
    // Connect to a known network.
-   //if (board->connectWifi("NETGEAR69", "silentsky723", 15) == false)
+   if (board->connectWifi("NETGEAR69", "silentsky723", 15) == false)
    //if (board->connectWifi("compunetix-guest", "compunetix", 15) == false)
-   if (board->connectWifi("Massive", "getshitdone", 15) == false)
+   //if (board->connectWifi("Massive", "getshitdone", 15) == false)
    {
       // If the ESP8266 fails to connect with the stored credentials, we'll create an AP to allow for wifi config.
       board->startAccessPoint("TOASTBOT", "");
@@ -98,8 +98,6 @@ void setup()
    ToastBot::add(new WebSocketAdapter("adapter1", new JsonProtocol(), 81));
    ToastBot::add(new IpServerAdapter("adapter2", new JsonProtocol(), 80));
    ToastBot::add(new MqttClientAdapter("adapter3", new JsonProtocol(), "broker.mqtt-dashboard.com", 1883, "toastbot1", "", ""));
-
-   //Logger::setLogger(new RemoteLogger("adapter1"));
 
    ToastBot::setup("myMachine");
 }

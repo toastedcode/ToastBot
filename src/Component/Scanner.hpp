@@ -16,7 +16,7 @@ public:
 
    static const int MAX_SERVO_POSITION = SERVO_POSITIONS - 1;
 
-   static const int SERVO_ROTATE_PERIOD = 1000;  // milliseconds
+   static const int SERVO_ROTATE_PERIOD = 250;  // milliseconds
 
    typedef int ScannerReading[SERVO_POSITIONS];
 
