@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <meta charset="ISO-8859-1">
+   <title>Machine Status</title>
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+   <script>
+      function updateImage()
+      {
+           $("#foo").html("test");
+
+           $.post("machineStatus.php", function(data, status)
+			{
+			   $("#foo").html(data);
+			   var json = JSON.parse(data);
+
+			   if (json.status == 1)
+			   {
+				  $("#indicator").attr("src", "green_light.png");
+			   }
+			   else
+			   {
+				  $("#indicator").attr("src", "red_light.png");
+			   }
+            });
+  	  }
+      setInterval(updateImage, 5000); //5 seconds
+   </script>
+</head>
+<body>
+   Washing machine status
+   <p/>
+   <img id="indicator" src="green_light.png"/>
+   <div id="foo"></div>
+</body>
+</html>

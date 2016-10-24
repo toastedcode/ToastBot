@@ -9,7 +9,7 @@ FollowAI::FollowAI(
                            timer(0),
                            scanner(scanner),
                            motorPair(motorPair),
-                           isAiEngaged(false)
+                           isAiEnabled(false)
 {
 }
 
@@ -26,15 +26,15 @@ void FollowAI::handleMessage(
    MessagePtr message)
 {
    // engage
-   if (message->getMessageId() == "engage")
+   if (message->getMessageId() == "enable")
    {
-      engage();
+      enable();
       message->setFree();
    }
    // disengage
-   else if (message->getMessageId() == "disengage")
+   else if (message->getMessageId() == "disable")
    {
-      disengage();
+      disable();
       message->setFree();
    }
    else
@@ -48,7 +48,7 @@ void FollowAI::timeout(
 {
    Scanner::ScannerReading reading;
 
-   if (isEngaged())
+   if (isEnabled())
    {
       scanner->read(reading);
 
@@ -64,9 +64,9 @@ void FollowAI::timeout(
    }
 }
 
-void FollowAI::engage()
+void FollowAI::enable()
 {
-   isAiEngaged = true;
+   isAiEnabled = true;
 
    if (timer)
    {
@@ -76,9 +76,9 @@ void FollowAI::engage()
    timer = Timer::newTimer("followAiTimer", AI_PERIOD, Timer::PERIODIC, this);
 }
 
-void FollowAI::disengage()
+void FollowAI::disable()
 {
-   isAiEngaged = false;
+   isAiEnabled = false;
 
    if (timer)
    {

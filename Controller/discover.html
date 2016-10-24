@@ -1,0 +1,223 @@
+<html>
+
+<style>
+
+body {
+    display: table;
+    margin: 0 auto;
+    text-align:center;
+}
+
+#myProgress {
+  position: relative;
+  width: 250px;
+  height: 20px;
+  background-color: #ddd;
+  z-index: 0;
+  margin: 20
+}
+
+#myBar {
+  position: absolute;
+  width: 0%;
+  height: 100%;
+  background-color: #4CAF50;
+  z-index: 1;
+}
+
+#myPercent {
+  position: relative;
+  z-index: 2;
+  text-align:center;
+  vertical-align: middle;
+}
+
+#botsDiv {
+  width: 500px;
+  height: 170px;
+  border: 2px solid #73AD21;
+  vertical-align: middle;
+  padding: 5px;
+}
+
+.botDiv {
+  width: 120px;
+  height: 150px;
+  text-align:center;
+  vertical-align: middle;
+  border: 1px solid #73AD21;
+  padding: 5px;
+  margin: 5px;
+  float: left;
+}
+
+.template {
+   display: none;
+}
+
+.botButton {
+   border-radius: 25px;
+   border: 2px solid #73AD21;
+   width: 100px;
+   height: 100px;
+}
+</style>
+
+<script src="toastbot.js"></script>
+<script src="scanner.js"></script>
+<script>
+var toastBots = [];
+
+function buildToastBotTable()
+{
+   botsDiv = document.getElementById("botsDiv");
+
+   // Delete the current contents.
+   /*
+   while (botsDiv.firstChild)
+   {
+      if (botsDiv.id != "botDiv_manual")
+      {
+         botsDiv.removeChild(botsDiv.firstChild);
+      }
+   }
+   */
+
+   var template = document.getElementById("botDiv_template");
+
+   for (i = 0; i < toastBots.length; i++)
+   {
+      var clone = template.cloneNode(true);
+
+      // Unique ids
+      suffix = "_" + i;
+      clone.id = "botDiv" + suffix;
+      children = clone.children;
+      for (child in children)
+      {
+         children[child].id = children[child].id + suffix;
+      }
+
+      botsDiv.appendChild(clone);
+
+      var ipAddress = toastBots[i].ipAddress;
+      var deviceId = toastBots[i].deviceId;
+
+      document.getElementById("ipAddress" + suffix).innerHTML = toastBots[i].ipAddress;
+      document.getElementById("deviceId" + suffix).innerHTML = toastBots[i].deviceId;
+      document.getElementById("button" + suffix).onclick = function(){launchController(deviceId, ipAddress)};
+      clone.className = "botDiv";
+      clone.style.display = "block";
+   }
+}
+
+/*
+function onIpFound(ipAddress)
+{
+   if (ipAddress)
+   {
+
+   }
+   else
+   {
+   }
+}
+
+getIPs(onIpFound);
+*/
+
+function launchController(deviceId, ipAddress)
+{
+   if (deviceId == "manual")
+   {
+      ipAddress = document.getElementById("ipAddressEntry").value;
+   }
+
+   url = "control.html";
+
+   if (deviceId)
+   {
+     url += "?deviceId=" + deviceId + "&ipAddress=" + ipAddress;
+   }
+
+   window.open(url);
+}
+
+function resetProgressBar()
+{
+   document.getElementById('myBar').style.width = 0;
+   document.getElementById('myPercent').innerHTML = "";
+}
+
+function updateProgressBar(progress)
+{
+   document.getElementById('myBar').style.width = progress + "%";
+   document.getElementById('myPercent').innerHTML = progress + "%";
+}
+
+var scanner = new Scanner();
+scanner.onDetected = function(ipAddress, deviceId)
+{
+   var bot = {};
+   bot.deviceId = deviceId;
+   bot.ipAddress = ipAddress;
+
+   toastBots.push(bot);
+
+   buildToastBotTable();
+};
+scanner.onCompleted = function()
+{
+   console.log("Completed\n");
+
+   document.getElementById("scanButton").value = "Scan";
+   resetProgressBar();
+}
+scanner.onProgress = function(progress)
+{
+   updateProgressBar(progress);
+};
+
+function scan()
+{
+   console.log(scanner.progress);
+   console.log(scanner.isScanning);
+
+   if (scanner.isScanning == false)
+   {
+      document.getElementById("scanButton").value = "Cancel";
+      scanner.scanForDevices("192.168.1");
+      updateProgressBar(0);
+   }
+   else
+   {
+      scanner.cancel();
+   }
+}
+</script>
+
+<body>
+
+<div id="botsDiv">
+   <div id="botDiv_manual" class="botDiv">
+      <input class="botButton" type="image" src="bot.jpg" onclick="launchController('manual')">
+      <div>Enter IP address</div>
+      <div><input id="ipAddressEntry" type="text" style="width:100px"></div>
+   </div>
+</div>
+
+<div id="botDiv_template" class="botDiv, template">
+   <input id="button" class="botButton" type="image" src="bot.jpg">
+   <div id="deviceId"></div>
+   <div id="ipAddress"></div>
+</div>
+
+<div id="myProgress">
+  <div id="myBar"></div>
+  <div id="myPercent"></div>
+</div>
+
+<div><input id="scanButton" type="button" value="Scan" onclick="scan()"></div>
+
+</body>
+</html>

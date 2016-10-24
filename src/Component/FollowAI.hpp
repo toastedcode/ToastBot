@@ -27,11 +27,11 @@ public:
    virtual void timeout(
       Timer* timer);
 
-   void engage();
+   void enable();
 
-   void disengage();
+   void disable();
 
-   bool isEngaged();
+   bool isEnabled();
 
    static const int AI_PERIOD;  // milliseconds
 
@@ -77,7 +77,7 @@ private:
 
    Scanner* scanner;
 
-   bool isAiEngaged;
+   bool isAiEnabled;
 };
 
 inline bool FollowAI::isEngaged()
