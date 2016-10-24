@@ -81,10 +81,11 @@ void setup()
 
    Motor* motor1 = new Motor("motor1", 0, 5);
    Motor* motor2 = new Motor("motor2", 2, 4);
-   
    ToastBot::add(motor1);
    ToastBot::add(motor2);
-   ToastBot::add(new MotorPair("motorPair1", motor1, motor2));
+   
+   MotorPair* motorPair1 = new MotorPair("motorPair1", motor1, motor2);
+   ToastBot::add(motorPair1);
 
    ServoComponent* servo1 = new ServoComponent("servo1", 14);
    ToastBot::add(servo1);
@@ -93,7 +94,10 @@ void setup()
    DistanceSensor* distance1 = new DistanceSensor("distance1", 13, 15, 100);
    ToastBot::add(distance1);
 
-   ToastBot::add(new Scanner("scanner1", servo1, distance1));
+   Scanner* scanner1 = new Scanner("scanner1", servo1, distance1);
+   ToastBot::add(scanner1);
+
+   ToastBot::add(new FollowAI("follow1", scanner1, motorPair1));
    
    ToastBot::add(new WebSocketAdapter("adapter1", new JsonProtocol(), 81));
    ToastBot::add(new IpServerAdapter("adapter2", new JsonProtocol(), 80));

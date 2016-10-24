@@ -3,6 +3,7 @@
 #include "Adapter\MqttClientAdapter.hpp"
 #include "Adapter\WebSocketAdapter.hpp"
 #include "Component\DistanceSensor.hpp"
+#include "Component\FollowAi.hpp"
 #include "Component\Motor.hpp"
 #include "Component\MotorPair.hpp"
 #include "Component\Scanner.hpp"
