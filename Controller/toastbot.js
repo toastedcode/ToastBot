@@ -53,12 +53,18 @@ function ToastBot()
          this.webSocket.close();
       }
    };
+   
+   ToastBot.prototype.isConnected = function()
+   {
+      return ((this.websocket) && (this.websocket.readyState == 1));
+   }
 
    ToastBot.prototype.ping = function()
    {
       console.log("ToastBot.ping: Url: " + this.url);
       console.log("ToastBot.ping: Ready state: " + this.webSocket.readyState);
-      if (this.webSocket)
+      
+      if (this.isConnected())
       {
          var message = '{"messageId":"ping"}';
          this.webSocket.send(message);
@@ -67,16 +73,25 @@ function ToastBot()
 
    ToastBot.prototype.motorPair = function(motorPairId, speed, yaw)
    {
-      if (this.webSocket)
+      if (this.isConnected())
       {
          var message = '{"messageId":"drive", "destination":"' + motorPairId + '", "speed":"' + speed + '", "yaw":"' + yaw + '"}';
+         this.webSocket.send(message);
+      }
+   }.bind(this);
+   
+   ToastBot.prototype.rotate = function(motorPairId, speed)
+   {
+      if (this.isConnected())
+      {
+         var message = '{"messageId":"rotate", "destination":"' + motorPairId + '", "speed":"' + speed + '"}';
          this.webSocket.send(message);
       }
    }.bind(this);
 
    ToastBot.prototype.servo = function(servoId, angle)
    {
-      if (this.webSocket)
+      if (this.isConnected())
       {
          var message = '{"messageId":"servo", "destination":"' + servoId + '", "angle":"' + angle + '"}';
          this.webSocket.send(message);
@@ -85,7 +100,7 @@ function ToastBot()
    
    ToastBot.prototype.follow = function(id, enable)
    {
-      if (this.webSocket)
+      if (this.isConnected())
       {
          var message = '{"messageId":"enable", "destination":"' + id + '"}';
          this.webSocket.send(message);

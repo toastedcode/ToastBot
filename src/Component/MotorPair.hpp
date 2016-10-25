@@ -42,12 +42,18 @@ public:
 
    // Sets the speed of the two motors in the pair.
    void drive(
-      // The speed of the left motor in the pair.
-      // Positive values indicate the motor is running forward; negative values reverse.
+      // The combined speed of the left and right motors.
+      // Positive values indicate the motors are running forward; negative values reverse.
       int speed,
       // The speed ratio between the left and right motors.
       // Positive values indicate the motor pair will be turning to the right; negative values left.
       int yaw);
+
+   void rotate(
+      // The speed of the left and right motors.
+      // Negative values will cause the right motor to rotate forward, and the left the rotate backwards (rotate left).
+      // Positive values will cause the left motor to rotate forward, and the right to rotate backwards (rotate right).
+      int speed);
 
    // Stops both motors in the pair by setting their speed to zero.
    void stop();

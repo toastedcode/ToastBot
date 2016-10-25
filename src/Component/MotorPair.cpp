@@ -40,6 +40,29 @@ void MotorPair::drive(
    updateMotors();
 }
 
+void MotorPair::rotate(
+   int speed)
+{
+   this->speed = abs(speed);
+   this->yaw = 0;
+
+   if (speed == 0)
+   {
+      leftMotor->setSpeed(this->speed);
+      rightMotor->setSpeed(this->speed);
+   }
+   else if (speed < 0)
+   {
+      leftMotor->setSpeed(this->speed * -1);
+      rightMotor->setSpeed(this->speed);
+   }
+   else
+   {
+      leftMotor->setSpeed(this->speed);
+      rightMotor->setSpeed(speed * -1);
+   }
+}
+
 void MotorPair::setup()
 {
 }
@@ -60,6 +83,14 @@ void MotorPair::handleMessage(
       Logger::logDebug("MotorPair::handleMessage: drive()\n");
 
       drive(message->getInt("speed"), message->getInt("yaw"));
+
+      message->setFree();
+   }
+   else if (message->getMessageId() == "rotate")
+   {
+      Logger::logDebug("MotorPair::handleMessage: rotate()\n");
+
+      rotate(message->getInt("speed"));
 
       message->setFree();
    }
