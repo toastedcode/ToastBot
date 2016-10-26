@@ -80,8 +80,8 @@ private:
    bool isAiEnabled;
 };
 
-inline bool FollowAI::isEngaged()
+inline bool FollowAI::isEnabled()
 {
-   return (isAiEngaged);
+   return (isAiEnabled);
 }
 

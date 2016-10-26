@@ -9,7 +9,6 @@
 // *****************************************************************************
 
 #include "Adapter.hpp"
-#include "Logger.hpp"
 #include "ESP8266WiFi.h"
 #include "../Messaging/JsonProtocol.hpp"
 #include "WebSocketServer.h"

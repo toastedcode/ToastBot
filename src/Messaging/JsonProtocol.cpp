@@ -1,6 +1,4 @@
 #include "JsonProtocol.hpp"
-
-#include "Logger.hpp"
 #include "StringUtils.hpp"
 
 const int JsonProtocol::MAX_PARAMETERS;
@@ -14,7 +12,7 @@ bool JsonProtocol::parse(
    String remainingString = messageString;
    ParameterSet parameters;
 
-   Logger::logDebug("JsonProtocol::parse: Parsing: \"%s\".", messageString.c_str());
+   printf("JsonProtocol::parse: Parsing: \"%s\".\n", messageString.c_str());
 
    // Strip braces and whitespace.
    remainingString = StringUtils::removeAll(remainingString, " \n\r\t{}");
@@ -22,7 +20,7 @@ bool JsonProtocol::parse(
    // Parse parameters.
    if (parseParameters(remainingString, parameters) == false)
    {
-      Logger::logDebug("JsonProtocol::parse: Failed to parse parameters.");
+      printf("JsonProtocol::parse: Failed to parse parameters.\n");
    }
    else
    {
@@ -51,7 +49,7 @@ String JsonProtocol::serialize(
 
    serializedMessage += "}";
 
-   Logger::logDebug("JsonProtocol::serialize: Serialized: \"%s\".", serializedMessage.c_str());
+   printf("JsonProtocol::serialize: Serialized: \"%s\".\n", serializedMessage.c_str());
 
    return (serializedMessage);
 }
@@ -126,7 +124,7 @@ bool JsonProtocol::parseParameter(
    }
    else
    {
-      Logger::logDebug("JsonProtocol::parse: Failed to parse parameter: \"%s\".", parameterString.c_str());
+      printf("JsonProtocol::parse: Failed to parse parameter: \"%s\".\n", parameterString.c_str());
    }
 
    return (isSuccess);
@@ -164,7 +162,7 @@ ParameterType JsonProtocol::getType(
    }
    else
    {
-      Logger::logDebug("JsonProtocol::getType: Treating unquoted value [%s] as STRING.", value.c_str());
+      printf("JsonProtocol::getType: Treating unquoted value [%s] as STRING.\n", value.c_str());
    }
 
    return (type);

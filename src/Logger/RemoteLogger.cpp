@@ -26,5 +26,8 @@ void RemoteLogger::log(
       message->setDestination(adapterId);
 
       Messaging::send(message);
+
+      // TODO: Remove.
+      printf("%s: %s\n", toString(logLevel).c_str(), string.c_str());
    }
 }

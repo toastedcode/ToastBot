@@ -13,8 +13,8 @@
 
 void WebSocketAdapter::setup()
 {
-   Logger::logDebug(
-      "WebSocketAdapter::setup: Web Socket Adapter [%s] is listening on port %d.",
+   printf(
+      "WebSocketAdapter::setup: Web Socket Adapter [%s] is listening on port %d.\n",
       getId().c_str(),
       port);
 
@@ -40,11 +40,11 @@ void WebSocketAdapter::loop()
 
    if (!wasConnected && isConnected)
    {
-      Logger::logDebug("WebSocketAdapter::loop: Web Socket Server Adapter [%s] connected.", getId().c_str());
+      printf("WebSocketAdapter::loop: Web Socket Server Adapter [%s] connected.\n", getId().c_str());
    }
    else if (wasConnected && !isConnected)
    {
-      Logger::logDebug("WebSocketAdapter::loop: Web Socket Server Adapter [%s] disconnected.", getId().c_str());
+      printf("WebSocketAdapter::loop: Web Socket Server Adapter [%s] disconnected.\n", getId().c_str());
 
       isNegotiated = false;
    }
@@ -61,11 +61,11 @@ void WebSocketAdapter::loop()
 
       if (!wasNegotiated && isNegotiated)
       {
-         Logger::logDebug("WebSocketAdapter::loop: Web Socket Server Adapter [%s] negotiated.", getId().c_str());
+         printf("WebSocketAdapter::loop: Web Socket Server Adapter [%s] negotiated.\n", getId().c_str());
       }
       else
       {
-         Logger::logDebug("WebSocketAdapter::loop: Web Socket Server Adapter [%s] failed negotiation.", getId().c_str());
+         printf("WebSocketAdapter::loop: Web Socket Server Adapter [%s] failed negotiation.\n", getId().c_str());
       }
    }
 
@@ -90,8 +90,8 @@ bool WebSocketAdapter::sendRemoteMessage(
    }
    else
    {
-      Logger::logDebug(
-         "IpServerAdapter::sendRemoteMessage: Failed to send message [%s] to remote host.",
+      printf(
+         "IpServerAdapter::sendRemoteMessage: Failed to send message [%s] to remote host.\n",
          message->getMessageId().c_str());
    }
 

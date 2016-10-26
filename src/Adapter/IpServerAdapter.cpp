@@ -3,8 +3,8 @@
 
 void IpServerAdapter::setup()
 {
-   Logger::logDebug(
-      "IpServerAdapter::setup: IP Server Adapter [%s] is listening on port %d.",
+   printf(
+      "IpServerAdapter::setup: IP Server Adapter [%s] is listening on port %d.\n",
       getId().c_str(),
       port);
 
@@ -28,8 +28,8 @@ bool IpServerAdapter::sendRemoteMessage(
       }
       else
       {
-         Logger::logDebug(
-            "IpServerAdapter::sendRemoteMessage: Failed to send message [%s] to remote host.",
+         printf(
+            "IpServerAdapter::sendRemoteMessage: Failed to send message [%s] to remote host.\n",
             message->getMessageId().c_str());
       }
    }
@@ -53,11 +53,11 @@ MessagePtr IpServerAdapter::getRemoteMessage()
    isConnected = client.connected();
    if (!wasConnected && isConnected)
    {
-      Logger::logDebug("IpServerAdapter::getRemoteMessage: IP Server Adapter [%s] connected.", getId().c_str());
+      printf("IpServerAdapter::getRemoteMessage: IP Server Adapter [%s] connected.\n", getId().c_str());
    }
    else if (wasConnected && !isConnected)
    {
-      Logger::logDebug("IpServerAdapter::getRemoteMessage: IP Server Adapter [%s] disconnected.", getId().c_str());
+      printf("IpServerAdapter::getRemoteMessage: IP Server Adapter [%s] disconnected.\n", getId().c_str());
    }
 
    if ((client) && client.available())

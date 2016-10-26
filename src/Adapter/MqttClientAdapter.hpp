@@ -12,7 +12,6 @@
 
 #include "Adapter.hpp"
 #include "ESP8266WiFi.h"
-#include "Logger.hpp"
 #include "PubSubClient.h"
 #include "PubSubListener.h"
 
