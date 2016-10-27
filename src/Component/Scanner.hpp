@@ -16,6 +16,8 @@ public:
 
    static const int MAX_SERVO_POSITION = SERVO_POSITIONS - 1;
 
+   static const int CENTERED_SERVO_POSITION = 2;
+
    static const int SERVO_ROTATE_PERIOD = 250;  // milliseconds
 
    typedef int ScannerReading[SERVO_POSITIONS];
@@ -37,6 +39,12 @@ public:
 
    void read(
       ScannerReading& reading);
+
+   void enable();
+
+   void disable();
+
+   bool isEnabled();
 
    static int getServoAngle(
       const int& position);
@@ -60,4 +68,6 @@ private:
    ScannerReading reading;
 
    Timer* servoTimer;
+
+   bool isScannerEnabled;
 };

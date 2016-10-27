@@ -74,6 +74,8 @@ void FollowAI::enable()
    }
 
    timer = Timer::newTimer("followAiTimer", AI_PERIOD, Timer::PERIODIC, this);
+
+   scanner->enable();
 }
 
 void FollowAI::disable()
@@ -84,6 +86,8 @@ void FollowAI::disable()
    {
       Timer::freeTimer(timer);
    }
+
+   scanner->disable();
 }
 
 void FollowAI::getMinDistance(

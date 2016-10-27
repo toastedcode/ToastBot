@@ -15,9 +15,10 @@ Scanner::Scanner(
    DistanceSensor* sensor) : Component(id),
                              servo(servo),
                              sensor(sensor),
-                             servoPosition(0),
+                             servoPosition(CENTERED_SERVO_POSITION),
                              servoDirection(RIGHT),
-                             servoTimer(0)
+                             servoTimer(0),
+                             isScannerEnabled(false)
 {
    memset(reading, 0, sizeof(ScannerReading));
 }
@@ -29,10 +30,7 @@ Scanner::~Scanner()
 
 void Scanner::setup()
 {
-   servo->rotate(getServoAngle(servoPosition));
-
-   servoTimer = Timer::newTimer("servoTimer", SERVO_ROTATE_PERIOD, Timer::PERIODIC, this);
-   servoTimer->start();
+   servo->rotate(getServoAngle(CENTERED_SERVO_POSITION));
 
    Component::setup();
 }
@@ -76,6 +74,36 @@ void Scanner::read(
    ScannerReading& reading)
 {
    memcpy(reading, this->reading, sizeof(ScannerReading));
+}
+
+void Scanner::enable()
+{
+   isScannerEnabled = true;
+
+   if (servoTimer)
+   {
+      Timer::freeTimer(servoTimer);
+   }
+   servoTimer = Timer::newTimer("servoTimer", SERVO_ROTATE_PERIOD, Timer::PERIODIC, this);
+
+   servo->rotate(getServoAngle(CENTERED_SERVO_POSITION));
+}
+
+void Scanner::disable()
+{
+   isScannerEnabled = false;
+
+   if (servoTimer)
+   {
+      Timer::freeTimer(servoTimer);
+   }
+
+   servo->rotate(getServoAngle(CENTERED_SERVO_POSITION));
+}
+
+bool Scanner::isEnabled()
+{
+   return (isScannerEnabled);
 }
 
 int Scanner::getServoAngle(
