@@ -25,13 +25,13 @@ void FollowAI::setup()
 void FollowAI::handleMessage(
    MessagePtr message)
 {
-   // engage
+   // enable
    if (message->getMessageId() == "enable")
    {
       enable();
       message->setFree();
    }
-   // disengage
+   // disable
    else if (message->getMessageId() == "disable")
    {
       disable();
@@ -71,6 +71,7 @@ void FollowAI::enable()
    if (timer)
    {
       Timer::freeTimer(timer);
+      timer = 0;
    }
 
    timer = Timer::newTimer("followAiTimer", AI_PERIOD, Timer::PERIODIC, this);
@@ -85,6 +86,7 @@ void FollowAI::disable()
    if (timer)
    {
       Timer::freeTimer(timer);
+      timer = 0;
    }
 
    scanner->disable();
@@ -117,6 +119,7 @@ FollowAI::Proximity FollowAI::getProximity(
 
    static const int ADJACENT_DISTANCE = 20;  // cm
    static const int NEAR_DISTANCE = 50;  // cm
+   static const int FAR_DISTANCE = 100;  // cm
 
    int minDistance = 0;
    int minPosition = 0;
@@ -134,7 +137,7 @@ FollowAI::Proximity FollowAI::getProximity(
    {
       proximity = NEAR;
    }
-   else
+   else if (minDistance < FAR_DISTANCE)
    {
       proximity = FAR;
    }

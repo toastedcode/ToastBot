@@ -18,7 +18,7 @@ class ToastBot
 
 public:
 
-   static const int MAX_COMPONENTS = 10;
+   static const int MAX_COMPONENTS = 30;
 
    static void setId(
       const String& id);

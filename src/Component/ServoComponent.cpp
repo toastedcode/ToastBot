@@ -37,7 +37,11 @@ void ServoComponent::handleMessage(
       Logger::logDebug("ServoComponent::handleMessage: rotate(%d)", newAngle);
 
       rotate(newAngle);
-   }
 
-   Component::handleMessage(message);
+      message->setFree();
+   }
+   else
+   {
+      Component::handleMessage(message);
+   }
 }

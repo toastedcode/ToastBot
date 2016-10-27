@@ -67,7 +67,7 @@ private:
 
    ScannerReading reading;
 
-   Timer* servoTimer;
+   Timer* timer;
 
    bool isScannerEnabled;
 };

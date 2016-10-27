@@ -67,9 +67,9 @@ void setup()
    Board::setBoard(board);
 
    // Connect to a known network.
-   if (board->connectWifi("NETGEAR69", "silentsky723", 15) == false)
+   //if (board->connectWifi("NETGEAR69", "silentsky723", 15) == false)
    //if (board->connectWifi("compunetix-guest", "compunetix", 15) == false)
-   //if (board->connectWifi("Massive", "getshitdone", 15) == false)
+   if (board->connectWifi("Massive", "getshitdone", 15) == false)
    {
       // If the ESP8266 fails to connect with the stored credentials, we'll create an AP to allow for wifi config.
       board->startAccessPoint("TOASTBOT", "");
@@ -91,13 +91,17 @@ void setup()
    ToastBot::add(servo1);
    ToastBot::add(new ServoComponent("servo2", 12));
 
-   DistanceSensor* distance1 = new DistanceSensor("distance1", 13, 15, 100);
+   DistanceSensor* distance1 = new DistanceSensor("distance1", 13, 15, 200);
    ToastBot::add(distance1);
 
    Scanner* scanner1 = new Scanner("scanner1", servo1, distance1);
    ToastBot::add(scanner1);
 
-   ToastBot::add(new FollowAI("follow1", scanner1, motorPair1));
+   FollowAI* follow1 = new FollowAI("follow1", scanner1, motorPair1);
+   ToastBot::add(follow1);
+
+   FollowAI_2* follow2 = new FollowAI_2("follow2", distance1, motorPair1);
+   ToastBot::add(follow2);
    
    ToastBot::add(new WebSocketAdapter("adapter1", new JsonProtocol(), 81));
    //ToastBot::add(new IpServerAdapter("adapter2", new JsonProtocol(), 80));

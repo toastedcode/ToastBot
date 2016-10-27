@@ -7,6 +7,8 @@ const int Scanner::MIN_SERVO_POSITION;
 
 const int Scanner::MAX_SERVO_POSITION;
 
+const int Scanner::CENTERED_SERVO_POSITION;
+
 const int Scanner::SERVO_ROTATE_PERIOD;
 
 Scanner::Scanner(
@@ -17,7 +19,7 @@ Scanner::Scanner(
                              sensor(sensor),
                              servoPosition(CENTERED_SERVO_POSITION),
                              servoDirection(RIGHT),
-                             servoTimer(0),
+                             timer(0),
                              isScannerEnabled(false)
 {
    memset(reading, 0, sizeof(ScannerReading));
@@ -25,7 +27,7 @@ Scanner::Scanner(
 
 Scanner::~Scanner()
 {
-   Timer::freeTimer(servoTimer);
+   Timer::freeTimer(timer);
 }
 
 void Scanner::setup()
@@ -80,11 +82,12 @@ void Scanner::enable()
 {
    isScannerEnabled = true;
 
-   if (servoTimer)
+   if (timer)
    {
-      Timer::freeTimer(servoTimer);
+      Timer::freeTimer(timer);
+      timer = 0;
    }
-   servoTimer = Timer::newTimer("servoTimer", SERVO_ROTATE_PERIOD, Timer::PERIODIC, this);
+   timer = Timer::newTimer("timer", SERVO_ROTATE_PERIOD, Timer::PERIODIC, this);
 
    servo->rotate(getServoAngle(CENTERED_SERVO_POSITION));
 }
@@ -93,9 +96,10 @@ void Scanner::disable()
 {
    isScannerEnabled = false;
 
-   if (servoTimer)
+   if (timer)
    {
-      Timer::freeTimer(servoTimer);
+      Timer::freeTimer(timer);
+      timer = 0;
    }
 
    servo->rotate(getServoAngle(CENTERED_SERVO_POSITION));
