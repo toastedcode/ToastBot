@@ -33,9 +33,10 @@ public:
 
    bool isEnabled();
 
-   static const int AI_PERIOD;  // milliseconds
-
 private:
+
+   // **************************************************************************
+   // FSM logic
 
    enum Proximity
    {
@@ -44,9 +45,6 @@ private:
       NEAR,
       FAR
    };
-
-   // **************************************************************************
-   // FSM logic
 
    enum State
    {

@@ -67,9 +67,8 @@ void setup()
    Board::setBoard(board);
 
    // Connect to a known network.
-   //if (board->connectWifi("NETGEAR69", "silentsky723", 15) == false)
-   //if (board->connectWifi("compunetix-guest", "compunetix", 15) == false)
-   if (board->connectWifi("Massive", "getshitdone", 15) == false)
+   if (board->connectWifi("NETGEAR69", "silentsky723", 15) == false)
+   //if (board->connectWifi("Massive", "getshitdone", 15) == false)
    {
       // If the ESP8266 fails to connect with the stored credentials, we'll create an AP to allow for wifi config.
       board->startAccessPoint("TOASTBOT", "");

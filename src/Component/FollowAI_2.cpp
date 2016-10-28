@@ -1,8 +1,20 @@
 #include "FollowAI_2.hpp"
 
-const int FollowAI_2::AI_PERIOD = 250;  // milliseconds
+const int ADJACENT_DISTANCE = 20;  // cm
+const int NEAR_DISTANCE = 50;  // cm
+const int FAR_DISTANCE = 100;  // cm
 
-const int SEARCH_SPEED = 60;
+const int SEARCH_SPEED = ((MotorPair::MAX_SPEED * 80) / 100);
+
+const int SEARCH_YAW = 50;
+
+const int FOLLOW_SPEEDS[] =
+{
+   0,                                    // NONE
+   0,                                    // ADJACENT,
+   ((MotorPair::MAX_SPEED * 80) / 100),  // NEAR,
+   MotorPair::MAX_SPEED,                 // FAR
+};
 
 const bool OFF = false;
 const bool ON = true;
@@ -11,6 +23,11 @@ const char* READING_TIMER_ID = "reading";
 const char* WAITING_TIMER_ID = "waiting";
 const char* SEARCH_TIMER_ID = "search";
 const char* LOST_TIMER_ID = "lost";
+
+const int READING_TIMER_PERIOD = 500;  // milliseconds
+const int WAITING_TIMER_PERIOD = 15000;  // milliseconds
+const int SEARCH_TIMER_PERIOD = 1000;  // milliseconds
+const int LOST_TIMER_PERIOD = 5000;  // milliseconds
 
 FollowAI_2::FollowAI_2(
    const String& id,
@@ -31,10 +48,10 @@ FollowAI_2::FollowAI_2(
 
 FollowAI_2::~FollowAI_2()
 {
-   setReadingTimer(OFF);
-   setWaitingTimer(OFF);
-   setLostTimer(OFF);
-   setSearchTimer(OFF);
+   Timer::freeTimer(readingTimer);
+   Timer::freeTimer(waitingTimer);
+   Timer::freeTimer(lostTimer);
+   Timer::freeTimer(searchTimer);
 }
 
 void FollowAI_2::setup()
@@ -65,13 +82,11 @@ void FollowAI_2::handleMessage(
 void FollowAI_2::timeout(
    Timer* timer)
 {
-   int reading;
-
    if (isEnabled())
    {
       if (timer->getId() == READING_TIMER_ID)
       {
-         onWaitingTimeout();
+         onReadingTimeout();
       }
       else if (timer->getId() == WAITING_TIMER_ID)
       {
@@ -110,6 +125,8 @@ void FollowAI_2::disable()
    setLostTimer(OFF);
    setSearchTimer(OFF);
 
+   motorPair->drive(0, 0);
+
    state = WAITING;
 }
 
@@ -143,7 +160,7 @@ void FollowAI_2::setState(
          case LOST:
          {
             setWaitingTimer(OFF);
-            setLostTimer(OFF);
+            setLostTimer(ON);
             setSearchTimer(ON);
             break;
          }
@@ -191,7 +208,7 @@ void FollowAI_2::onProximity(
 
 void FollowAI_2::onReadingTimeout()
 {
-   int reading = sensor->read();
+   int reading = DistanceSensor::toCentimeters(sensor->read());
 
    Proximity newProximity = getProximity(reading);
 
@@ -207,6 +224,8 @@ void FollowAI_2::onReadingTimeout()
 
 void FollowAI_2::onWaitingTimeout()
 {
+   Logger::logDebug("FollowAI_2::onWaitingTimeout");
+
    if (state == WAITING)
    {
       // TODO: Implement periodic rotation.
@@ -215,6 +234,8 @@ void FollowAI_2::onWaitingTimeout()
 
 void FollowAI_2::onLostTimeout()
 {
+   Logger::logDebug("FollowAI_2::onLostTimeout");
+
    if (state == LOST)
    {
       setState(WAITING);
@@ -224,43 +245,92 @@ void FollowAI_2::onLostTimeout()
 
 void FollowAI_2::onSearchTimeout()
 {
-   searchDirection = (searchDirection == LEFT) ? RIGHT : LEFT;
+   if (state == LOST)
+   {
+      searchDirection = (searchDirection == LEFT) ? RIGHT : LEFT;
 
-   motorPair->drive(SEARCH_SPEED, getYaw(searchDirection));
+      Logger::logDebug("FollowAI_2::onSearchTimeout: direction = %d", searchDirection);
+
+      motorPair->drive(SEARCH_SPEED, getYaw(searchDirection));
+   }
 }
 
 void FollowAI_2::setReadingTimer(
    const bool& isOn)
 {
+   if (!readingTimer)
+   {
+      readingTimer = Timer::newTimer(READING_TIMER_ID, READING_TIMER_PERIOD, Timer::PERIODIC, this);
+   }
 
+   if (isOn && !readingTimer->isStarted())
+   {
+      readingTimer->start();
+   }
+   else if (!isOn && readingTimer->isStarted())
+   {
+      readingTimer->stop();
+   }
 }
 
 void FollowAI_2::setWaitingTimer(
    const bool& isOn)
 {
+   if (!waitingTimer)
+   {
+      waitingTimer = Timer::newTimer(WAITING_TIMER_ID, WAITING_TIMER_PERIOD, Timer::PERIODIC, this);
+   }
 
+   if (isOn && !waitingTimer->isStarted())
+   {
+      waitingTimer->start();
+   }
+   else if (!isOn && waitingTimer->isStarted())
+   {
+      waitingTimer->stop();
+   }
 }
 
 void FollowAI_2::setLostTimer(
    const bool& isOn)
 {
+   if (!lostTimer)
+   {
+      lostTimer = Timer::newTimer(LOST_TIMER_ID, LOST_TIMER_PERIOD, Timer::PERIODIC, this);
+   }
 
+   if (isOn && !lostTimer->isStarted())
+   {
+      lostTimer->start();
+   }
+   else if (!isOn && lostTimer->isStarted())
+   {
+      lostTimer->stop();
+   }
 }
 
 void FollowAI_2::setSearchTimer(
    const bool& isOn)
 {
+   if (!searchTimer)
+   {
+      searchTimer = Timer::newTimer(SEARCH_TIMER_ID, SEARCH_TIMER_PERIOD, Timer::PERIODIC, this);
+   }
 
+   if (isOn && !searchTimer->isStarted())
+   {
+      searchTimer->start();
+   }
+   else if (!isOn && searchTimer->isStarted())
+   {
+      searchTimer->stop();
+   }
 }
 
 FollowAI_2::Proximity FollowAI_2::getProximity(
    const int& reading)
 {
    Proximity proximity = NONE;
-
-   static const int ADJACENT_DISTANCE = 20;  // cm
-   static const int NEAR_DISTANCE = 50;  // cm
-   static const int FAR_DISTANCE = 100;  // cm
 
    if (reading == 0)
    {
@@ -285,22 +355,12 @@ FollowAI_2::Proximity FollowAI_2::getProximity(
 int FollowAI_2::getSpeed(
    const Proximity& proximity)
 {
-   static const int FOLLOW_SPEEDS[] =
-   {
-      0,    // NONE
-      0,    // ADJACENT,
-      60,   // NEAR,
-      100,  // FAR
-   };
-
    return (FOLLOW_SPEEDS[proximity]);
 }
 
 int FollowAI_2::getYaw(
    const SearchDirection& searchDirection)
 {
-   static const int SEARCH_YAW = 30;
-
    return ((searchDirection == LEFT) ? SEARCH_YAW : (SEARCH_YAW * -1));
 }
 
