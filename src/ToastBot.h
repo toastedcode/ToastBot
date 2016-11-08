@@ -2,6 +2,7 @@
 #include "Adapter\IpServerAdapter.hpp"
 #include "Adapter\MqttClientAdapter.hpp"
 #include "Adapter\WebSocketAdapter.hpp"
+#include "Behavior\ScoutBehavior.hpp"
 #include "Component\DistanceSensor.hpp"
 #include "Component\FollowAI.hpp"
 #include "Component\FollowAI_2.hpp"
