@@ -20,7 +20,7 @@ public:
    virtual void loop();
 
    virtual void handleMessage(
-      Message* message);
+      MessagePtr message);
 
    int getState() const;
 
@@ -67,7 +67,7 @@ inline Behavior::~Behavior()
 }
 
 inline void Behavior::handleMessage(
-   Message* message)
+   MessagePtr message)
 {
    Component::handleMessage(message);
 }

@@ -24,12 +24,8 @@ public:
 
    virtual ~ScoutBehavior();
 
-   virtual void setup();
-
-   virtual void loop();
-
-   void handleMessage(
-      Message* message);
+   virtual void handleMessage(
+      MessagePtr message);
 
    virtual void enable();
 
@@ -51,12 +47,3 @@ private:
 
    Behavior* rotateBehavior;
 };
-
-
-inline void ScoutBehavior::setup()
-{
-}
-
-inline void ScoutBehavior::loop()
-{
-}

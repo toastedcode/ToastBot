@@ -2,6 +2,8 @@
 
 void Behavior::setup()
 {
+   Component::setup();
+
    for (int i = 0; i < children.length(); i++)
    {
       children.item(i)->value->setup();
@@ -10,6 +12,8 @@ void Behavior::setup()
 
 void Behavior::loop()
 {
+   Component::loop();
+
    if (isEnabled())
    {
       for (int i = 0; i < children.length(); i++)

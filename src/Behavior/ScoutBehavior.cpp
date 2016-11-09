@@ -1,3 +1,4 @@
+#include "Logger.hpp"
 #include "ScoutBehavior.hpp"
 
 // *****************************************************************************
@@ -23,19 +24,21 @@ public:
       DistanceSensor* distanceSensor) :
          Behavior(id)
    {
-      setState(INIT);
+      Logger::logDebug("ForwardBehavior: start");
+
       this->motorPair = motorPair;
       this->distanceSensor = distanceSensor;
+
+      timer = Timer::newTimer("sensorTimer", 500, Timer::PERIODIC, this);
+
+      setState(INIT);
+
+      Logger::logDebug("ForwardBehavior: end");
    }
 
    ~ForwardBehavior()
    {
       Timer::freeTimer(timer);
-   }
-
-   virtual void setup()
-   {
-      timer = Timer::newTimer("sensorTimer", 500, Timer::PERIODIC, this);
    }
 
    virtual void timeout(
@@ -77,6 +80,8 @@ public:
          }
       }
 
+      Logger::logDebug("%s: -> %d", getId().c_str(), state);
+
       Behavior::setState(state);
    }
 
@@ -106,8 +111,13 @@ public:
       MotorPair* motorPair) :
          Behavior(id)
    {
-      setState(INIT);
+      Logger::logDebug("ReverseBehavior: start");
+
       this->motorPair = motorPair;
+
+      setState(INIT);
+
+      Logger::logDebug("ReverseBehavior: end");
    }
 
    ~ReverseBehavior() {}
@@ -149,6 +159,8 @@ public:
          }
       }
 
+      Logger::logDebug("%s: -> %d", getId().c_str(), state);
+
       Behavior::setState(state);
    }
 
@@ -174,8 +186,13 @@ public:
       MotorPair* motorPair) :
          Behavior(id)
    {
-      setState(INIT);
+      Logger::logDebug("RotateBehavior: start");
+
       this->motorPair = motorPair;
+
+      setState(INIT);
+
+      Logger::logDebug("RotateBehavior: end");
    }
 
    ~RotateBehavior() {}
@@ -183,12 +200,18 @@ public:
    virtual void timeout(
       Timer* timer)
    {
+      Logger::logDebug("RotateBehavior::timeout: start");
+
       if (getState() == ROTATING)
       {
          setState(DONE);
       }
 
+      Logger::logDebug("RotateBehavior::timeout: mid");
+
       Timer::freeTimer(timer);
+
+      Logger::logDebug("RotateBehavior::timeout: end");
    }
 
    virtual void setState(
@@ -205,7 +228,7 @@ public:
          case ROTATING:
          {
             motorPair->rotate(100);
-            Timer* timer = Timer::newTimer("rotateTimer", 1000, Timer::ONE_SHOT, this);
+            Timer* timer = Timer::newTimer("rotateTimer", 3000, Timer::ONE_SHOT, this);
             timer->start();
             break;
          }
@@ -215,7 +238,14 @@ public:
             motorPair->drive(0, 0);
             break;
          }
+
+         default:
+         {
+            break;
+         }
       }
+
+      Logger::logDebug("%s: -> %d", getId().c_str(), state);
 
       Behavior::setState(state);
    }
@@ -235,15 +265,23 @@ ScoutBehavior::ScoutBehavior(
    DistanceSensor* distanceSensor) :
       Behavior(id)
 {
+   Logger::logDebug("ScoutBehavior: start");
+
    forwardBehavior = new ForwardBehavior(id + ".forward", motorPair, distanceSensor);
    reverseBehavior = new ReverseBehavior(id + ".reverse", motorPair);
    rotateBehavior = new RotateBehavior(id + ".rotate", motorPair);
+
+   forwardBehavior->addListener(this);
+   reverseBehavior->addListener(this);
+   rotateBehavior->addListener(this);
 
    addChild(forwardBehavior);
    addChild(reverseBehavior);
    addChild(rotateBehavior);
 
    disable();
+
+   Logger::logDebug("ScoutBehavior: end");
 }
 
 ScoutBehavior::~ScoutBehavior()
@@ -254,7 +292,7 @@ ScoutBehavior::~ScoutBehavior()
 }
 
 void ScoutBehavior::handleMessage(
-   Message* message)
+   MessagePtr message)
 {
    // enable
    if (message->getMessageId() == "enable")
@@ -342,6 +380,8 @@ void ScoutBehavior::setState(
          break;
       }
    }
+
+   Logger::logDebug("%s: -> %d", getId().c_str(), state);
 
    Behavior::setState(state);
 }
