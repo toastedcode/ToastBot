@@ -24,16 +24,12 @@ public:
       DistanceSensor* distanceSensor) :
          Behavior(id)
    {
-      Logger::logDebug("ForwardBehavior: start");
-
       this->motorPair = motorPair;
       this->distanceSensor = distanceSensor;
 
       timer = Timer::newTimer("sensorTimer", 500, Timer::PERIODIC, this);
 
       setState(INIT);
-
-      Logger::logDebug("ForwardBehavior: end");
    }
 
    ~ForwardBehavior()
@@ -44,12 +40,15 @@ public:
    virtual void timeout(
       Timer* timer)
    {
-      int reading = DistanceSensor::toCentimeters(distanceSensor->read());
-
-      if ((getState() == MOVING) &&
-          (reading <= 10))
+      if (isEnabled())
       {
-         setState(BLOCKED);
+         int reading = DistanceSensor::toCentimeters(distanceSensor->read());
+
+         if ((getState() == MOVING) &&
+             (reading <= 10))
+         {
+            setState(BLOCKED);
+         }
       }
    }
 
@@ -80,9 +79,9 @@ public:
          }
       }
 
-      Logger::logDebug("%s: -> %d", getId().c_str(), state);
-
       Behavior::setState(state);
+
+      Logger::logDebug("%s: -> %d", getId().c_str(), state);
    }
 
 private:
@@ -111,13 +110,9 @@ public:
       MotorPair* motorPair) :
          Behavior(id)
    {
-      Logger::logDebug("ReverseBehavior: start");
-
       this->motorPair = motorPair;
 
       setState(INIT);
-
-      Logger::logDebug("ReverseBehavior: end");
    }
 
    ~ReverseBehavior() {}
@@ -125,12 +120,13 @@ public:
    virtual void timeout(
       Timer* timer)
    {
-      if (getState() == MOVING)
+      if (isEnabled())
       {
-         setState(DONE);
+         if (getState() == MOVING)
+         {
+            setState(DONE);
+         }
       }
-
-      Timer::freeTimer(timer);
    }
 
    virtual void setState(
@@ -186,13 +182,9 @@ public:
       MotorPair* motorPair) :
          Behavior(id)
    {
-      Logger::logDebug("RotateBehavior: start");
-
       this->motorPair = motorPair;
 
       setState(INIT);
-
-      Logger::logDebug("RotateBehavior: end");
    }
 
    ~RotateBehavior() {}
@@ -200,18 +192,13 @@ public:
    virtual void timeout(
       Timer* timer)
    {
-      Logger::logDebug("RotateBehavior::timeout: start");
-
-      if (getState() == ROTATING)
+      if (isEnabled())
       {
-         setState(DONE);
+         if (getState() == ROTATING)
+         {
+            setState(DONE);
+         }
       }
-
-      Logger::logDebug("RotateBehavior::timeout: mid");
-
-      Timer::freeTimer(timer);
-
-      Logger::logDebug("RotateBehavior::timeout: end");
    }
 
    virtual void setState(
@@ -265,8 +252,6 @@ ScoutBehavior::ScoutBehavior(
    DistanceSensor* distanceSensor) :
       Behavior(id)
 {
-   Logger::logDebug("ScoutBehavior: start");
-
    forwardBehavior = new ForwardBehavior(id + ".forward", motorPair, distanceSensor);
    reverseBehavior = new ReverseBehavior(id + ".reverse", motorPair);
    rotateBehavior = new RotateBehavior(id + ".rotate", motorPair);
@@ -280,8 +265,6 @@ ScoutBehavior::ScoutBehavior(
    addChild(rotateBehavior);
 
    disable();
-
-   Logger::logDebug("ScoutBehavior: end");
 }
 
 ScoutBehavior::~ScoutBehavior()
@@ -329,23 +312,26 @@ void ScoutBehavior::onStateChange(
    const int& previousState,
    const int& newState)
 {
-   if ((getState() == FORWARD) &&
-       (behavior->getId() == (getId() + ".forward")) &&
-       (newState == ForwardBehavior::BLOCKED))
+   if (isEnabled())
    {
-      setState(REVERSE);
-   }
-   else if ((getState() == REVERSE) &&
-            (behavior->getId() == (getId() + ".reverse")) &&
-            (newState == ReverseBehavior::DONE))
-   {
-      setState(ROTATE);
-   }
-   else if ((getState() == ROTATE) &&
-            (behavior->getId() == (getId() + ".rotate")) &&
-            (newState == RotateBehavior::DONE))
-   {
-      setState(FORWARD);
+      if ((getState() == FORWARD) &&
+          (behavior->getId() == (getId() + ".forward")) &&
+          (newState == ForwardBehavior::BLOCKED))
+      {
+         setState(REVERSE);
+      }
+      else if ((getState() == REVERSE) &&
+               (behavior->getId() == (getId() + ".reverse")) &&
+               (newState == ReverseBehavior::DONE))
+      {
+         setState(ROTATE);
+      }
+      else if ((getState() == ROTATE) &&
+               (behavior->getId() == (getId() + ".rotate")) &&
+               (newState == RotateBehavior::DONE))
+      {
+         setState(FORWARD);
+      }
    }
 }
 
