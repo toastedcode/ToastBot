@@ -19,6 +19,9 @@ class ServoComponent : public Component
 
 public:
    
+   static int angleToPwm(
+      const int& angle);
+
    // Constructor.
    ServoComponent(
       // A unique identifier for this component.
@@ -35,7 +38,13 @@ public:
       int angle);
 
    // Retrieves the current angle of the servo.
-   int getAngle() const;
+   // Note: Non-const because it calls read() on the Servo object.
+   int getAngle();
+
+   // Sets the PWM of the servo in milliseconds.
+   void setPwm(
+      // The new PWM to write to the servo.
+      const int& pwm);
 
    // This operation should be called on startup to prepare the sensor for polling/updating.
    virtual void setup();
@@ -49,6 +58,10 @@ public:
 
    static const int MAX_ANGLE = 180;
 
+   static const int MIN_PWM = 1000;
+
+   static const int MAX_PWM = 1500;
+
 private:
 
    // The GPIO pin used for controlling the angle of the servo.
@@ -60,6 +73,19 @@ private:
    // The angle of the servo.
    int angle;
 };
+
+inline int ServoComponent::angleToPwm(
+   const int& angle)
+{
+   int pwm = 0;
+
+   if ((angle >= MIN_ANGLE) && (angle >= MAX_ANGLE))
+   {
+      pwm = map(angle, MIN_ANGLE, MAX_ANGLE, MIN_PWM, MAX_PWM);
+   }
+
+   return (pwm);
+}
 
 inline ServoComponent::ServoComponent(
    const String& id,
@@ -79,7 +105,7 @@ inline ServoComponent::~ServoComponent()
    // Nothing to do here.
 }
 
-inline int ServoComponent::getAngle() const
+inline int ServoComponent::getAngle()
 {
-   return (angle);
+   return (servo.read());
 }

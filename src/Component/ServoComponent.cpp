@@ -15,11 +15,20 @@ const int ServoComponent::MIN_ANGLE;
 
 const int ServoComponent::MAX_ANGLE;
 
+const int ServoComponent::MIN_PWM;
+
+const int ServoComponent::MAX_PWM;
+
 void ServoComponent::rotate(
    int angle)
 {
-   this->angle = constrain(angle, MIN_ANGLE, MAX_ANGLE);
-   servo.write(angle);
+   servo.write(constrain(angle, MIN_ANGLE, MAX_ANGLE));
+}
+
+void ServoComponent::setPwm(
+   const int& pwm)
+{
+   servo.writeMicroseconds(constrain(pwm, MIN_PWM, MAX_PWM));
 }
 
 void ServoComponent::handleMessage(
@@ -32,11 +41,11 @@ void ServoComponent::handleMessage(
    if ((message->getMessageId() == "servo") ||
        (message->getMessageId() == "rotate"))
    {
-      int newAngle = message->getInt("angle");
+      int angle = message->getInt("angle");
 
-      Logger::logDebug("ServoComponent::handleMessage: rotate(%d)", newAngle);
+      Logger::logDebug("ServoComponent::handleMessage: rotate(%d)", angle);
 
-      rotate(newAngle);
+      rotate(angle);
 
       message->setFree();
    }
