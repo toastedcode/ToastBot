@@ -21,20 +21,8 @@ ServoPanBehavior::~ServoPanBehavior()
 void ServoPanBehavior::handleMessage(
    MessagePtr message)
 {
-   // enable
-   if (message->getMessageId() == "enable")
-   {
-      enable();
-      message->setFree();
-   }
-   // disable
-   else if (message->getMessageId() == "disable")
-   {
-      disable();
-      message->setFree();
-   }
    // panTo
-   else if (message->getMessageId() == "panTo")
+   if (message->getMessageId() == "panTo")
    {
       int angle = message->getInt("angle");
       int seconds = message->getInt("seconds");
@@ -50,7 +38,7 @@ void ServoPanBehavior::handleMessage(
    }
    else
    {
-      Component::handleMessage(message);
+      Behavior::handleMessage(message);
    }
 }
 

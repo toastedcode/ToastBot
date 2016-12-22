@@ -1,0 +1,230 @@
+#include "FollowBehavior.hpp.work"
+
+// *****************************************************************************
+
+namespace
+{
+
+class ProximityBehavior : public Behavior, TimerListener
+{
+
+public:
+
+   enum Proximity
+   {
+      NONE,
+      ADJACENT,
+      NEAR,
+      FAR
+   };
+
+   ProximityBehavior(
+      const String& id) :
+         Behavior(id)
+   {
+      timer = Timer::newTimer("sensorTimer", 500, Timer::PERIODIC, this);
+
+      setState(NONE);
+   }
+
+   ~ProximityBehavior()
+   {
+      Timer::freeTimer(timer);
+   }
+
+   virtual void timeout(
+      Timer* timer)
+   {
+      if (isEnabled())
+      {
+         int reading = DistanceSensor::toCentimeters(distanceSensor->read());
+
+         setState(getProximity(reading));
+      }
+   }
+
+   virtual void setState(
+      const int& state)
+   {
+      Behavior::setState(state);
+
+      Logger::logDebug("%s: -> %d", getId().c_str(), state);
+   }
+
+private:
+
+   Proximity ProximityBehavior::getProximity(
+      const int& reading)
+   {
+      const int ADJACENT_DISTANCE = 20;  // cm
+      const int NEAR_DISTANCE = 50;  // cm
+      const int FAR_DISTANCE = 100;  // cm
+
+      Proximity proximity = NONE;
+
+      if (reading == 0)
+      {
+         proximity = NONE;
+      }
+      else if (reading <= ADJACENT_DISTANCE)
+      {
+         proximity = ADJACENT;
+      }
+      else if (reading < NEAR_DISTANCE)
+      {
+         proximity = NEAR;
+      }
+      else if (reading < FAR_DISTANCE)
+      {
+         proximity = FAR;
+      }
+
+      return (proximity);
+   }
+
+   Timer* timer;
+};
+
+class FollowingBehavior  : public Behavior, TimerListener
+{
+
+public:
+
+   enum State
+   {
+      LEFT,
+      RIGHT
+   };
+
+   FollowingBehavior(
+      const String& id,
+      const MotorPair* motorPair) :
+         Behavior(id),
+         motorPair(motorPair),
+         timer(0)
+   {
+      setState(LEFT);
+   }
+
+   ~FollowingBehavior()
+   {
+      Timer::freeTimer(timer);
+   }
+
+   virtual void timeout(
+      Timer* timer)
+   {
+      if (isEnabled())
+      {
+         setState((getState() == LEFT) ? RIGHT : LEFT);
+      }
+   }
+
+   virtual void setState(
+      const int& state)
+   {
+      Behavior::setState(state);
+
+      Logger::logDebug("%s: -> %d", getId().c_str(), state);
+   }
+
+private:
+
+   Timer* timer;
+
+   MotorPair* motorPair;
+};
+
+}
+
+// *****************************************************************************
+
+ScoutBehavior::ScoutBehavior(
+   const String& id,
+   MotorPair* motorPair,
+   DistanceSensor* distanceSensor) :
+      Behavior(id)
+{
+   disable();
+}
+
+ScoutBehavior::~ScoutBehavior()
+{
+}
+
+void ScoutBehavior::enable()
+{
+   setState(FORWARD);
+   Behavior::enable();
+}
+
+void ScoutBehavior::disable()
+{
+   setState(INIT);
+   Behavior::disable();
+}
+
+void ScoutBehavior::onStateChange(
+   Behavior* behavior,
+   const int& previousState,
+   const int& newState)
+{
+   if (isEnabled())
+   {
+      if ((getState() == FORWARD) &&
+          (behavior->getId() == (getId() + ".forward")) &&
+          (newState == ForwardBehavior::BLOCKED))
+      {
+         setState(REVERSE);
+      }
+      else if ((getState() == REVERSE) &&
+               (behavior->getId() == (getId() + ".reverse")) &&
+               (newState == ReverseBehavior::DONE))
+      {
+         setState(ROTATE);
+      }
+      else if ((getState() == ROTATE) &&
+               (behavior->getId() == (getId() + ".rotate")) &&
+               (newState == RotateBehavior::DONE))
+      {
+         setState(FORWARD);
+      }
+   }
+}
+
+void ScoutBehavior::setState(
+   const int& state)
+{
+   switch (state)
+   {
+      case INIT:
+      {
+         forwardBehavior->setState(ForwardBehavior::INIT);
+         reverseBehavior->setState(ReverseBehavior::INIT);
+         rotateBehavior->setState(RotateBehavior::INIT);
+         break;
+      }
+
+      case FORWARD:
+      {
+         forwardBehavior->setState(ForwardBehavior::MOVING);
+         break;
+      }
+
+      case REVERSE:
+      {
+         reverseBehavior->setState(ReverseBehavior::MOVING);
+         break;
+      }
+
+      case ROTATE:
+      {
+         rotateBehavior->setState(RotateBehavior::ROTATING);
+         break;
+      }
+   }
+
+   Logger::logDebug("%s: -> %d", getId().c_str(), state);
+
+   Behavior::setState(state);
+}

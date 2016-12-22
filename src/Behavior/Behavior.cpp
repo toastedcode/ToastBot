@@ -1,5 +1,26 @@
 #include "Behavior.hpp"
 
+void Behavior::handleMessage(
+   MessagePtr message)
+{
+   // enable
+   if (message->getMessageId() == "enable")
+   {
+      enable();
+      message->setFree();
+   }
+   // disable
+   else if (message->getMessageId() == "disable")
+   {
+      disable();
+      message->setFree();
+   }
+   else
+   {
+      Component::handleMessage(message);
+   }
+}
+
 void Behavior::setup()
 {
    Component::setup();

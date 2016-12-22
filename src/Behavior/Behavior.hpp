@@ -15,12 +15,12 @@ public:
 
    virtual ~Behavior();
 
+   void handleMessage(
+      MessagePtr message);
+
    virtual void setup();
 
    virtual void loop();
-
-   virtual void handleMessage(
-      MessagePtr message);
 
    int getState() const;
 
@@ -64,12 +64,6 @@ inline Behavior::Behavior(
 
 inline Behavior::~Behavior()
 {
-}
-
-inline void Behavior::handleMessage(
-   MessagePtr message)
-{
-   Component::handleMessage(message);
 }
 
 inline int Behavior::getState() const
