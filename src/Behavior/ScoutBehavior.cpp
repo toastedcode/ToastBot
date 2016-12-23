@@ -44,6 +44,8 @@ public:
       {
          int reading = DistanceSensor::toCentimeters(distanceSensor->read());
 
+         Logger::logDebug("ForwardBehavior::timeout: %d\n", reading);
+
          if ((getState() == MOVING) &&
              (reading <= 10))
          {
@@ -263,6 +265,10 @@ ScoutBehavior::ScoutBehavior(
    addChild(forwardBehavior);
    addChild(reverseBehavior);
    addChild(rotateBehavior);
+
+   forwardBehavior->enable();
+   reverseBehavior->enable();
+   rotateBehavior->enable();
 
    disable();
 }
