@@ -1,6 +1,7 @@
-#include "Adapter\IpClientAdapter.hpp"
-#include "Adapter\IpServerAdapter.hpp"
 #include "Adapter\MqttClientAdapter.hpp"
+#include "Adapter\TcpClientAdapter.hpp"
+#include "Adapter\TcpServerAdapter.hpp"
+#include "Adapter\UdpAdapter.hpp"
 #include "Adapter\WebSocketAdapter.hpp"
 #include "Behavior\ScoutBehavior.hpp"
 #include "Behavior\ServoPanBehavior.hpp"
@@ -14,3 +15,7 @@
 #include "Logger\RemoteLogger.hpp"
 #include "Messaging\JsonProtocol.hpp"
 #include "ToastBot.hpp"
+
+#include "Adapter/TcpClientAdapter.hpp"
+#include "Adapter/TcpServerAdapter.hpp"
+#include "Adapter/UdpAdapter.hpp"

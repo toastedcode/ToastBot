@@ -107,8 +107,10 @@ void setup()
    ToastBot::add(new ScoutBehavior("scout1", motorPair1, distance1));
    
    ToastBot::add(new WebSocketAdapter("adapter1", new JsonProtocol(), 81));
-   //ToastBot::add(new IpServerAdapter("adapter2", new JsonProtocol(), 80));
-   //ToastBot::add(new MqttClientAdapter("adapter3", new JsonProtocol(), "broker.mqtt-dashboard.com", 1883, "toastbot1", "", ""));
+   ToastBot::add(new TcpServerAdapter("adapter2", new JsonProtocol(), 1975));
+   ToastBot::add(new MqttClientAdapter("adapter3", new JsonProtocol(), "broker.mqtt-dashboard.com", 1883, "toastbot1", "", ""));
+   ToastBot::add(new UdpAdapter("adapter4", new JsonProtocol(), 1993));
+   ToastBot::add(new TcpClientAdapter("adapter5", new JsonProtocol(), "192.168.1.1", 1997));
 
    //Logger::setLogger(new RemoteLogger("adapter1"));
 

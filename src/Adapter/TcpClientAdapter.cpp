@@ -1,14 +1,14 @@
-#include "IpClientAdapter.hpp"
 #include "Messaging.h"
+#include "TcpClientAdapter.hpp"
 
-const int IpClientAdapter::RETRY_DELAY = 5000;  // 5 seconds
+const int TcpClientAdapter::RETRY_DELAY = 5000;  // 5 seconds
 
-void IpClientAdapter::setup()
+void TcpClientAdapter::setup()
 {
    connect();
 }
 
-void IpClientAdapter::loop()
+void TcpClientAdapter::loop()
 {
    Adapter::loop();
 
@@ -20,7 +20,7 @@ void IpClientAdapter::loop()
    }
 }
 
-bool IpClientAdapter::sendRemoteMessage(
+bool TcpClientAdapter::sendRemoteMessage(
    MessagePtr message)
 {
    bool isSuccess = false;
@@ -39,7 +39,7 @@ bool IpClientAdapter::sendRemoteMessage(
    return (isSuccess);
 }
 
-MessagePtr IpClientAdapter::getRemoteMessage()
+MessagePtr TcpClientAdapter::getRemoteMessage()
 {
    MessagePtr message = 0;
 
@@ -73,7 +73,7 @@ MessagePtr IpClientAdapter::getRemoteMessage()
    return (message);
 }
 
-bool IpClientAdapter::connect()
+bool TcpClientAdapter::connect()
 {
    bool success = client.connect(host.c_str(), port);
 
@@ -89,7 +89,7 @@ bool IpClientAdapter::connect()
    return (success);
 }
 
-bool IpClientAdapter::disconnect()
+bool TcpClientAdapter::disconnect()
 {
    // TODO
    return (false);

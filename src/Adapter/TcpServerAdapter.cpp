@@ -1,17 +1,17 @@
-#include "IpServerAdapter.hpp"
 #include "Messaging.h"
+#include "TcpServerAdapter.hpp"
 
-void IpServerAdapter::setup()
+void TcpServerAdapter::setup()
 {
    printf(
-      "IpServerAdapter::setup: IP Server Adapter [%s] is listening on port %d.\n",
+      "TcpServerAdapter::setup: TCP Server Adapter [%s] is listening on port %d.\n",
       getId().c_str(),
       port);
 
    server.begin();
 }
 
-bool IpServerAdapter::sendRemoteMessage(
+bool TcpServerAdapter::sendRemoteMessage(
    MessagePtr message)
 {
    bool isSuccess = false;
@@ -29,7 +29,7 @@ bool IpServerAdapter::sendRemoteMessage(
       else
       {
          printf(
-            "IpServerAdapter::sendRemoteMessage: Failed to send message [%s] to remote host.\n",
+            "TcpServerAdapter::sendRemoteMessage: Failed to send message [%s] to remote host.\n",
             message->getMessageId().c_str());
       }
    }
@@ -37,7 +37,7 @@ bool IpServerAdapter::sendRemoteMessage(
    return (isSuccess);
 }
 
-MessagePtr IpServerAdapter::getRemoteMessage()
+MessagePtr TcpServerAdapter::getRemoteMessage()
 {
    MessagePtr message = 0;
 
@@ -53,11 +53,11 @@ MessagePtr IpServerAdapter::getRemoteMessage()
    isConnected = client.connected();
    if (!wasConnected && isConnected)
    {
-      printf("IpServerAdapter::getRemoteMessage: IP Server Adapter [%s] connected.\n", getId().c_str());
+      printf("TcpServerAdapter::getRemoteMessage: TCP Server Adapter [%s] connected.\n", getId().c_str());
    }
    else if (wasConnected && !isConnected)
    {
-      printf("IpServerAdapter::getRemoteMessage: IP Server Adapter [%s] disconnected.\n", getId().c_str());
+      printf("TcpServerAdapter::getRemoteMessage: TCP Server Adapter [%s] disconnected.\n", getId().c_str());
    }
 
    if ((client) && client.available())
