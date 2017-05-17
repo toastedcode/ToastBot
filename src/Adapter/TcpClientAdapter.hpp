@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Adapter.hpp"
 #include "ESP8266WiFi.h"
 
