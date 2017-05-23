@@ -9,12 +9,22 @@ class UdpAdapter : public Adapter
 
 public:
 
+   // Constructor for UDP listen-only adapter.
    UdpAdapter(
       const String& id,
       Protocol* protocol,
       const int& port);
 
+   // Constructor for UDP send-only adapter.
+   UdpAdapter(
+      const String& id,
+      Protocol* protocol,
+      const IPAddress& ipAddress,
+      const int& port);
+
    virtual void setup();
+
+   virtual void loop();
 
    virtual bool sendRemoteMessage(
       MessagePtr message);
@@ -23,16 +33,21 @@ public:
 
 protected:
 
-   int port;
+   int listenPort;
+
+   IPAddress sendIpAddress;
+
+   int sendPort;
 
    WiFiUDP server;
-};
 
-inline UdpAdapter::UdpAdapter(
-   const String& id,
-   Protocol* protocol,
-   const int& port) :
-      Adapter(id, protocol),
-      port(port)
-{
-}
+private:
+
+   // This operation retrieves (or creates, if necessary) a "reply adapter" which
+   // can be used to reply to a message received by this adapter.
+   String getReplyAdapter(
+      // The IP address to use when sending a reply.
+      const IPAddress& ipAddress,
+      // The port to use when sending a reply.
+      const int& port) const;
+};

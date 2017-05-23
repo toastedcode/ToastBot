@@ -2,9 +2,11 @@
 #include <Board.h>
 #include <ESP8266WiFi.h>
 #include <Common.h>
+#include <FS.h>
 #include <Messaging.h>
 #include <NewPing.h>
 #include <Logger.h>
+#include <Properties.h>
 #include <PubSubClient.h>
 #include <Timer.h>
 #include <ToastBot.h>
@@ -51,6 +53,50 @@ void Robox::handleMessage(
 
       message->setFree();   
    }
+   else if (message->getMessageId() == "reset")
+   {
+      Logger::logDebug("Resetting ...");
+      Board::getBoard()->reset();
+   }
+   else if (message->getMessageId() == "property")
+   {
+      String propertyName = message->getString("name");
+      String propertyValue = message->getString("value");
+
+      if (propertyName != "")
+      {
+         Properties properties("/toastbot.properties");
+
+         if (propertyValue != "")
+         {
+            properties.set(propertyName, propertyValue);
+            Logger::logDebug("Updated properties: %s = %s", propertyName.c_str(), propertyValue.c_str());
+         }
+         else
+         {
+            properties.remove(propertyName);
+            Logger::logDebug("Removed property: %s", propertyName.c_str());
+         }
+
+         properties.save();
+      }
+   }
+   else if (message->getMessageId() == "digitalWrite")
+   {
+      int pin = message->getInt("pin");
+      int value = message->getInt("value");
+
+      Logger::logDebug("digitalWrite(%d, %d)", pin, value);
+      Board::getBoard()->digitalWrite(pin, value);
+   }
+   else if (message->getMessageId() == "analogWrite")
+   {
+      int pin = message->getInt("pin");
+      int value = message->getInt("value");
+
+      Logger::logDebug("analogWrite(%d, %d)", pin, value);
+      Board::getBoard()->analogWrite(pin, value);
+   }
    else
    {
       Component::handleMessage(message);
@@ -60,15 +106,22 @@ void Robox::handleMessage(
 void setup()
 {
    Serial.begin(9600);
+
+   SPIFFS.begin();
     
    Logger::setLogger(new SerialLogger());
+
+   Properties properties;
+   properties.load("/toastbot.properties");
+   Logger::logDebug("Properties: \n%s", properties.toString().c_str());
 
    WifiBoard* board = new Esp8266Board();
    Board::setBoard(board);
 
    // Connect to a known network.
-   if (board->connectWifi("NETGEAR69", "silentsky723", 15) == false)
+   //if (board->connectWifi("NETGEAR69", "silentsky723", 15) == false)
    //if (board->connectWifi("Massive", "getshitdone", 15) == false)
+   if (board->connectWifi("compunetix-guest", "compunetix", 15) == false)
    {
       // If the ESP8266 fails to connect with the stored credentials, we'll create an AP to allow for wifi config.
       board->startAccessPoint("TOASTBOT", "");
@@ -104,13 +157,14 @@ void setup()
    ToastBot::add(follow2);
    */
 
-   ToastBot::add(new ScoutBehavior("scout1", motorPair1, distance1));
-   
-   ToastBot::add(new WebSocketAdapter("adapter1", new JsonProtocol(), 81));
+   //ToastBot::add(new ScoutBehavior("scout1", motorPair1, distance1));
+
+   ToastBot::add(new SerialAdapter("serial", new JsonProtocol()));
+   //ToastBot::add(new WebSocketAdapter("adapter1", new JsonProtocol(), 81));
    ToastBot::add(new TcpServerAdapter("adapter2", new JsonProtocol(), 1975));
-   ToastBot::add(new MqttClientAdapter("adapter3", new JsonProtocol(), "broker.mqtt-dashboard.com", 1883, "toastbot1", "", ""));
+   //ToastBot::add(new MqttClientAdapter("adapter3", new JsonProtocol(), "broker.mqtt-dashboard.com", 1883, "toastbot1", "", ""));
    ToastBot::add(new UdpAdapter("adapter4", new JsonProtocol(), 1993));
-   ToastBot::add(new TcpClientAdapter("adapter5", new JsonProtocol(), "192.168.1.1", 1997));
+   //ToastBot::add(new TcpClientAdapter("adapter5", new JsonProtocol(), "192.168.1.1", 1997));
 
    //Logger::setLogger(new RemoteLogger("adapter1"));
 

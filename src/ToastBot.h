@@ -1,4 +1,5 @@
 #include "Adapter\MqttClientAdapter.hpp"
+#include "Adapter\SerialAdapter.hpp"
 #include "Adapter\TcpClientAdapter.hpp"
 #include "Adapter\TcpServerAdapter.hpp"
 #include "Adapter\UdpAdapter.hpp"
