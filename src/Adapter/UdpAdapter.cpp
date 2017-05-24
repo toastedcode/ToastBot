@@ -1,6 +1,7 @@
 #include "Board.hpp"
 #include "Messaging.h"
 #include "UdpAdapter.hpp"
+#include "StringUtils.hpp"
 
 UdpAdapter::UdpAdapter(
    const String& id,
@@ -68,16 +69,31 @@ bool UdpAdapter::sendRemoteMessage(
 {
    bool isSuccess = false;
 
-   // If this is not a listen-only adapter ...
-   if (sendPort != 0)
+   IPAddress remoteIpAddress;
+   int remotePort = 0;
+
+   // Try to parse the remote IP address and port from the reply adapter id.
+   parseReplyAdapterId(message->getDestination(), remoteIpAddress, remotePort);
+
+   // If no remote address was specified, use the configured send address.
+   if (remotePort == 0)
+   {
+      remoteIpAddress = sendIpAddress;
+      remotePort = sendPort;
+   }
+
+   // If we have a valid destination ...
+   if (remotePort != 0)
    {
       String serializedMessage = protocol->serialize(message);
 
       if (serializedMessage != "")
       {
-         if (server.beginPacket(sendIpAddress, sendPort) != 0)
+         if (server.beginPacket(remoteIpAddress, remotePort) != 0)
          {
-            server.write(serializedMessage.c_str());
+            printf("UdpAdapter::sendRemoteMessage Sending to %s:%d\n", remoteIpAddress.toString().c_str(), remotePort);
+
+            server.write(serializedMessage.c_str(), serializedMessage.length());
             isSuccess = server.endPacket();
          }
       }
@@ -127,7 +143,7 @@ MessagePtr UdpAdapter::getRemoteMessage()
                else
                {
                   // Create a "reply adapter" that we can use to reply to this message.
-                  String replyAdapterId = getReplyAdapter(server.remoteIP(), server.remotePort());
+                  String replyAdapterId = getReplyAdapterId(server.remoteIP(), server.remotePort());
                   message->setSource(replyAdapterId);
                }
             }
@@ -142,7 +158,7 @@ MessagePtr UdpAdapter::getRemoteMessage()
    return (message);
 }
 
-String UdpAdapter::getReplyAdapter(
+String UdpAdapter::getReplyAdapterId(
    const IPAddress& ipAddress,
    const int& port) const
 {
@@ -150,17 +166,35 @@ String UdpAdapter::getReplyAdapter(
 
    // Create a unique id for this adapter.
    IPAddress nonConstIpAddress = ipAddress;
-   String replyAdapterId = PREFIX + nonConstIpAddress.toString() + ":" + String(port);
-
-   if (MessageRouter::isRegistered(replyAdapterId) == false)
-   {
-      printf(
-         "UdpAdapter::getReplyAdapter: Creating UDP reply adapter [%s].\n",
-         replyAdapterId.c_str());
-
-      Adapter* adapter = new UdpAdapter(replyAdapterId, protocol, ipAddress, port);
-      MessageRouter::registerHandler(adapter);
-   }
+   String replyAdapterId = getId() + MESSAGE_HANDLER_ID_SEPARATOR + nonConstIpAddress.toString() + ":" + String(port);
 
    return (replyAdapterId);
+}
+
+void UdpAdapter::parseReplyAdapterId(
+   const String& replyAdapterId,
+   IPAddress& ipAddress,
+   int& port)
+{
+   // Parses: udpadapter@10.4.41.179:8080 into 10.4.41.179 and 8080.
+
+   // Find the "@".
+   int pos = StringUtils::findFirstOf(replyAdapterId, MESSAGE_HANDLER_ID_SEPARATOR);
+
+   if (pos != -1)
+   {
+      String destination = replyAdapterId.substring(pos + 1);
+
+      // Find the ":";
+      pos = StringUtils::findFirstOf(destination, ":");
+
+      if (pos != -1)
+      {
+         String ipAddressStr = destination.substring(0, pos);
+         String portStr = destination.substring(pos + 1);
+
+         ipAddress.fromString(ipAddressStr.c_str());
+         port = portStr.toInt();
+      }
+   }
 }

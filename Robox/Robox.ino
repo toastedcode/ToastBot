@@ -12,6 +12,8 @@
 #include <ToastBot.h>
 #include <WebSocketServer.h>
 
+#include "StringUtils.hpp"
+
 class Robox : public Component
 {
   
@@ -45,7 +47,12 @@ void Robox::handleMessage(
 
       if (WifiBoard::getBoard())
       {
-        reply->set("macAddress", WifiBoard::getBoard()->getMacAddress());
+        unsigned char mac[6] = {0, 0, 0, 0, 0, 0};
+        WifiBoard::getBoard()->getMacAddress(mac);
+        char macAddress[18];
+        sprintf(macAddress, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+        
+        reply->set("macAddress", macAddress);
         reply->set("ipAddress", WifiBoard::getBoard()->getIpAddress());
       }
       
@@ -163,13 +170,16 @@ void setup()
    //ToastBot::add(new WebSocketAdapter("adapter1", new JsonProtocol(), 81));
    ToastBot::add(new TcpServerAdapter("adapter2", new JsonProtocol(), 1975));
    //ToastBot::add(new MqttClientAdapter("adapter3", new JsonProtocol(), "broker.mqtt-dashboard.com", 1883, "toastbot1", "", ""));
-   ToastBot::add(new UdpAdapter("adapter4", new JsonProtocol(), 1993));
-   //ToastBot::add(new TcpClientAdapter("adapter5", new JsonProtocol(), "192.168.1.1", 1997));
+   ToastBot::add(new UdpAdapter("adapter4", new JsonProtocol(), 1993));  
+   //ToastBot::add(new UdpAdapter("adapter5", new JsonProtocol(), IPAddress(10, 1, 11, 249), 55056));
+   //ToastBot::add(new TcpClientAdapter("adapter5", new JsonProtocol(), "10.1.11.249", 1997));
 
-   //Logger::setLogger(new RemoteLogger("adapter1"));
+   Logger::setLogger(new RemoteLogger("adapter2"));
 
-   ToastBot::setup("myMachine");
+   ToastBot::setup(properties.getString("deviceName"));
 }
+
+long retryTime = millis() + 5000;;
 
 void loop()
 {

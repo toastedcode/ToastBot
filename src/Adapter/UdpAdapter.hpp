@@ -43,11 +43,16 @@ protected:
 
 private:
 
-   // This operation retrieves (or creates, if necessary) a "reply adapter" which
+   // This operation creates a "reply adapter id" which
    // can be used to reply to a message received by this adapter.
-   String getReplyAdapter(
+   String getReplyAdapterId(
       // The IP address to use when sending a reply.
       const IPAddress& ipAddress,
       // The port to use when sending a reply.
       const int& port) const;
+
+   void parseReplyAdapterId(
+      const String& replyAdapterId,
+      IPAddress& ipAddress,
+      int& port);
 };
