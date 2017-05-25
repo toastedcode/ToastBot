@@ -45,28 +45,27 @@ MessagePtr TcpClientAdapter::getRemoteMessage()
 
    String serializedMessage = "";
 
-   while ((client.connected()) &&
-          (client.available() > 0))
+   if ((client) && client.available())
    {
-      serializedMessage += client.read();
-   }
+      serializedMessage = client.readStringUntil('\r');
 
-   if (serializedMessage.length() > 0)
-   {
-      // Create a new message.
-      message = Messaging::newMessage();
+      if (serializedMessage.length() > 0)
+      {
+         // Create a new message.
+         message = Messaging::newMessage();
 
-      // Parse the message from the message string.
-      if (protocol->parse(serializedMessage, message) == true)
-      {
-         // Parse was successful.
-         message->setSource(getId());
-      }
-      else
-      {
-         // Parse failed.  Set the message free.
-         message->setFree();
-         message = 0;
+         // Parse the message from the message string.
+         if (protocol->parse(serializedMessage, message) == true)
+         {
+            // Parse was successful.
+            message->setSource(getId());
+         }
+         else
+         {
+            // Parse failed.  Set the message free.
+            message->setFree();
+            message = 0;
+         }
       }
    }
 

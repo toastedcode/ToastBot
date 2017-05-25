@@ -42,6 +42,8 @@ private:
    static String id;
 
    static Set<Component*, MAX_COMPONENTS> components;
+
+   static bool initialized;
 };
 
 inline void ToastBot::setId(

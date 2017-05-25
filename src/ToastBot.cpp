@@ -18,6 +18,8 @@ const int ToastBot::MAX_COMPONENTS;
 
 String ToastBot::id;
 
+bool ToastBot::initialized = false;
+
 Set<Component*, ToastBot::MAX_COMPONENTS> ToastBot::components;
 
 bool ToastBot::add(
@@ -29,6 +31,12 @@ bool ToastBot::add(
    if (components.add(component) == true)
    {
       MessageRouter::registerHandler(component, setDefaultHandler);
+
+      if (initialized == true)
+      {
+         component->setup();
+      }
+
       isSuccess = true;
    }
 
@@ -60,6 +68,8 @@ void ToastBot::setup(
    {
       components.item(i)->value->setup();
    }
+
+   initialized = true;
 }
 
 void ToastBot::loop()

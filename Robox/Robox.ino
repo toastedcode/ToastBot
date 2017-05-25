@@ -12,8 +12,9 @@
 #include <ToastBot.h>
 #include <WebSocketServer.h>
 
-#include "StringUtils.hpp"
+#include "Robox.hpp"
 
+/*
 class Robox : public Component
 {
   
@@ -104,11 +105,22 @@ void Robox::handleMessage(
       Logger::logDebug("analogWrite(%d, %d)", pin, value);
       Board::getBoard()->analogWrite(pin, value);
    }
+   else if (message->getMessageId() == "bridge")
+   {
+      String name = message->getString("name");
+      String host = message->getString("host");
+      int port = message->getInt("port");
+      
+      Logger::logDebug("bridge(%s, %s:%d)", name.c_str(), host.c_str(), port);
+      
+      ToastBot::add(new TcpClientAdapter(name, new JsonProtocol(), host, port));
+   }
    else
    {
       Component::handleMessage(message);
    }
 }
+*/
 
 void setup()
 {
@@ -174,7 +186,7 @@ void setup()
    //ToastBot::add(new UdpAdapter("adapter5", new JsonProtocol(), IPAddress(10, 1, 11, 249), 55056));
    //ToastBot::add(new TcpClientAdapter("adapter5", new JsonProtocol(), "10.1.11.249", 1997));
 
-   Logger::setLogger(new RemoteLogger("adapter2"));
+   //Logger::setLogger(new RemoteLogger("adapter2"));
 
    ToastBot::setup(properties.getString("deviceName"));
 }

@@ -38,32 +38,6 @@ void UdpAdapter::setup()
    }
 }
 
-void UdpAdapter::loop()
-{
-   MessagePtr message = NULL;
-
-   //
-   // Send
-   //
-
-   Component::loop();
-
-   //
-   // Receive
-   //
-
-   message = getRemoteMessage();
-   while (message != NULL)
-   {
-      // Disable this.  We'll set the source id to the "reply adapter" in getRemoteMessage().
-      //message->setSource(getId());
-
-      MessageRouter::send(message);
-
-      message = getRemoteMessage();
-   }
-}
-
 bool UdpAdapter::sendRemoteMessage(
    MessagePtr message)
 {
@@ -73,7 +47,7 @@ bool UdpAdapter::sendRemoteMessage(
    int remotePort = 0;
 
    // Try to parse the remote IP address and port from the reply adapter id.
-   parseReplyAdapterId(message->getDestination(), remoteIpAddress, remotePort);
+   parseSocketString(message->getDestination(), remoteIpAddress, remotePort);
 
    // If no remote address was specified, use the configured send address.
    if (remotePort == 0)
@@ -142,9 +116,9 @@ MessagePtr UdpAdapter::getRemoteMessage()
                }
                else
                {
-                  // Create a "reply adapter" that we can use to reply to this message.
-                  String replyAdapterId = getReplyAdapterId(server.remoteIP(), server.remotePort());
-                  message->setSource(replyAdapterId);
+                  // Address the message from the ipaddress:port from which we received the message..
+                  String src = getSocketString(server.remoteIP(), server.remotePort());
+                  message->setSource(src);
                }
             }
          }
@@ -158,43 +132,36 @@ MessagePtr UdpAdapter::getRemoteMessage()
    return (message);
 }
 
-String UdpAdapter::getReplyAdapterId(
+String UdpAdapter::getSocketString(
    const IPAddress& ipAddress,
-   const int& port) const
+   const int& port)
 {
-   static const String PREFIX = "UDP_REPLY_";
-
    // Create a unique id for this adapter.
    IPAddress nonConstIpAddress = ipAddress;
-   String replyAdapterId = getId() + MESSAGE_HANDLER_ID_SEPARATOR + nonConstIpAddress.toString() + ":" + String(port);
+   String destination = nonConstIpAddress.toString() + ":" + String(port);
 
-   return (replyAdapterId);
+   return (destination);
 }
 
-void UdpAdapter::parseReplyAdapterId(
-   const String& replyAdapterId,
+void UdpAdapter::parseSocketString(
+   const String& socketString,
    IPAddress& ipAddress,
    int& port)
 {
-   // Parses: udpadapter@10.4.41.179:8080 into 10.4.41.179 and 8080.
+   // Parses: 10.4.41.179:8080 into 10.4.41.179 and 8080.
 
-   // Find the "@".
-   int pos = StringUtils::findFirstOf(replyAdapterId, MESSAGE_HANDLER_ID_SEPARATOR);
+   // Initialize the return value.
+   port = 0;
+
+   // Find the ":";
+   int pos = StringUtils::findFirstOf(socketString, ":");
 
    if (pos != -1)
    {
-      String destination = replyAdapterId.substring(pos + 1);
+      String ipAddressStr = socketString.substring(0, pos);
+      String portStr = socketString.substring(pos + 1);
 
-      // Find the ":";
-      pos = StringUtils::findFirstOf(destination, ":");
-
-      if (pos != -1)
-      {
-         String ipAddressStr = destination.substring(0, pos);
-         String portStr = destination.substring(pos + 1);
-
-         ipAddress.fromString(ipAddressStr.c_str());
-         port = portStr.toInt();
-      }
+      ipAddress.fromString(ipAddressStr.c_str());
+      port = portStr.toInt();
    }
 }

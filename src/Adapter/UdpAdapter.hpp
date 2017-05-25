@@ -24,8 +24,6 @@ public:
 
    virtual void setup();
 
-   virtual void loop();
-
    virtual bool sendRemoteMessage(
       MessagePtr message);
 
@@ -43,16 +41,18 @@ protected:
 
 private:
 
-   // This operation creates a "reply adapter id" which
-   // can be used to reply to a message received by this adapter.
-   String getReplyAdapterId(
+   // This operation returns a stringified version of an IP address and port.
+   // Format xxx.xxx.xxx.xxx:xx
+   static String getSocketString(
       // The IP address to use when sending a reply.
       const IPAddress& ipAddress,
       // The port to use when sending a reply.
-      const int& port) const;
+      const int& port);
 
-   void parseReplyAdapterId(
-      const String& replyAdapterId,
+   // This operation parses a string into an IP address and port.
+   // Expected format xxx.xxx.xxx.xxx:xx
+   static void parseSocketString(
+      const String& destination,
       IPAddress& ipAddress,
       int& port);
 };
