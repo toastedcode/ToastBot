@@ -65,8 +65,6 @@ bool UdpAdapter::sendRemoteMessage(
       {
          if (server.beginPacket(remoteIpAddress, remotePort) != 0)
          {
-            printf("UdpAdapter::sendRemoteMessage Sending to %s:%d\n", remoteIpAddress.toString().c_str(), remotePort);
-
             server.write(serializedMessage.c_str(), serializedMessage.length());
             isSuccess = server.endPacket();
          }
