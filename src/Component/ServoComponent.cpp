@@ -9,6 +9,7 @@
 // *****************************************************************************
 
 #include "Logger.hpp"
+#include "Messaging.hpp"
 #include "ServoComponent.hpp"
 
 const int ServoComponent::MIN_ANGLE;
@@ -31,6 +32,13 @@ void ServoComponent::setPwm(
    servo.writeMicroseconds(constrain(pwm, MIN_PWM, MAX_PWM));
 }
 
+void ServoComponent::setup()
+{
+   servo.attach(pin);
+
+   Messaging::subscribe(this, "killSwitch");
+}
+
 void ServoComponent::handleMessage(
    MessagePtr message)
 {
@@ -46,6 +54,15 @@ void ServoComponent::handleMessage(
       Logger::logDebug("ServoComponent::handleMessage: rotate(%d)", angle);
 
       rotate(angle);
+
+      message->setFree();
+   }
+   // killSwitch
+   else if (message->getMessageId() == "killSwitch")
+   {
+      Logger::logDebug("ServoComponent::handleMessage: killSwitch");
+
+      rotate(MIN_ANGLE);
 
       message->setFree();
    }

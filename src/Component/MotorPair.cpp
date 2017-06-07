@@ -24,7 +24,10 @@ const int MotorPair::MAX_YAW;
 MotorPair::MotorPair(
    const String& id,
    Motor* leftMotor,
-   Motor* rightMotor) : Component(id)
+   Motor* rightMotor) :
+      Component(id),
+      speed(0),
+      yaw(0)
 {
    this->leftMotor = leftMotor;
    this->rightMotor = rightMotor;
@@ -65,6 +68,7 @@ void MotorPair::rotate(
 
 void MotorPair::setup()
 {
+   Messaging::subscribe(this, "killSwitch");
 }
 
 void MotorPair::run()
@@ -91,6 +95,15 @@ void MotorPair::handleMessage(
       Logger::logDebug("MotorPair::handleMessage: rotate()\n");
 
       rotate(message->getInt("speed"));
+
+      message->setFree();
+   }
+   // killSwitch
+   else if (message->getMessageId() == "killSwitch")
+   {
+      Logger::logDebug("MotorPair::handleMessage: killSwitch");
+
+      drive(0, 0);
 
       message->setFree();
    }

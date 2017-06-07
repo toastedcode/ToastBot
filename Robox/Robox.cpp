@@ -42,10 +42,14 @@ void Robox::handleMessage(
       String propertyName = message->getString("name");
       String propertyValue = message->getString("value");
 
-      if (propertyName != "")
-      {
-         Properties properties("/toastbot.properties");
+      Properties properties("/toastbot.properties");
 
+      if (propertyName == "")
+      {
+         Logger::logDebug("Properties: \n%s", properties.toString().c_str());
+      }
+      else
+      {
          if (propertyValue != "")
          {
             properties.set(propertyName, propertyValue);
@@ -90,4 +94,54 @@ void Robox::handleMessage(
    {
       Component::handleMessage(message);
    }
+}
+
+
+String Robox::getUniqueId()
+{
+   static const String PREFIX = "ROBOX";
+
+   String uniqueId = "";
+   char buffer[32];
+
+   WifiBoard* board = WifiBoard::getBoard();
+
+   if (board)
+   {
+      // Retrieve the MAC address of the board.
+      unsigned char mac[6] = {0, 0, 0, 0, 0, 0};
+      board->getMacAddress(mac);
+
+      // Make an id out of the MAC address.
+      sprintf(buffer,
+              "%s_%02X%02X%02X%02X%02X%02X",
+              PREFIX.c_str(),
+              mac[0],
+              mac[1],
+              mac[2],
+              mac[3],
+              mac[4],
+              mac[5]);
+   }
+   else
+   {
+#ifdef ARDUINO
+      // Seed the random number generator.
+      randomSeed(analogRead(0));
+
+      // Make an id out of some random numbers.
+      sprintf(buffer,
+              "%s_%02X%02X%02X%02X%02X%02X",
+              PREFIX.c_str(),
+              random(255),
+              random(255),
+              random(255),
+              random(255),
+              random(255),
+              random(255),
+              random(255));
+#endif
+   }
+
+   return (String(buffer));
 }

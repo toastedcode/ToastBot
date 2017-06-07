@@ -50,6 +50,8 @@ void Motor::setup()
       Board::getBoard()->pinMode(directionPin, OUTPUT);
       Board::getBoard()->pinMode(speedPin, OUTPUT);
    }
+
+   Messaging::subscribe(this, "killSwitch");
 }
 
 void Motor::handleMessage(
@@ -63,6 +65,15 @@ void Motor::handleMessage(
       Logger::logDebug("Motor::handleMessage: setSpeed(%d)", newSpeed);
 
       setSpeed(newSpeed);
+
+      message->setFree();
+   }
+   // killSwitch
+   else if (message->getMessageId() == "killSwitch")
+   {
+      Logger::logDebug("Motor::handleMessage: killSwitch");
+
+      setSpeed(NO_SPEED);
 
       message->setFree();
    }

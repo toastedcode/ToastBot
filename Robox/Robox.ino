@@ -32,14 +32,16 @@ void setup()
    // Connect to a wifi network.
    String ssid = properties.getString("wifi.ssid");
    String password = properties.getString("wifi.password");
+   String deviceName = properties.getString("deviceName");
    if ((ssid == "") ||
        (board->connectWifi(ssid, password, 15) == false))
    {
       // If the ESP8266 fails to connect with the stored credentials, we'll create an AP to allow for wifi config.
-      board->startAccessPoint("TOASTBOT", "");
+      String apName = (deviceName.length() > 0) ? deviceName : Robox::getUniqueId();
+      board->startAccessPoint(apName, "");
    }
 
-   Logger::logDebug("Starting TOASTBOT");
+   Logger::logDebug("Starting ROBOX");
 
    ToastBot::add(new Robox(), true);  // <-- default handler
 

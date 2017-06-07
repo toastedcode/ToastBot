@@ -91,13 +91,9 @@ inline ServoComponent::ServoComponent(
    const String& id,
    const int& pin) :
       Component(id),
-      pin(pin)
+      pin(pin),
+      angle(0)
 {
-}
-
-inline void ServoComponent::setup()
-{
-   servo.attach(pin);
 }
 
 inline ServoComponent::~ServoComponent()
