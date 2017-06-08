@@ -1,10 +1,11 @@
+#include "Logger.hpp"
 #include "Messaging.h"
 #include "TcpServerAdapter.hpp"
 
 void TcpServerAdapter::setup()
 {
-   printf(
-      "TcpServerAdapter::setup: TCP Server Adapter [%s] is listening on port %d.\n",
+   Logger::logDebug(
+      "TcpServerAdapter::setup: TCP Server Adapter [%s] is listening on port %d.",
       getId().c_str(),
       port);
 
@@ -28,8 +29,8 @@ bool TcpServerAdapter::sendRemoteMessage(
       }
       else
       {
-         printf(
-            "TcpServerAdapter::sendRemoteMessage: Failed to send message [%s] to remote host.\n",
+         Logger::logWarning(
+            "TcpServerAdapter::sendRemoteMessage: Failed to send message [%s] to remote host.",
             message->getMessageId().c_str());
       }
    }
@@ -41,44 +42,78 @@ MessagePtr TcpServerAdapter::getRemoteMessage()
 {
    MessagePtr message = 0;
 
-   String serializedMessage = "";
+   static const int BUFFER_SIZE = 256;
 
+   static const char LF = '\n';
+   static const char CR = '\r';
+
+   static char buffer[BUFFER_SIZE];
+
+   static int readIndex = 0;
+
+   static bool isConnected = false;
+
+   // Check for a TCP connection.
    if (!client.connected())
    {
       client = server.available();
    }
 
-   static bool isConnected = false;
    bool wasConnected = isConnected;
    isConnected = client.connected();
    if (!wasConnected && isConnected)
    {
-      printf("TcpServerAdapter::getRemoteMessage: TCP Server Adapter [%s] connected.\n", getId().c_str());
+      Logger::logDebug("TcpServerAdapter::getRemoteMessage: TCP Server Adapter [%s] connected.", getId().c_str());
    }
    else if (wasConnected && !isConnected)
    {
-      printf("TcpServerAdapter::getRemoteMessage: TCP Server Adapter [%s] disconnected.\n", getId().c_str());
+      Logger::logDebug("TcpServerAdapter::getRemoteMessage: TCP Server Adapter [%s] disconnected.", getId().c_str());
    }
 
-   if ((client) && client.available())
+   if (client && client.available())
    {
-      serializedMessage = client.readStringUntil('\r');
-
-      if (serializedMessage.length() > 0)
+      if (readIndex < BUFFER_SIZE)
       {
-         // Create a new message.
-         message = Messaging::newMessage();
+         char c = client.read();
 
-         if (message)
+         if ((c == CR) || (c == LF))
          {
-            // Parse the message from the message string.
-            if (protocol->parse(serializedMessage, message) == false)
+            // Create the message string.
+            buffer[readIndex] = 0;
+            String serializedMessage = String(buffer);
+
+            if (serializedMessage.length() > 0)
             {
-               // Parse failed.  Set the message free.
-               message->setFree();
-               message = 0;
+               // Create a new message.
+               message = Messaging::newMessage();
+
+               if (message)
+               {
+                  // Parse the message from the message string.
+                  if (protocol->parse(serializedMessage, message) == false)
+                  {
+                     // Parse failed.  Set the message free.
+                     message->setFree();
+                     message = 0;
+                  }
+               }
             }
+
+            // Reset the read index.
+            readIndex = 0;
          }
+         else
+         {
+            // Store the character.
+            buffer[readIndex] = c;
+            readIndex++;
+         }
+      }
+      else
+      {
+         Logger::logWarning("TcpServerAdapter::getRemoteMessage: Buffer overflow.  Discarding bytes.");
+
+         readIndex = 0;
       }
    }
 
