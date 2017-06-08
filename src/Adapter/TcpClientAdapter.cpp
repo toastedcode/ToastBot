@@ -1,3 +1,4 @@
+#include "Logger.hpp"
 #include "Messaging.h"
 #include "TcpClientAdapter.hpp"
 
@@ -43,29 +44,59 @@ MessagePtr TcpClientAdapter::getRemoteMessage()
 {
    MessagePtr message = 0;
 
-   String serializedMessage = "";
+   static const int BUFFER_SIZE = 256;
 
-   if ((client) && client.available())
+   static const char LF = '\n';
+   static const char CR = '\r';
+
+   static char buffer[BUFFER_SIZE];
+
+   static int readIndex = 0;
+
+   if (client && client.available())
    {
-      serializedMessage = client.readStringUntil('\r');
-
-      if (serializedMessage.length() > 0)
+      if (readIndex < BUFFER_SIZE)
       {
-         // Create a new message.
-         message = Messaging::newMessage();
+         char c = client.read();
 
-         // Parse the message from the message string.
-         if (protocol->parse(serializedMessage, message) == true)
+         if ((c == CR) || (c == LF))
          {
-            // Parse was successful.
-            message->setSource(getId());
+            // Create the message string.
+            buffer[readIndex] = 0;
+            String serializedMessage = String(buffer);
+
+            if (serializedMessage.length() > 0)
+            {
+               // Create a new message.
+               message = Messaging::newMessage();
+
+               if (message)
+               {
+                  // Parse the message from the message string.
+                  if (protocol->parse(serializedMessage, message) == false)
+                  {
+                     // Parse failed.  Set the message free.
+                     message->setFree();
+                     message = 0;
+                  }
+               }
+            }
+
+            // Reset the read index.
+            readIndex = 0;
          }
          else
          {
-            // Parse failed.  Set the message free.
-            message->setFree();
-            message = 0;
+            // Store the character.
+            buffer[readIndex] = c;
+            readIndex++;
          }
+      }
+      else
+      {
+         Logger::logWarning("TcpClientAdapter::getRemoteMessage: Buffer overflow.  Discarding bytes.");
+
+         readIndex = 0;
       }
    }
 

@@ -12,7 +12,9 @@ bool JsonProtocol::parse(
    String remainingString = messageString;
    ParameterSet parameters;
 
+#ifdef MESSAGING_DEBUG
    printf("JsonProtocol::parse: Parsing: \"%s\".\n", messageString.c_str());
+#endif
 
    // Strip braces and whitespace.
    remainingString = StringUtils::removeAll(remainingString, " \n\r\t{}");
@@ -20,7 +22,9 @@ bool JsonProtocol::parse(
    // Parse parameters.
    if (parseParameters(remainingString, parameters) == false)
    {
+#ifdef MESSAGING_DEBUG
       printf("JsonProtocol::parse: Failed to parse parameters.\n");
+#endif
    }
    else
    {
@@ -49,7 +53,9 @@ String JsonProtocol::serialize(
 
    serializedMessage += "}";
 
+#ifdef MESSAGING_DEBUG
    printf("JsonProtocol::serialize: Serialized: \"%s\".\n", serializedMessage.c_str());
+#endif
 
    return (serializedMessage);
 }
@@ -124,7 +130,9 @@ bool JsonProtocol::parseParameter(
    }
    else
    {
+#ifdef MESSAGING_DEBUG
       printf("JsonProtocol::parse: Failed to parse parameter: \"%s\".\n", parameterString.c_str());
+#endif
    }
 
    return (isSuccess);
@@ -162,7 +170,9 @@ ParameterType JsonProtocol::getType(
    }
    else
    {
+#ifdef MESSAGING_DEBUG
       printf("JsonProtocol::getType: Treating unquoted value [%s] as STRING.\n", value.c_str());
+#endif
    }
 
    return (type);

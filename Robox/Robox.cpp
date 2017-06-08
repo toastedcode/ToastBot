@@ -7,6 +7,8 @@
 void Robox::handleMessage(
       MessagePtr message)
 {
+   Logger::logDebug("Robox::handleMessage: %s", message->getMessageId().c_str());
+
    //  ping
    if (message->getMessageId() == "ping")
    {

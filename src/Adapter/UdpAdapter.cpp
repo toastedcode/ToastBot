@@ -1,4 +1,5 @@
 #include "Board.hpp"
+#include "Logger.hpp"
 #include "Messaging.h"
 #include "UdpAdapter.hpp"
 #include "StringUtils.hpp"
@@ -29,8 +30,8 @@ void UdpAdapter::setup()
 {
    if (listenPort != 0)
    {
-      printf(
-         "UdpAdapter::setup: UDP Adapter [%s] is listening on port %d.\n",
+      Logger::logDebug(
+         "UdpAdapter::setup: UDP Adapter [%s] is listening on port %d.",
          getId().c_str(),
          listenPort);
 
