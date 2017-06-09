@@ -26,6 +26,11 @@ public:
       // The GPIO pin that will be used to set the motor speed.
       const int& speedPin);
 
+   // Constructor.
+   Motor(
+      // A message containing the parameters to use in creating the component.
+      MessagePtr message);
+
    // Destructor.
    virtual ~Motor();
 

@@ -28,10 +28,21 @@ const int Motor::MAX_PWM;
 Motor::Motor(
    const String& id,
    const int& directionPin,
-   const int& speedPin) : Component(id)
+   const int& speedPin) :
+      Component(id),
+      speed(0)
 {
    this->directionPin = directionPin;
    this->speedPin = speedPin;
+}
+
+Motor::Motor(
+   MessagePtr message) :
+      Component(message),
+      speed(0)
+{
+   directionPin = message->isSet("directionPin") ? message->getInt("directionPin") : 0;
+   speedPin = message->isSet("speedPin") ? message->getInt("speedPin") : 0;
 }
 
 void Motor::setSpeed(

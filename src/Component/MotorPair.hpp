@@ -26,6 +26,11 @@ public:
       // The right motor in a motor pair.
       Motor* rightMotor);
 
+   // Constructor.
+   MotorPair(
+      // A message containing the parameters to use in creating the component.
+      MessagePtr message);
+
    // Destructor.
    virtual ~MotorPair();
 

@@ -57,6 +57,23 @@ bool ToastBot::remove(
    return (isSuccess);
 }
 
+Component* ToastBot::get(
+   const String& id) const
+{
+   Component* component = 0;
+
+   for (int i = 0; i < components.length(); i++)
+   {
+      if (components.item(i)->value->getId() == id)
+      {
+         component = components.item(i)->value;
+         break;
+      }
+   }
+
+   return (component);
+}
+
 void ToastBot::setup(
    const String& id)
 {

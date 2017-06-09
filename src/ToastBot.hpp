@@ -32,6 +32,9 @@ public:
    static bool remove(
       Component* component);
 
+   static Component* get(
+      const String& id) const;
+
    static void setup(
       const String& id);
 

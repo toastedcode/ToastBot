@@ -29,6 +29,11 @@ public:
       // The control pin for the servo.
       const int& pin);
 
+   // Constructor.
+   ServoComponent(
+      // A message containing the parameters to use in creating the component.
+      MessagePtr message);
+
    // Destructor.
    virtual ~ServoComponent();
 
@@ -85,20 +90,6 @@ inline int ServoComponent::angleToPwm(
    }
 
    return (pwm);
-}
-
-inline ServoComponent::ServoComponent(
-   const String& id,
-   const int& pin) :
-      Component(id),
-      pin(pin),
-      angle(0)
-{
-}
-
-inline ServoComponent::~ServoComponent()
-{
-   // Nothing to do here.
 }
 
 inline int ServoComponent::getAngle()
