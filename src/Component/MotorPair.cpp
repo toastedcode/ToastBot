@@ -8,9 +8,10 @@
 // *****************************************************************************
 // *****************************************************************************
 
-#include "Logger.h"
+#include "Logger.hpp"
 #include "Messaging.hpp"
 #include "MotorPair.hpp"
+#include "ToastBot.hpp"
 
 const int MotorPair::MIN_SPEED;
 
@@ -23,7 +24,10 @@ const int MotorPair::MAX_YAW;
 MotorPair::MotorPair(
    const String& id,
    Motor* leftMotor,
-   Motor* rightMotor) : Component(id)
+   Motor* rightMotor) :
+      Component(id),
+      speed(0),
+      yaw(0)
 {
    this->leftMotor = leftMotor;
    this->rightMotor = rightMotor;
@@ -34,13 +38,37 @@ void MotorPair::drive(
    int yaw)
 {
    this->speed = constrain(speed, MIN_SPEED, MAX_SPEED);
-   this->yaw = constrain(speed, MIN_YAW, MAX_YAW);
+   this->yaw = constrain(yaw, MIN_YAW, MAX_YAW);
 
    updateMotors();
 }
 
+void MotorPair::rotate(
+   int speed)
+{
+   this->speed = abs(speed);
+   this->yaw = 0;
+
+   if (speed == 0)
+   {
+      leftMotor->setSpeed(this->speed);
+      rightMotor->setSpeed(this->speed);
+   }
+   else if (speed < 0)
+   {
+      leftMotor->setSpeed(this->speed * -1);
+      rightMotor->setSpeed(this->speed);
+   }
+   else
+   {
+      leftMotor->setSpeed(this->speed);
+      rightMotor->setSpeed(speed * -1);
+   }
+}
+
 void MotorPair::setup()
 {
+   Messaging::subscribe(this, "killSwitch");
 }
 
 void MotorPair::run()
@@ -51,22 +79,38 @@ void MotorPair::run()
 void MotorPair::handleMessage(
    MessagePtr message)
 {
-   if (message->getMessageId() == "ping")
+   // motorPair
+   // drive
+   if ((message->getMessageId() == "motorPair") ||
+       (message->getMessageId() == "drive"))
    {
-      Logger::logDebug("Motor::handleMessage: ping()\n");
+      Logger::logDebug("MotorPair::handleMessage: drive()\n");
 
-      Message* reply = Messaging::newMessage();
-      reply->setMessageId("pong");
-      reply->setSource(this->getAddress());
-      reply->setDestination(message->getSource());
-      Messaging::send(reply);
+      drive(message->getInt("speed"), message->getInt("yaw"));
+
+      message->setFree();
+   }
+   else if (message->getMessageId() == "rotate")
+   {
+      Logger::logDebug("MotorPair::handleMessage: rotate()\n");
+
+      rotate(message->getInt("speed"));
+
+      message->setFree();
+   }
+   // killSwitch
+   else if (message->getMessageId() == "killSwitch")
+   {
+      Logger::logDebug("MotorPair::handleMessage: killSwitch");
+
+      drive(0, 0);
+
+      message->setFree();
    }
    else
    {
-      Logger::logDebug("MotorPair::handleMessage: Unhandled message \"" + message->getMessageId() + "\"\n");
+      Component::handleMessage(message);
    }
-
-   message->setFree();
 }
 
 void MotorPair::updateMotors()
@@ -77,12 +121,12 @@ void MotorPair::updateMotors()
    if (yaw < 0)
    {
       // Cause the motor pair to yaw to the left by decreasing the speed of the left motor.
-      leftMotorSpeed = ((rightMotorSpeed * abs(yaw)) / 100);
+      leftMotorSpeed = ((speed * (MAX_YAW - abs(yaw))) / 100);
    }
    else if (yaw > 0)
    {
       // Cause the motor pair to yaw to the right by decreasing the speed of the right motor.
-      rightMotorSpeed = ((leftMotorSpeed * yaw) / 100);
+      rightMotorSpeed = ((speed * (MAX_YAW - yaw)) / 100);
    }
 
    leftMotor->setSpeed(leftMotorSpeed);

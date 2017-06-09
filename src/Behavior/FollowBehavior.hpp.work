@@ -1,0 +1,41 @@
+#pragma once
+
+#include "Behavior.hpp"
+
+class FollowBehavior : public Behavior
+{
+
+public:
+
+   enum State
+   {
+      STOPPED,
+      FOLLOWING,
+      LOST
+   };
+
+   FollowBehavior(
+      const String& id,
+      MotorPair* motorPair,
+      DistanceSensor* distanceSensor);
+
+   virtual ~FollowBehavior();
+
+   virtual void enable();
+
+   virtual void disable();
+
+   virtual void onStateChange(
+      Behavior* behavior,
+      const int& previousState,
+      const int& newState);
+
+   virtual void setState(
+      const int& state);
+
+private:
+
+   Behavior* proximityBehavior;
+
+   Behavior* followingBehavior;
+};

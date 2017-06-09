@@ -1,21 +1,19 @@
+#pragma once
+
 #include "Adapter.hpp"
-#include "Logger.h"
 #include "ESP8266WiFi.h"
 
-class IpClientAdapter : public Adapter
+class TcpServerAdapter : public Adapter
 {
 
 public:
 
-   IpClientAdapter(
+   TcpServerAdapter(
       const String& id,
       Protocol* protocol,
-      const String& host,
       const int& port);
 
    virtual void setup();
-
-   virtual void loop();
 
    virtual bool sendRemoteMessage(
       MessagePtr message);
@@ -24,28 +22,18 @@ public:
 
 protected:
 
-   bool connect();
-
-   bool disconnect();
-
-   static const int RETRY_DELAY;
-
-   WiFiClient client;
-
-   String host;
-
    int port;
 
-   int retryTime;
+   WiFiServer server;
+
+   WiFiClient client;
 };
 
-inline IpClientAdapter::IpClientAdapter(
+inline TcpServerAdapter::TcpServerAdapter(
    const String& id,
    Protocol* protocol,
-   const String& host,
    const int& port) : Adapter(id, protocol),
-                      host(host),
                       port(port),
-                      retryTime(0)
+                      server(port)
 {
 }

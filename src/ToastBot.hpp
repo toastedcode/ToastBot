@@ -18,7 +18,7 @@ class ToastBot
 
 public:
 
-   static const int MAX_COMPONENTS = 10;
+   static const int MAX_COMPONENTS = 30;
 
    static void setId(
       const String& id);
@@ -26,7 +26,8 @@ public:
    static String getId();
 
    static bool add(
-      Component* component);
+      Component* component,
+      const bool& setDefaultHandler = false);
 
    static bool remove(
       Component* component);
@@ -41,6 +42,8 @@ private:
    static String id;
 
    static Set<Component*, MAX_COMPONENTS> components;
+
+   static bool initialized;
 };
 
 inline void ToastBot::setId(

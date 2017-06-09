@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+
+#controller_div
+{
+    border-radius: 25px;
+    border: 2px solid #73AD21;
+    padding: 20px;
+    width: 770px;
+    height: 260px;
+}
+
+#joystick_div
+{
+    border-radius: 25px;
+    border: 2px solid #73AD21;
+    width: 200px;
+    height: 200px;
+    float: left;
+    margin-right: 20px;
+}
+
+#controls_div
+{
+    width: 310px;
+    height: 310px;
+    float: left;
+    margin-right: 20px;
+}
+
+#gamepad_div
+{
+    border-radius: 25px;
+    border: 2px solid #73AD21;
+    padding: 5px;
+    width: 200px;
+    height: 200px;
+    float: left;
+}
+
+.gamepad_button_div
+{
+    border-radius: 25px;
+    border: 2px solid #73AD21;
+    padding: 5px;
+    width: 40px;
+    height: 40px;
+    float: left;
+    margin: 5px;
+}
+
+.hidden
+{
+   visibility: hidden;
+}
+
+.slider_div
+{
+    border-radius: 25px;
+    border: 2px solid #73AD21;
+    padding: 20px;
+    width: 270px;
+    height: 30px;
+    float: left;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.slider
+{
+    width: 100%;
+}
+
+#buttons_div
+{
+    border-radius: 25px;
+    border: 2px solid #73AD21;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding: 15px;
+    width: 270px;
+    height: 50px;
+    float: left;
+}
+
+.button
+{
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 15px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 2px;
+}
+
+.button_pressed
+{
+    color: orange;
+}
+
+</style>
+</head>
+
+<body>
+<div id="controller_div">
+   <div id="joystick_div"></div>
+   <div id="controls_div">
+      <div class="slider_div"><input id="slider1" class="slider" type="range" value="0" min="0" max="180"></div>
+      <div class="slider_div"><input id="slider2" class="slider" type="range" value="0" min="0" max="180"></div>
+      <div id="buttons_div">
+         <button id="follow_button" class="button">Follow</button>
+         <button class="button">Unused</button>
+         <button class="button">Unused</button>
+      </div>
+   </div>
+   <div id="gamepad_div">
+      <div class="gamepad_button_div hidden"></div>
+      <div id="up_button" class="gamepad_button_div"></div>
+      <div class="gamepad_button_div hidden"></div>
+      <div id="left_button" class="gamepad_button_div"></div>
+      <div class="gamepad_button_div  hidden"></div>
+      <div id="right_button" class="gamepad_button_div"></div>
+      <div class="gamepad_button_div hidden"></div>
+      <div id="down_button" class="gamepad_button_div"></div>
+      <div class="gamepad_button_div hidden"></div>
+   </div>
+</div>
+<div id="message_div"></div>
+
+<script src="virtualjoystick.js"></script>
+<script src="toastbot.js"></script>
+<script>
+ console.log("Touchscreen is", VirtualJoystick.touchScreenAvailable() ? "available" : "not available");
+
+ // Track control changes since the last interval.
+ var lastDeltaX = [0, 0];
+ var lastDeltaY = [0, 0];
+ var lastAngle = [0, 0];
+ var following = false;
+ 
+ // Joystick object.
+ var joystick = new VirtualJoystick({
+    container : document.getElementById('joystick_div'),
+    mouseSupport : true,
+    limitStickTravel : true,
+    stationaryBase : true,
+    baseX : 100,
+    baseY : 100,
+ });
+
+ // ToastBot object
+ var toastBot = new ToastBot();
+ toastBot.onConnect = function()
+ {
+    console.log("Connected");
+    toastBot.ping();
+ };
+ toastBot.onDisconnect = function()
+  {
+     console.log("Disconnected");
+ };
+ toastBot.onMessage = function(json)
+ {
+    document.getElementById("message_div").innerHTML = JSON.stringify(json);
+ }
+
+// Get GET parameters
+var qd = {};
+location.search.substr(1).split("&").forEach(function(item) {
+    var s = item.split("="),
+        k = s[0],
+        v = s[1] && decodeURIComponent(s[1]);
+    (k in qd) ? qd[k].push(v) : qd[k] = [v]
+})
+
+console.log(qd);
+if (qd.ipAddress[0])
+{
+   toastBot.connect("ws://" + qd.ipAddress[0] + ":81");
+}
+
+ // Set a periodic interval where we will update the Toastbot components.
+ setInterval(function()
+ {
+    //
+    // Motors update
+    //
+
+    if ((lastDeltaX[0] != joystick.deltaX()) ||
+   (lastDeltaY[0] != joystick.deltaY()))
+    {
+      /*
+      //var divWidth = document.getElementById("joystick_div").clentWidth;
+      //var divHeight = document.getElementById("joystick_div").clentHeight;
+
+      // Calculate speed/yaw based on the joystick movement.
+      var speed = Math.floor(joystick.deltaY() * 100 / 100);
+      var yaw = Math.floor(joystick.deltaX() * 100 / 100);
+      */
+
+      var divWidth = 200; //document.getElementById("joystick_div").clentWidth;
+      var divHeight = 200; // document.getElementById("joystick_div").clentHeight;
+
+      // Calculate speed/yaw based on the joystick movement.
+      var speed = Math.floor((joystick.deltaY() * 100) / (divHeight / 2));
+      var yaw = Math.floor((joystick.deltaX() * 100) / (divWidth / 2));
+
+      // Command the ToastBot.
+      toastBot.motorPair("motorPair1", speed, yaw);
+
+      // Reset the deltas.
+      lastDeltaX[0] = joystick.deltaX();
+      lastDeltaY[0] = joystick.deltaY();
+    }
+
+    //
+   // Servo update
+    //
+
+    var angle = document.getElementById('slider1').value;
+    if (angle != lastAngle[0])
+    {
+       toastBot.servo("servo1", angle);
+       lastAngle[0] = angle;
+    }
+    
+    angle = document.getElementById('slider2').value;
+    if (angle != lastAngle[1])
+    {
+       toastBot.servo("servo2", angle);
+       lastAngle[1] = angle;
+    }
+
+ }, 500);
+ 
+ document.getElementById("follow_button").onclick = function()
+ {
+    following = !following;
+    
+    if (following)
+    {
+       document.getElementById("follow_button").style.color = "orange";
+    }
+    else
+    {
+       document.getElementById("follow_button").style.color = "white";
+    }
+    
+    toastBot.follow("follow1", following);
+ }
+ 
+ document.getElementById("up_button").onmousedown = function()
+ {
+    console.log("Up - Pressed");
+    toastBot.motorPair("motorPair1", 100, 0);
+ }
+ 
+ document.getElementById("up_button").onmouseup = function()
+ {
+    console.log("Up - Released");
+    toastBot.motorPair("motorPair1", 0, 0);
+ }
+ 
+ document.getElementById("down_button").onmousedown = function()
+ {
+    console.log("Down - Pressed");
+    toastBot.motorPair("motorPair1", -100, 0);
+ }
+ 
+ document.getElementById("down_button").onmouseup = function()
+ {
+    console.log("Down - Released");
+    toastBot.motorPair("motorPair1", 0, 0);
+ }
+ 
+ document.getElementById("left_button").onmousedown = function()
+ {
+    console.log("Left - Pressed");
+    toastBot.rotate("motorPair1", 100);
+ }
+ 
+ document.getElementById("left_button").onmouseup = function()
+ {
+    console.log("Left - Released");
+    toastBot.rotate("motorPair1", 0);
+ }
+ 
+ document.getElementById("right_button").onmousedown = function()
+ {
+    console.log("Right - Pressed");
+    toastBot.rotate("motorPair1", -100);
+ }
+ 
+ document.getElementById("right_button").onmouseup = function()
+ {
+    console.log("Right - Released");
+    toastBot.rotate("motorPair1", 0);
+ }
+  
+</script>
+</body>
+</html>

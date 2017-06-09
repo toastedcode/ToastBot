@@ -40,16 +40,22 @@ public:
 
    virtual void setup();
 
-   virtual void loop();
-
    // This operation handles a message directed to this sensor.
    virtual void handleMessage(
       // The message to handle.
       MessagePtr message);
 
-   static const int MIN_SPEED = 0;
+   static const int NO_SPEED = 0;
 
-   static const int MAX_SPEED = 1023;
+   static const int MIN_SPEED = -100;
+
+   static const int MAX_SPEED = 100;
+
+   static const int NO_PWM = 0;
+
+   static const int MIN_PWM = 300;
+
+   static const int MAX_PWM = 1023;
 
 private:
 

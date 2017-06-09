@@ -8,14 +8,22 @@
 // *****************************************************************************
 // *****************************************************************************
 
-#include "ESP8266.h"
-#include "Logger.h"
+#include "Board.hpp"
+#include "Logger.hpp"
 #include "Motor.hpp"
 #include "Messaging.hpp"
+
+const int Motor::NO_SPEED;
 
 const int Motor::MIN_SPEED;
 
 const int Motor::MAX_SPEED;
+
+const int Motor::NO_PWM;
+
+const int Motor::MIN_PWM;
+
+const int Motor::MAX_PWM;
 
 Motor::Motor(
    const String& id,
@@ -29,67 +37,70 @@ Motor::Motor(
 void Motor::setSpeed(
    int speed)
 {
-   this->speed = speed;
+   Logger::logDebug("Motor::handleMessage: setSpeed(%d)", speed);
+   this->speed = constrain(speed, MIN_SPEED, MAX_SPEED);
 
    updatePins();
 }
 
 void Motor::setup()
 {
-   pinMode(directionPin, OUTPUT);
-   pinMode(speedPin, OUTPUT);
-}
+   if (Board::getBoard())
+   {
+      Board::getBoard()->pinMode(directionPin, OUTPUT);
+      Board::getBoard()->pinMode(speedPin, OUTPUT);
+   }
 
-void Motor::loop()
-{
-
+   Messaging::subscribe(this, "killSwitch");
 }
 
 void Motor::handleMessage(
    MessagePtr message)
 {
-   // MOTOR_CONFIG
+   // setSpeed
    if (message->getMessageId() == "setSpeed")
    {
       int newSpeed = message->getInt("speed");
 
-      Logger::logDebug("Motor::handleMessage: setSpeed(" + String(newSpeed) +  ")\n");
+      Logger::logDebug("Motor::handleMessage: setSpeed(%d)", newSpeed);
 
       setSpeed(newSpeed);
-   }
-   else if (message->getMessageId() == "ping")
-   {
-      Logger::logDebug("Motor::handleMessage: ping()\n");
 
-      Message* reply = Messaging::newMessage();
-      reply->setMessageId("pong");
-      reply->setSource(this->getAddress());
-      reply->setDestination(message->getSource());
-      Messaging::send(reply);
+      message->setFree();
+   }
+   // killSwitch
+   else if (message->getMessageId() == "killSwitch")
+   {
+      Logger::logDebug("Motor::handleMessage: killSwitch");
+
+      setSpeed(NO_SPEED);
+
+      message->setFree();
    }
    else
    {
-      Logger::logDebug("Motor::handleMessage: Unhandled message \"" + message->getMessageId() + "\"\n");
+      Component::handleMessage(message);
    }
-
-   message->setFree();
 }
 
 void Motor::updatePins()
 {
-   if (speed == 0)
+   if (Board::getBoard())
    {
-      digitalWrite(directionPin, LOW);
-      analogWrite(speedPin, MIN_SPEED);
-   }
-   else if (speed > 0)
-   {
-      digitalWrite(directionPin, HIGH);
-      analogWrite(speedPin, (MAX_SPEED - speed));
-   }
-   else // if (speed < 0)
-   {
-      digitalWrite(directionPin, LOW);
-      analogWrite(speedPin, abs(speed));
+      if (speed == 0)
+      {
+         Board::getBoard()->digitalWrite(directionPin, LOW);
+         Board::getBoard()->analogWrite(speedPin, NO_PWM);
+      }
+      else if (speed > 0)
+      {
+         Board::getBoard()->digitalWrite(directionPin, HIGH);
+         Board::getBoard()->analogWrite(speedPin, ((speed * (MAX_PWM - MIN_PWM)) / 100));
+      }
+      else // if (speed < 0)
+      {
+         Board::getBoard()->digitalWrite(directionPin, LOW);
+         Board::getBoard()->analogWrite(speedPin, ((abs(speed) * (MAX_PWM - MIN_PWM)) / 100));
+      }
    }
 }
