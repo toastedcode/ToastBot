@@ -48,19 +48,19 @@ void Robox::handleMessage(
 
       if (propertyName == "")
       {
-         Logger::logDebug("Properties: \n%s", properties.toString().c_str());
+         Logger::logDebug("Robox::handleMessage: Properties: \n%s", properties.toString().c_str());
       }
       else
       {
          if (propertyValue != "")
          {
             properties.set(propertyName, propertyValue);
-            Logger::logDebug("Updated properties: %s = %s", propertyName.c_str(), propertyValue.c_str());
+            Logger::logDebug("Robox::handleMessage: Updated properties: %s = %s", propertyName.c_str(), propertyValue.c_str());
          }
          else
          {
             properties.remove(propertyName);
-            Logger::logDebug("Removed property: %s", propertyName.c_str());
+            Logger::logDebug("Robox::handleMessage: Removed property: %s", propertyName.c_str());
          }
 
          properties.save();
@@ -71,7 +71,7 @@ void Robox::handleMessage(
       int pin = message->getInt("pin");
       int value = message->getInt("value");
 
-      Logger::logDebug("digitalWrite(%d, %d)", pin, value);
+      Logger::logDebug("Robox::handleMessage: digitalWrite(%d, %d)", pin, value);
       Board::getBoard()->digitalWrite(pin, value);
    }
    else if (message->getMessageId() == "analogWrite")
@@ -79,7 +79,7 @@ void Robox::handleMessage(
       int pin = message->getInt("pin");
       int value = message->getInt("value");
 
-      Logger::logDebug("analogWrite(%d, %d)", pin, value);
+      Logger::logDebug("Robox::handleMessage: analogWrite(%d, %d)", pin, value);
       Board::getBoard()->analogWrite(pin, value);
    }
    else if (message->getMessageId() == "bridge")
@@ -88,9 +88,38 @@ void Robox::handleMessage(
       String host = message->getString("host");
       int port = message->getInt("port");
       
-      Logger::logDebug("bridge(%s, %s:%d)", name.c_str(), host.c_str(), port);
+      Logger::logDebug("Robox::handleMessage: bridge(%s, %s:%d)", name.c_str(), host.c_str(), port);
       
       ToastBot::add(new TcpClientAdapter(name, new JsonProtocol(), host, port));
+   }
+   else if (message->getMessageId() == "create")
+   {
+      String classId = message->getString("class");
+      String id = message->getString("id");
+
+      Logger::logDebug("Robox::handleMessage: create(%s, %s)", classId.c_str(), id.c_str());
+
+      Component* component = ComponentFactory::create(classId, message);
+
+      if (component)
+      {
+         ToastBot::add(component);
+      }
+   }
+   else if (message->getMessageId() == "setLogger")
+   {
+      String adapterId = message->getString("adapter");
+
+      Logger::logDebug("Robox::handleMessage: setLogger(%s)", adapterId.c_str());
+
+      if (ToastBot::get(adapterId))
+      {
+        Logger::setLogger(new RemoteLogger(adapterId));
+      }
+      else
+      {
+        Logger::logDebug("Robox::handleMessage: No adapter [%s] available.", adapterId.c_str());
+      }
    }
    else
    {

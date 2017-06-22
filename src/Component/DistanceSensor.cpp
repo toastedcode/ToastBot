@@ -16,7 +16,9 @@ DistanceSensor::DistanceSensor(
    const String& id,
    const int& triggerPin,
    const int& echoPin,
-   const int& maxCmDistance) : Sensor(id)
+   const int& maxCmDistance) :
+      Sensor(id),
+      sensorValue(0)
 {
    sensor = new NewPing(triggerPin, echoPin, maxCmDistance);
 }

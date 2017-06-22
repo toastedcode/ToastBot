@@ -58,7 +58,7 @@ bool ToastBot::remove(
 }
 
 Component* ToastBot::get(
-   const String& id) const
+   const String& id)
 {
    Component* component = 0;
 

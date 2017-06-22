@@ -60,6 +60,9 @@ void setup()
    DistanceSensor* distance1 = new DistanceSensor("distance1", 13, 15, 200);
    ToastBot::add(distance1);
 
+   Led* led1 = new Led("led1", 16);
+   ToastBot::add(led1);
+
    /*
    Scanner* scanner1 = new Scanner("scanner1", servo1, distance1);
    ToastBot::add(scanner1);
@@ -69,21 +72,30 @@ void setup()
 
    FollowAI_2* follow2 = new FollowAI_2("follow2", distance1, motorPair1);
    ToastBot::add(follow2);
+
+   ToastBot::add(new ScoutBehavior("scout1", motorPair1, distance1));
    */
 
-   //ToastBot::add(new ScoutBehavior("scout1", motorPair1, distance1));
-
    ToastBot::add(new SerialAdapter("serial", new JsonProtocol()));
+   ToastBot::add(new UdpAdapter("discover", new JsonProtocol(), 1993));  
+   ToastBot::add(new TcpServerAdapter("control", new JsonProtocol(), 1975));
+   ToastBot::add(new TcpServerAdapter("debug", new JsonProtocol(), 1977));
+
    //ToastBot::add(new WebSocketAdapter("adapter1", new JsonProtocol(), 81));
-   ToastBot::add(new TcpServerAdapter("adapter2", new JsonProtocol(), 1975));
    //ToastBot::add(new MqttClientAdapter("adapter3", new JsonProtocol(), "broker.mqtt-dashboard.com", 1883, "toastbot1", "", ""));
-   ToastBot::add(new UdpAdapter("adapter4", new JsonProtocol(), 1993));  
    //ToastBot::add(new UdpAdapter("adapter5", new JsonProtocol(), IPAddress(10, 1, 11, 249), 55056));
    //ToastBot::add(new TcpClientAdapter("adapter5", new JsonProtocol(), "10.1.11.249", 1997));
 
-   //Logger::setLogger(new RemoteLogger("adapter2"));
-
    ToastBot::setup(properties.getString("deviceName"));
+
+   if (WifiBoard::getBoard()->isConnected())
+   {
+      led1->blink("_--------");
+   }
+   else
+   {
+      led1->pulse(2000);
+   }   
 }
 
 void loop()

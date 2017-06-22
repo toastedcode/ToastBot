@@ -2,6 +2,19 @@
 #include "Messaging.h"
 #include "TcpServerAdapter.hpp"
 
+const int TcpServerAdapter::BUFFER_SIZE;
+
+TcpServerAdapter::TcpServerAdapter(
+   const String& id,
+   Protocol* protocol,
+   const int& port) :
+      Adapter(id, protocol),
+      port(port),
+      server(port),
+      isConnected(false)
+{
+}
+
 void TcpServerAdapter::setup()
 {
    Logger::logDebug(
@@ -21,6 +34,8 @@ bool TcpServerAdapter::sendRemoteMessage(
 
    if (serializedMessage != "")
    {
+      serializedMessage += "\n";
+
       if (client && client.connected())
       {
          client.write(serializedMessage.c_str(), serializedMessage.length());
@@ -29,9 +44,11 @@ bool TcpServerAdapter::sendRemoteMessage(
       }
       else
       {
+#ifdef MESSAGING_DEBUG
          Logger::logWarning(
             "TcpServerAdapter::sendRemoteMessage: Failed to send message [%s] to remote host.",
             message->getMessageId().c_str());
+#endif
       }
    }
 
@@ -42,16 +59,8 @@ MessagePtr TcpServerAdapter::getRemoteMessage()
 {
    MessagePtr message = 0;
 
-   static const int BUFFER_SIZE = 256;
-
    static const char LF = '\n';
    static const char CR = '\r';
-
-   static char buffer[BUFFER_SIZE];
-
-   static int readIndex = 0;
-
-   static bool isConnected = false;
 
    // Check for a TCP connection.
    if (!client.connected())
@@ -61,6 +70,7 @@ MessagePtr TcpServerAdapter::getRemoteMessage()
 
    bool wasConnected = isConnected;
    isConnected = client.connected();
+
    if (!wasConnected && isConnected)
    {
       Logger::logDebug("TcpServerAdapter::getRemoteMessage: TCP Server Adapter [%s] connected.", getId().c_str());
@@ -111,7 +121,9 @@ MessagePtr TcpServerAdapter::getRemoteMessage()
       }
       else
       {
+#ifdef MESSAGING_DEBUG
          Logger::logWarning("TcpServerAdapter::getRemoteMessage: Buffer overflow.  Discarding bytes.");
+#endif
 
          readIndex = 0;
       }

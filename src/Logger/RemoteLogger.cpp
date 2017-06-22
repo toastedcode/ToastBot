@@ -28,6 +28,7 @@ void RemoteLogger::log(
       Messaging::send(message);
 
       // TODO: Remove.
-      printf("%s: %s\n", toString(logLevel).c_str(), string.c_str());
+      //printf("%s: %s\n", toString(logLevel).c_str(), string.c_str());
+      printf("Remotely logged: %s: %s\n", toString(logLevel).c_str(), string.c_str());
    }
 }

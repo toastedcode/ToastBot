@@ -33,7 +33,7 @@ public:
       Component* component);
 
    static Component* get(
-      const String& id) const;
+      const String& id);
 
    static void setup(
       const String& id);
