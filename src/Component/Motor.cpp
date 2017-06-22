@@ -9,7 +9,6 @@
 // *****************************************************************************
 
 #include "Board.hpp"
-#include "ComponentFactory.hpp"
 #include "Logger.hpp"
 #include "Motor.hpp"
 #include "Messaging.hpp"
@@ -25,8 +24,6 @@ const int Motor::NO_PWM;
 const int Motor::MIN_PWM;
 
 const int Motor::MAX_PWM;
-
-static const ComponentCreator<Motor> MotorCreator("motor");
 
 Motor::Motor(
    const String& id,

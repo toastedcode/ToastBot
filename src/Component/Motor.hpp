@@ -11,6 +11,7 @@
 #pragma once
 
 #include "Component.hpp"
+#include "ComponentFactory.hpp"
 
 class Motor : public Component
 {
@@ -77,6 +78,8 @@ private:
    // Positive values indicate the motor is running forward; negative values reverse.
    int speed;
 };
+
+REGISTER(Motor, motor)
 
 inline Motor::~Motor()
 {

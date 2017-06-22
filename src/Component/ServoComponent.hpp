@@ -13,6 +13,7 @@
 #include <Servo.h>
 
 #include "Component.hpp"
+#include "ComponentFactory.hpp"
 
 class ServoComponent : public Component
 {
@@ -78,6 +79,8 @@ private:
    // The angle of the servo.
    int angle;
 };
+
+REGISTER(ServoComponent, servo)
 
 inline int ServoComponent::angleToPwm(
    const int& angle)

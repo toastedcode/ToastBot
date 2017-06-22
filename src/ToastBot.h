@@ -6,7 +6,6 @@
 #include "Adapter\WebSocketAdapter.hpp"
 #include "Behavior\ScoutBehavior.hpp"
 #include "Behavior\ServoPanBehavior.hpp"
-#include "Component\ComponentFactory.hpp"
 #include "Component\DistanceSensor.hpp"
 #include "Component\FollowAI.hpp"
 #include "Component\FollowAI_2.hpp"

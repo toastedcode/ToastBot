@@ -38,6 +38,8 @@ void Robox::handleMessage(
    {
       Logger::logDebug("Resetting ...");
       Board::getBoard()->reset();
+
+      message->setFree();
    }
    else if (message->getMessageId() == "property")
    {
@@ -65,6 +67,8 @@ void Robox::handleMessage(
 
          properties.save();
       }
+
+      message->setFree();
    }
    else if (message->getMessageId() == "digitalWrite")
    {
@@ -73,6 +77,8 @@ void Robox::handleMessage(
 
       Logger::logDebug("Robox::handleMessage: digitalWrite(%d, %d)", pin, value);
       Board::getBoard()->digitalWrite(pin, value);
+
+      message->setFree();
    }
    else if (message->getMessageId() == "analogWrite")
    {
@@ -81,6 +87,8 @@ void Robox::handleMessage(
 
       Logger::logDebug("Robox::handleMessage: analogWrite(%d, %d)", pin, value);
       Board::getBoard()->analogWrite(pin, value);
+
+      message->setFree();
    }
    else if (message->getMessageId() == "bridge")
    {
@@ -91,6 +99,8 @@ void Robox::handleMessage(
       Logger::logDebug("Robox::handleMessage: bridge(%s, %s:%d)", name.c_str(), host.c_str(), port);
       
       ToastBot::add(new TcpClientAdapter(name, new JsonProtocol(), host, port));
+
+      message->setFree();
    }
    else if (message->getMessageId() == "create")
    {
@@ -105,6 +115,8 @@ void Robox::handleMessage(
       {
          ToastBot::add(component);
       }
+
+      message->setFree();
    }
    else if (message->getMessageId() == "setLogger")
    {
@@ -120,6 +132,18 @@ void Robox::handleMessage(
       {
         Logger::logDebug("Robox::handleMessage: No adapter [%s] available.", adapterId.c_str());
       }
+
+      message->setFree();
+   }
+   else if (message->getMessageId() == "setLogLevel")
+   {
+      LogLevel logLevel = fromString(message->getString("logLevel"));  // defaults to SEVERE
+
+      Logger::logDebug("Robox::handleMessage: setLogLevel(%s)", toString(logLevel).c_str());
+
+      Logger::setLogLevel(logLevel);
+
+      message->setFree();
    }
    else
    {
