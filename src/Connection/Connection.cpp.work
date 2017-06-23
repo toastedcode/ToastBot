@@ -1,0 +1,74 @@
+#include "Connection.hpp"
+#include "Logger.hpp"
+
+ConnectionMode Connection::getMode() const
+{
+   return (mode);
+}
+
+void Connection::setMode(
+   const ConnectionMode mode)
+{
+      Logger::logDebug("Connection::setMode: %s -> %s", toString(this->mode).c_str(), toString(mode).c_str());
+
+      this->mode = mode;
+}
+
+void Connection::setup()
+{
+
+}
+
+void Connection::loop()
+{
+
+}
+
+static void Connection::setApConfig(
+   const String& ssid,
+   const String& password)
+{
+   accesPointConfig.ssid = ssid;
+   accesPointConfig.password = password;
+}
+
+void Connection::setWifiConfig(
+   const String& ssid,
+   const String& password)
+{
+   this->wifiConfig.ssid = ssid;
+   this->wifiConfig.password = password;
+}
+
+void Connection::setServerConfig(
+   const String& host,
+   const String& clientId,
+   const String& clientPassword)
+{
+   serverConfig.host = host;
+   serverConfig.clientId = clientId;
+   serverConfig.clientPassword = clientPassword;
+}
+
+void Connection::setStatusLed(
+   Led* statusLed)
+{
+   this->statusLed = statusLed;
+}
+
+void Connection::updateStatusLed()
+{
+   if (statusLed)
+   {
+      //switch (connectionState)
+      {
+
+      }
+   }
+}
+
+(board->connectWifi(ssid, password, 15) == false))
+ {
+    // If the ESP8266 fails to connect with the stored credentials, we'll create an AP to allow for wifi config.
+    String apName = (deviceName.length() > 0) ? deviceName : Robox::getUniqueId();
+    board->startAccessPoint(apName, "");
