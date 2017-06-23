@@ -14,35 +14,9 @@
 
 #include "Robox.h"
 
-void setup()
+// TODO: Move to ToastBot
+void createComponents()
 {
-   Serial.begin(9600);
-
-   SPIFFS.begin();
-    
-   Logger::setLogger(new SerialLogger());
-
-   Properties properties;
-   properties.load("/toastbot.properties");
-   Logger::logDebug("Properties: \n%s", properties.toString().c_str());
-
-   WifiBoard* board = new Esp8266Board();
-   Board::setBoard(board);
-
-   // Connect to a wifi network.
-   String ssid = properties.getString("wifi.ssid");
-   String password = properties.getString("wifi.password");
-   String deviceName = properties.getString("deviceName");
-   if ((ssid == "") ||
-       (board->connectWifi(ssid, password, 15) == false))
-   {
-      // If the ESP8266 fails to connect with the stored credentials, we'll create an AP to allow for wifi config.
-      String apName = (deviceName.length() > 0) ? deviceName : Robox::getUniqueId();
-      board->startAccessPoint(apName, "");
-   }
-
-   Logger::logDebug("Starting ROBOX");
-
    ToastBot::add(new Robox(), true);  // <-- default handler
 
    Motor* motor1 = new Motor("motor1", 0, 5);
@@ -63,6 +37,12 @@ void setup()
    Led* led1 = new Led("led1", 16);
    ToastBot::add(led1);
 
+   ToastBot::add(new SerialAdapter("serial", new JsonProtocol()));
+   ToastBot::add(new UdpAdapter("discover", new JsonProtocol(), 1993));  
+   ToastBot::add(new TcpServerAdapter("control", new JsonProtocol(), 1975));
+   ToastBot::add(new TcpServerAdapter("debug", new JsonProtocol(), 1977));
+
+   // Experimental components.   
    /*
    Scanner* scanner1 = new Scanner("scanner1", servo1, distance1);
    ToastBot::add(scanner1);
@@ -74,28 +54,54 @@ void setup()
    ToastBot::add(follow2);
 
    ToastBot::add(new ScoutBehavior("scout1", motorPair1, distance1));
+   
+   ToastBot::add(new WebSocketAdapter("adapter1", new JsonProtocol(), 81));
+   ToastBot::add(new MqttClientAdapter("adapter3", new JsonProtocol(), "broker.mqtt-dashboard.com", 1883, "toastbot1", "", ""));
+   ToastBot::add(new UdpAdapter("adapter5", new JsonProtocol(), IPAddress(10, 1, 11, 249), 55056));
+   ToastBot::add(new TcpClientAdapter("adapter5", new JsonProtocol(), "10.1.11.249", 1997));
    */
+}
 
-   ToastBot::add(new SerialAdapter("serial", new JsonProtocol()));
-   ToastBot::add(new UdpAdapter("discover", new JsonProtocol(), 1993));  
-   ToastBot::add(new TcpServerAdapter("control", new JsonProtocol(), 1975));
-   ToastBot::add(new TcpServerAdapter("debug", new JsonProtocol(), 1977));
+// TODO: Move to ToastBot
+void createConnections()
+{
+   const Properties& properties = ToastBot::getProperties();
 
-   //ToastBot::add(new WebSocketAdapter("adapter1", new JsonProtocol(), 81));
-   //ToastBot::add(new MqttClientAdapter("adapter3", new JsonProtocol(), "broker.mqtt-dashboard.com", 1883, "toastbot1", "", ""));
-   //ToastBot::add(new UdpAdapter("adapter5", new JsonProtocol(), IPAddress(10, 1, 11, 249), 55056));
-   //ToastBot::add(new TcpClientAdapter("adapter5", new JsonProtocol(), "10.1.11.249", 1997));
-
-   ToastBot::setup(properties.getString("deviceName"));
-
+   // Connect to a wifi network.
+   String ssid = properties.getString("wifi.ssid");
+   String password = properties.getString("wifi.password");
+   String deviceName = properties.getString("deviceName");
+   if ((ssid == "") ||
+       (WifiBoard::getBoard()->connectWifi(ssid, password, 15) == false))
+   {
+      // If the ESP8266 fails to connect with the stored credentials, we'll create an AP to allow for wifi config.
+      String apName = (deviceName.length() > 0) ? deviceName : Robox::getUniqueId();
+      WifiBoard::getBoard()->startAccessPoint(apName, "");
+   }
+   
+   // Blink the onboard LED to indicate connection status.
+   Led* led = (Led*)ToastBot::get("led1");
    if (WifiBoard::getBoard()->isConnected())
    {
-      led1->blink("_--------");
+      led->blink("_--------");
    }
    else
    {
-      led1->pulse(2000);
-   }   
+      led->pulse(2000);
+   }
+}
+
+// *****************************************************************************
+//                                  Arduino
+// *****************************************************************************
+
+void setup()
+{
+   ToastBot::setup(new Esp8266Board());
+   
+   createComponents();
+   
+   createConnections();
 }
 
 void loop()

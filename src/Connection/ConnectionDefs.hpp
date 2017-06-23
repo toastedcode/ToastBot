@@ -24,6 +24,7 @@ inline String toString(
    return (enumToString[mode]);
 }
 
+inline ConnectionMode parseConnectionMode(
    const String& modeString)
 {
    ConnectionMode mode = ACCESS_POINT;
@@ -32,6 +33,7 @@ inline String toString(
    {
       if (modeString == toString(static_cast<ConnectionMode>(i)))
       {
+         mode = static_cast<ConnectionMode>(i);
          break;
       }
    }

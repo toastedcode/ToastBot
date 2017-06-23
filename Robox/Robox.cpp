@@ -145,6 +145,26 @@ void Robox::handleMessage(
 
       message->setFree();
    }
+   else if (message->getMessageId() == "wifiConfig")
+   {
+      String ssid = message->getString("ssid");
+      String password = message->getString("password");
+
+      Logger::logDebug("Robox::handleMessage: wifiConfig(%s, %s)", ssid.c_str(), password.c_str());
+
+      ToastBot::setProperty("ssid", ssid);
+      ToastBot::setProperty("password", password);
+
+      // TODO: Update Connection class.
+   }
+   else if (message->getMessageId() == "mode")
+   {
+      ConnectionMode mode = parseConnectionMode(message->getString("mode"));
+
+      Logger::logDebug("Robox::handleMessage: connectionMode(%s)", toString(mode).c_str());
+
+      // TODO: Update Connection class.
+   }
    else
    {
       Component::handleMessage(message);

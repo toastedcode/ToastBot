@@ -10,7 +10,9 @@
 
 #pragma once
 
+#include "Board.hpp"
 #include "Component.hpp"
+#include "Properties.hpp"
 #include "Set.hpp"
 
 class ToastBot
@@ -35,14 +37,27 @@ public:
    static Component* get(
       const String& id);
 
+   static const Properties& getProperties();
+
+   template<typename T>
+   inline static const void setProperty(
+      const String& name,
+      const T& value)
+   {
+      properties.set(name, value);
+      properties.save();
+   }
+
    static void setup(
-      const String& id);
+      Board* board);
 
    static void loop();
 
 private:
 
    static String id;
+
+   static Properties properties;
 
    static Set<Component*, MAX_COMPONENTS> components;
 
