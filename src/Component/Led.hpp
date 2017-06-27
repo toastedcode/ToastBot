@@ -11,6 +11,7 @@
 #pragma once
 
 #include "Component.hpp"
+#include "ComponentFactory.hpp"
 
 class Led : public Component
 {
@@ -144,3 +145,5 @@ private:
 
    LedPulse* ledPulse;
 };
+
+REGISTER(Led, led)

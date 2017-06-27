@@ -22,19 +22,16 @@ public:
 
    static const int MAX_COMPONENTS = 30;
 
-   static void setId(
-      const String& id);
-
    static String getId();
 
-   static bool add(
+   static bool addComponent(
       Component* component,
       const bool& setDefaultHandler = false);
 
-   static bool remove(
+   static bool removeComponent(
       Component* component);
 
-   static Component* get(
+   static Component* getComponent(
       const String& id);
 
    static const Properties& getProperties();
@@ -55,7 +52,7 @@ public:
 
 private:
 
-   static String id;
+   static String getUniqueId();
 
    static Properties properties;
 
@@ -63,14 +60,3 @@ private:
 
    static bool initialized;
 };
-
-inline void ToastBot::setId(
-   const String& id)
-{
-   ToastBot::id = id;
-}
-
-inline String ToastBot::getId()
-{
-   return (id);
-}

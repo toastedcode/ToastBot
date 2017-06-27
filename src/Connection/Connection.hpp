@@ -1,20 +1,19 @@
 #pragma once
 
 #include "ConnectionDefs.hpp"
+#include "../Component/Led.hpp"
 
 class Connection
 {
 
 public:
 
-   static ConnectionMode getMode() const;
+   static ConnectionMode getMode();
 
    static void setMode(
       const ConnectionMode mode);
 
    static void setup();
-
-   static void loop();
 
    static void setApConfig(
       const String& ssid,
@@ -34,13 +33,13 @@ public:
 
 private:
 
-   void updateStatusLed();
+   static void updateStatusLed();
 
    static const ConnectionMode DEFAULT_MODE;
 
    static ConnectionMode mode;
 
-   static WifiConfig accesPointConfig;
+   static WifiConfig accessPointConfig;
 
    static WifiConfig wifiConfig;
 

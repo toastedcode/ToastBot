@@ -12,15 +12,15 @@
 #include "FS.h"
 
 #include "BasicMessage.hpp"
+#include "Connection/Connection.hpp"
 #include "Logger.hpp"
 #include "Messaging.hpp"
 #include "SerialLogger.hpp"
 #include "Timer.hpp"
 #include "ToastBot.hpp"
+#include "WifiBoard.hpp"
 
 const int ToastBot::MAX_COMPONENTS;
-
-String ToastBot::id;
 
 Properties ToastBot::properties;
 
@@ -41,7 +41,23 @@ const String ASCII_LOGO =
 "MM....MMMMMMM..MMMMMMM .MMMMMMM...MM. MM=..MMMMMMM. MMMMMMM.\n"
 "............................................................\n";
 
-bool ToastBot::add(
+String ToastBot::getId()
+{
+   String id = "";
+
+   if (properties.isSet("deviceName"))
+   {
+      id = properties.getString("deviceName");
+   }
+   else
+   {
+      id = getUniqueId();
+   }
+
+   return (id);
+}
+
+bool ToastBot::addComponent(
    Component* component,
    const bool& setDefaultHandler)
 {
@@ -62,7 +78,7 @@ bool ToastBot::add(
    return (isSuccess);
 }
 
-bool ToastBot::remove(
+bool ToastBot::removeComponent(
    Component* component)
 {
    bool isSuccess = false;
@@ -76,7 +92,7 @@ bool ToastBot::remove(
    return (isSuccess);
 }
 
-Component* ToastBot::get(
+Component* ToastBot::getComponent(
    const String& id)
 {
    Component* component = 0;
@@ -108,20 +124,18 @@ void ToastBot::setup(
 #endif
 
    // Logo.
-   //Serial.printf("\n\n" + ASCII_LOGO + "\n");
+   Serial.print("\n\n" + ASCII_LOGO + "\n");
 
    // Set the logger.
    Logger::setLogger(new SerialLogger());
-
-   // Setup the board.
-   // TODO: Read board from properties file and create dynamically.
-   Board::setBoard(board);
 
    // Load properties.
    properties.load(PROPERTIES_FILE);
    Logger::logDebug("ToastBot::setup: Properties: \n%s", properties.toString().c_str());
 
-   setId(properties.getString("deviceName"));
+   // Setup the board.
+   // TODO: Read board from properties file and create dynamically.
+   Board::setBoard(board);
 
    //  Setup messaging.
    Messaging::setup<BasicMessage>(10);
@@ -133,13 +147,17 @@ void ToastBot::setup(
    }
 
    // Configure the connection manager.
-   // TODO:
-   /*
-   Connection::setApConfig(properties.getString("ap.ssid"), properties.getString("ap.password"));
+   if (properties.isSet("ap.ssid"))
+   {
+      Connection::setApConfig(properties.getString("ap.ssid"), properties.getString("ap.password"));
+   }
+   else
+   {
+      Connection::setApConfig(getId(), "");
+   }
    Connection::setWifiConfig(properties.getString("wifi.ssid"), properties.getString("wifi.password"));
    Connection::setServerConfig(properties.getString("server.host"), properties.getString("server.clientId"), properties.getString("server.clientPassword"));
-   Connection::setMode(fromString(properties.getString("mode")));
-   */
+   Connection::setMode(parseConnectionMode(properties.getString("mode")));
 
    initialized = true;
 }
@@ -152,4 +170,53 @@ void ToastBot::loop()
    {
       components.item(i)->value->loop();
    }
+}
+
+String ToastBot::getUniqueId()
+{
+   static const String PREFIX = "ROBOX";
+
+   String uniqueId = "";
+   char buffer[32];
+
+   WifiBoard* board = WifiBoard::getBoard();
+
+   if (board)
+   {
+      // Retrieve the MAC address of the board.
+      unsigned char mac[6] = {0, 0, 0, 0, 0, 0};
+      board->getMacAddress(mac);
+
+      // Make an id out of the MAC address.
+      sprintf(buffer,
+              "%s_%02X%02X%02X%02X%02X%02X",
+              PREFIX.c_str(),
+              mac[0],
+              mac[1],
+              mac[2],
+              mac[3],
+              mac[4],
+              mac[5]);
+   }
+   else
+   {
+#ifdef ARDUINO
+      // Seed the random number generator.
+      randomSeed(analogRead(0));
+
+      // Make an id out of some random numbers.
+      sprintf(buffer,
+              "%s_%02X%02X%02X%02X%02X%02X",
+              PREFIX.c_str(),
+              random(255),
+              random(255),
+              random(255),
+              random(255),
+              random(255),
+              random(255),
+              random(255));
+#endif
+   }
+
+   return (String(buffer));
 }

@@ -43,12 +43,12 @@ MotorPair::MotorPair(
 {
    if (message->isSet("leftMotor"))
    {
-      leftMotor = (Motor*)ToastBot::get(message->getString("leftMotor"));
+      leftMotor = (Motor*)ToastBot::getComponent(message->getString("leftMotor"));
    }
 
    if (message->isSet("rightMotor"))
    {
-      leftMotor = (Motor*)ToastBot::get(message->getString("rightMotor"));
+      leftMotor = (Motor*)ToastBot::getComponent(message->getString("rightMotor"));
    }
 }
 

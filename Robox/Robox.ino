@@ -17,78 +17,75 @@
 // TODO: Move to ToastBot
 void createComponents()
 {
-   ToastBot::add(new Robox(), true);  // <-- default handler
+   ToastBot::addComponent(new Robox(), true);  // <-- default handler
 
+   /*
    Motor* motor1 = new Motor("motor1", 0, 5);
    Motor* motor2 = new Motor("motor2", 2, 4);
-   ToastBot::add(motor1);
-   ToastBot::add(motor2);
-   
+   ToastBot::addComponent(motor1);
+   ToastBot::addComponent(motor2);
+      
    MotorPair* motorPair1 = new MotorPair("motorPair1", motor1, motor2);
-   ToastBot::add(motorPair1);
+   ToastBot::addComponent(motorPair1);
+   */
+
+   Logger::logDebug("***Creating***");
+   Message* message = MessageFactory::newMessage();
+   JsonProtocol protocol;
+   String componentIds[50];
+   int count = 0;
+   ToastBot::getProperties().getKeys("component", componentIds, count);
+   for (int i = 0; i < count; i++)
+   {
+      String componentDescription = ToastBot::getProperties().getString(componentIds[i]);
+     
+      if (protocol.parse(componentDescription, message))
+      {
+        Logger::logDebug("Creating %s component [%s]", message->getString("class").c_str(), message->getString("id").c_str());
+
+        Component* component = ComponentFactory::create(message->getString("class"), message);
+        if (component)
+        {
+          ToastBot::addComponent(component);
+        }
+      }
+   }
+   message->setFree();
 
    ServoComponent* servo1 = new ServoComponent("servo1", 14);
-   ToastBot::add(servo1);
-   ToastBot::add(new ServoComponent("servo2", 12));
+   ToastBot::addComponent(servo1);
+   ToastBot::addComponent(new ServoComponent("servo2", 12));
 
    DistanceSensor* distance1 = new DistanceSensor("distance1", 13, 15, 200);
-   ToastBot::add(distance1);
+   ToastBot::addComponent(distance1);
 
    Led* led1 = new Led("led1", 16);
-   ToastBot::add(led1);
+   ToastBot::addComponent(led1);
+   Connection::setStatusLed(led1);
 
-   ToastBot::add(new SerialAdapter("serial", new JsonProtocol()));
-   ToastBot::add(new UdpAdapter("discover", new JsonProtocol(), 1993));  
-   ToastBot::add(new TcpServerAdapter("control", new JsonProtocol(), 1975));
-   ToastBot::add(new TcpServerAdapter("debug", new JsonProtocol(), 1977));
+   ToastBot::addComponent(new SerialAdapter("serial", new JsonProtocol()));
+   ToastBot::addComponent(new UdpAdapter("discover", new JsonProtocol(), 1993));  
+   ToastBot::addComponent(new TcpServerAdapter("control", new JsonProtocol(), 1975));
+   ToastBot::addComponent(new TcpServerAdapter("debug", new JsonProtocol(), 1977));
 
    // Experimental components.   
    /*
    Scanner* scanner1 = new Scanner("scanner1", servo1, distance1);
-   ToastBot::add(scanner1);
+   ToastBot::addComponent(scanner1);
 
    FollowAI* follow1 = new FollowAI("follow1", scanner1, motorPair1);
-   ToastBot::add(follow1);
+   ToastBot::addComponent(follow1);
 
    FollowAI_2* follow2 = new FollowAI_2("follow2", distance1, motorPair1);
-   ToastBot::add(follow2);
+   ToastBot::addComponent(follow2);
 
-   ToastBot::add(new ScoutBehavior("scout1", motorPair1, distance1));
+   ToastBot::addComponent(new ScoutBehavior("scout1", motorPair1, distance1));
    
-   ToastBot::add(new WebSocketAdapter("adapter1", new JsonProtocol(), 81));
-   ToastBot::add(new MqttClientAdapter("adapter3", new JsonProtocol(), "broker.mqtt-dashboard.com", 1883, "toastbot1", "", ""));
-   ToastBot::add(new UdpAdapter("adapter5", new JsonProtocol(), IPAddress(10, 1, 11, 249), 55056));
-   ToastBot::add(new TcpClientAdapter("adapter5", new JsonProtocol(), "10.1.11.249", 1997));
+   ToastBot::addComponent(new WebSocketAdapter("adapter1", new JsonProtocol(), 81));
+   ToastBot::addComponent(new MqttClientAdapter("adapter3", new JsonProtocol(), "broker.mqtt-dashboard.com", 1883, "toastbot1", "", ""));
+   ToastBot::addComponent(new UdpAdapter("adapter5", new JsonProtocol(), IPAddress(10, 1, 11, 249), 55056));
+   ToastBot::addComponent(new TcpClientAdapter("adapter5", new JsonProtocol(), "10.1.11.249", 1997));
    */
-}
-
-// TODO: Move to ToastBot
-void createConnections()
-{
-   const Properties& properties = ToastBot::getProperties();
-
-   // Connect to a wifi network.
-   String ssid = properties.getString("wifi.ssid");
-   String password = properties.getString("wifi.password");
-   String deviceName = properties.getString("deviceName");
-   if ((ssid == "") ||
-       (WifiBoard::getBoard()->connectWifi(ssid, password, 15) == false))
-   {
-      // If the ESP8266 fails to connect with the stored credentials, we'll create an AP to allow for wifi config.
-      String apName = (deviceName.length() > 0) ? deviceName : Robox::getUniqueId();
-      WifiBoard::getBoard()->startAccessPoint(apName, "");
-   }
-   
-   // Blink the onboard LED to indicate connection status.
-   Led* led = (Led*)ToastBot::get("led1");
-   if (WifiBoard::getBoard()->isConnected())
-   {
-      led->blink("_--------");
-   }
-   else
-   {
-      led->pulse(2000);
-   }
 }
 
 // *****************************************************************************
@@ -100,8 +97,6 @@ void setup()
    ToastBot::setup(new Esp8266Board());
    
    createComponents();
-   
-   createConnections();
 }
 
 void loop()

@@ -15,6 +15,7 @@
 #include "Component\Scanner.hpp"
 #include "Component\ServoComponent.hpp"
 #include "Connection\ConnectionDefs.hpp"
+#include "Connection\Connection.hpp"
 #include "Logger\RemoteLogger.hpp"
 #include "Messaging\JsonProtocol.hpp"
 #include "ToastBot.hpp"

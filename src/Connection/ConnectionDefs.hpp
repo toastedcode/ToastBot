@@ -1,5 +1,7 @@
 #pragma once
 
+#include "CommonDefs.hpp"
+
 enum ConnectionMode
 {
    CONNECTION_MODE_FIRST,

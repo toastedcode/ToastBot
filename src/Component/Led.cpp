@@ -5,8 +5,6 @@
 #include "Logger.hpp"
 #include "StringUtils.hpp"
 
-static const ComponentCreator<Led> LedCreator("led");
-
 static const bool CONTINUE_PATTERN = false;
 
 const int Led::MIN_BRIGHTNESS;

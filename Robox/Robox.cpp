@@ -98,7 +98,7 @@ void Robox::handleMessage(
       
       Logger::logDebug("Robox::handleMessage: bridge(%s, %s:%d)", name.c_str(), host.c_str(), port);
       
-      ToastBot::add(new TcpClientAdapter(name, new JsonProtocol(), host, port));
+      ToastBot::addComponent(new TcpClientAdapter(name, new JsonProtocol(), host, port));
 
       message->setFree();
    }
@@ -113,7 +113,7 @@ void Robox::handleMessage(
 
       if (component)
       {
-         ToastBot::add(component);
+         ToastBot::addComponent(component);
       }
 
       message->setFree();
@@ -124,7 +124,7 @@ void Robox::handleMessage(
 
       Logger::logDebug("Robox::handleMessage: setLogger(%s)", adapterId.c_str());
 
-      if (ToastBot::get(adapterId))
+      if (ToastBot::getComponent(adapterId))
       {
         Logger::setLogger(new RemoteLogger(adapterId));
       }
@@ -155,7 +155,7 @@ void Robox::handleMessage(
       ToastBot::setProperty("ssid", ssid);
       ToastBot::setProperty("password", password);
 
-      // TODO: Update Connection class.
+      Connection::setWifiConfig(ssid, password);
    }
    else if (message->getMessageId() == "mode")
    {
@@ -163,7 +163,7 @@ void Robox::handleMessage(
 
       Logger::logDebug("Robox::handleMessage: connectionMode(%s)", toString(mode).c_str());
 
-      // TODO: Update Connection class.
+      Connection::setMode(mode);
    }
    else
    {
