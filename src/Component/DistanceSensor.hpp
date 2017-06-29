@@ -38,9 +38,6 @@ public:
    virtual int readMedian(
       const int& iterations);
 
-   // This operation retrieves the last-read sensor value.
-   virtual int value();
-
    // This operation sets up automatic polling on the sensor.
    void poll(
       // The rate at which updates should be sent, in milliseconds.
@@ -51,6 +48,10 @@ public:
 
    static int toInches(
       const int& microseconds);
+
+protected:
+
+   virtual void onPoll();
 
 private:
 

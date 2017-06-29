@@ -24,6 +24,11 @@ public:
       // A unique identifier for this sensor.
       const String& id);
 
+   // Constructor.
+   Sensor(
+      // A message containing the parameters to use in creating the component.
+      MessagePtr message);
+
    // Destructor.
    virtual ~Sensor();
 
@@ -32,12 +37,14 @@ public:
 
    virtual int read() = 0;
 
-   virtual int value() = 0;
-
    // This operation sets up automatic polling on the sensor.
    void poll(
       // The rate at which updates should be sent, in milliseconds.
       const int& period);
+
+protected:
+
+   virtual void onPoll() = 0;
 
 private:
 

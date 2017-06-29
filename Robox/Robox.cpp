@@ -46,7 +46,7 @@ void Robox::handleMessage(
       String propertyName = message->getString("name");
       String propertyValue = message->getString("value");
 
-      Properties properties("/toastbot.properties");
+      Properties& properties = ToastBot::getProperties();
 
       if (propertyName == "")
       {
@@ -165,58 +165,22 @@ void Robox::handleMessage(
 
       Connection::setMode(mode);
    }
+   else if (message->getMessageId() == "subscribe")
+   {
+      String source = message->getSource();
+      String topic = message->getString("toTopic");
+
+      Logger::logDebug("Robox::handleMessage: subscribe(%s, %s)", source.c_str(), topic.c_str());
+
+      Component* component = ToastBot::getComponent(source);
+      if (component)
+      {
+        Messaging::subscribe(component, topic);
+      }
+   }   
    else
    {
       Component::handleMessage(message);
    }
 }
 
-
-String Robox::getUniqueId()
-{
-   static const String PREFIX = "ROBOX";
-
-   String uniqueId = "";
-   char buffer[32];
-
-   WifiBoard* board = WifiBoard::getBoard();
-
-   if (board)
-   {
-      // Retrieve the MAC address of the board.
-      unsigned char mac[6] = {0, 0, 0, 0, 0, 0};
-      board->getMacAddress(mac);
-
-      // Make an id out of the MAC address.
-      sprintf(buffer,
-              "%s_%02X%02X%02X%02X%02X%02X",
-              PREFIX.c_str(),
-              mac[0],
-              mac[1],
-              mac[2],
-              mac[3],
-              mac[4],
-              mac[5]);
-   }
-   else
-   {
-#ifdef ARDUINO
-      // Seed the random number generator.
-      randomSeed(analogRead(0));
-
-      // Make an id out of some random numbers.
-      sprintf(buffer,
-              "%s_%02X%02X%02X%02X%02X%02X",
-              PREFIX.c_str(),
-              random(255),
-              random(255),
-              random(255),
-              random(255),
-              random(255),
-              random(255),
-              random(255));
-#endif
-   }
-
-   return (String(buffer));
-}

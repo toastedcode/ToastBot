@@ -12,6 +12,7 @@
 #include <ToastBot.h>
 #include <WebSocketServer.h>
 
+#include "FactoryResetButton.hpp"
 #include "Robox.h"
 
 // TODO: Move to ToastBot
@@ -58,6 +59,10 @@ void createComponents()
 
    DistanceSensor* distance1 = new DistanceSensor("distance1", 13, 15, 200);
    ToastBot::addComponent(distance1);
+
+   Button* flashButton = new FactoryResetButton("flashButton", 0);
+   flashButton->setLongPress(5000);
+   ToastBot::addComponent(flashButton);
 
    Led* led1 = new Led("led1", 16);
    ToastBot::addComponent(led1);

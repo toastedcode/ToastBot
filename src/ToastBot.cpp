@@ -28,7 +28,8 @@ bool ToastBot::initialized = false;
 
 Set<Component*, ToastBot::MAX_COMPONENTS> ToastBot::components;
 
-const String PROPERTIES_FILE = "/toastbot.properties";
+const String PROPERTIES_FILE = "/robox.properties";
+const String DEFAULT_PROPERTIES_FILE = "/default.properties";
 
 const String ASCII_LOGO =
 "............................................................\n"
@@ -109,7 +110,7 @@ Component* ToastBot::getComponent(
    return (component);
 }
 
-const Properties& ToastBot::getProperties()
+Properties& ToastBot::getProperties()
 {
    return (properties);
 }
@@ -169,6 +170,22 @@ void ToastBot::loop()
    for (int i = 0; i < components.length(); i++)
    {
       components.item(i)->value->loop();
+   }
+}
+
+void ToastBot::factoryReset()
+{
+   Logger::logDebug("ToastBot::factoryReset: Resetting device back to factory default.");
+
+   Properties defaultProperties;
+   defaultProperties.load(DEFAULT_PROPERTIES_FILE);
+
+   defaultProperties.saveAs(PROPERTIES_FILE);
+
+   Board* board = Board::getBoard();
+   if (board)
+   {
+      board->reset();
    }
 }
 

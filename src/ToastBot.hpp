@@ -34,7 +34,7 @@ public:
    static Component* getComponent(
       const String& id);
 
-   static const Properties& getProperties();
+   static Properties& getProperties();
 
    template<typename T>
    inline static const void setProperty(
@@ -49,6 +49,8 @@ public:
       Board* board);
 
    static void loop();
+
+   static void factoryReset();
 
 private:
 
