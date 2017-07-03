@@ -33,6 +33,25 @@ MotorPair::MotorPair(
    this->rightMotor = rightMotor;
 }
 
+MotorPair::MotorPair(
+   MessagePtr message) :
+      Component(message),
+      leftMotor(0),
+      rightMotor(0),
+      speed(0),
+      yaw(0)
+{
+   if (message->isSet("leftMotor"))
+   {
+      leftMotor = (Motor*)ToastBot::getComponent(message->getString("leftMotor"));
+   }
+
+   if (message->isSet("rightMotor"))
+   {
+      rightMotor = (Motor*)ToastBot::getComponent(message->getString("rightMotor"));
+   }
+}
+
 void MotorPair::drive(
    int speed,
    int yaw)

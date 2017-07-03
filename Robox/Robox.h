@@ -19,8 +19,4 @@ public:
    virtual void handleMessage(
       // The message to handle.
       MessagePtr message);
-
-   // Creates a unique id using the MAC address.
-   // Useful for creating AP names.
-   static String getUniqueId();
 };

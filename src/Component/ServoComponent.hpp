@@ -13,6 +13,7 @@
 #include <Servo.h>
 
 #include "Component.hpp"
+#include "ComponentFactory.hpp"
 
 class ServoComponent : public Component
 {
@@ -28,6 +29,11 @@ public:
       const String& id,
       // The control pin for the servo.
       const int& pin);
+
+   // Constructor.
+   ServoComponent(
+      // A message containing the parameters to use in creating the component.
+      MessagePtr message);
 
    // Destructor.
    virtual ~ServoComponent();
@@ -74,6 +80,8 @@ private:
    int angle;
 };
 
+REGISTER(ServoComponent, servo)
+
 inline int ServoComponent::angleToPwm(
    const int& angle)
 {
@@ -85,20 +93,6 @@ inline int ServoComponent::angleToPwm(
    }
 
    return (pwm);
-}
-
-inline ServoComponent::ServoComponent(
-   const String& id,
-   const int& pin) :
-      Component(id),
-      pin(pin),
-      angle(0)
-{
-}
-
-inline ServoComponent::~ServoComponent()
-{
-   // Nothing to do here.
 }
 
 inline int ServoComponent::getAngle()

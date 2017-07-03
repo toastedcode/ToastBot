@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "ComponentFactory.hpp"
 #include "Motor.hpp"
 
 class MotorPair : public Component
@@ -25,6 +26,11 @@ public:
       Motor* leftMotor,
       // The right motor in a motor pair.
       Motor* rightMotor);
+
+   // Constructor.
+   MotorPair(
+      // A message containing the parameters to use in creating the component.
+      MessagePtr message);
 
    // Destructor.
    virtual ~MotorPair();
@@ -102,6 +108,8 @@ private:
    // Positive values indicate the motor pair will be turning to the right; negative values left.
    int yaw;
 };
+
+REGISTER(MotorPair, motorpair)
 
 inline MotorPair::~MotorPair()
 {

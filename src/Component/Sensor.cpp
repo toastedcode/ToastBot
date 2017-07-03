@@ -11,8 +11,16 @@
 #include "Sensor.hpp"
 
 Sensor::Sensor(
-   const String& id) : Component(id),
-                       pollTimer(0)
+   const String& id) :
+      Component(id),
+      pollTimer(0)
+{
+}
+
+Sensor::Sensor(
+   MessagePtr message) :
+      Component(message),
+      pollTimer(0)
 {
 }
 
@@ -23,7 +31,7 @@ Sensor::~Sensor()
 void Sensor::timeout(
    Timer* timer)
 {
-   read();
+   onPoll();
 }
 
 void Sensor::poll(

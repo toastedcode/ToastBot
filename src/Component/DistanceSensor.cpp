@@ -16,9 +16,21 @@ DistanceSensor::DistanceSensor(
    const String& id,
    const int& triggerPin,
    const int& echoPin,
-   const int& maxCmDistance) : Sensor(id)
+   const int& maxCmDistance) :
+      Sensor(id),
+      sensorValue(0)
 {
    sensor = new NewPing(triggerPin, echoPin, maxCmDistance);
+}
+
+DistanceSensor::DistanceSensor(
+   MessagePtr message) :
+      Sensor(message),
+      sensorValue(0)
+{
+   sensor = new NewPing(message->getInt("triggerPin"),
+                        message->getInt("echoPin"),
+                        message->getInt("maxDistance"));
 }
 
 DistanceSensor::~DistanceSensor()
@@ -46,9 +58,16 @@ int DistanceSensor::readMedian(
    return (sensorValue);
 }
 
-int DistanceSensor::value()
+void DistanceSensor::onPoll()
 {
-   return (sensorValue);
+   MessagePtr message = Messaging::newMessage();
+   if (message)
+   {
+      message->setTopic("sensorPoll");
+      message->setSource(getId());
+      message->set("value", sensorValue);
+      Messaging::publish(message);
+   }
 }
 
 int DistanceSensor::toCentimeters(

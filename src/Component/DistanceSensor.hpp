@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "ComponentFactory.hpp"
 #include "NewPing.h"
 #include "Sensor.hpp"
 
@@ -26,6 +27,11 @@ public:
       const int& echoPin,
       const int& maxCmDistance);
 
+   // Constructor.
+   DistanceSensor(
+      // A message containing the parameters to use in creating the component.
+      MessagePtr message);
+
    // Destructor.
    virtual ~DistanceSensor();
 
@@ -38,9 +44,6 @@ public:
    virtual int readMedian(
       const int& iterations);
 
-   // This operation retrieves the last-read sensor value.
-   virtual int value();
-
    // This operation sets up automatic polling on the sensor.
    void poll(
       // The rate at which updates should be sent, in milliseconds.
@@ -52,9 +55,15 @@ public:
    static int toInches(
       const int& microseconds);
 
+protected:
+
+   virtual void onPoll();
+
 private:
 
    NewPing* sensor;
 
    int sensorValue;
 };
+
+REGISTER(DistanceSensor, distancesensor)

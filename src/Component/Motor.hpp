@@ -11,6 +11,7 @@
 #pragma once
 
 #include "Component.hpp"
+#include "ComponentFactory.hpp"
 
 class Motor : public Component
 {
@@ -25,6 +26,11 @@ public:
       const int& directionPin,
       // The GPIO pin that will be used to set the motor speed.
       const int& speedPin);
+
+   // Constructor.
+   Motor(
+      // A message containing the parameters to use in creating the component.
+      MessagePtr message);
 
    // Destructor.
    virtual ~Motor();
@@ -72,6 +78,8 @@ private:
    // Positive values indicate the motor is running forward; negative values reverse.
    int speed;
 };
+
+REGISTER(Motor, motor)
 
 inline Motor::~Motor()
 {

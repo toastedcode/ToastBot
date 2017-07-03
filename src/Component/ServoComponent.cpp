@@ -20,6 +20,29 @@ const int ServoComponent::MIN_PWM;
 
 const int ServoComponent::MAX_PWM;
 
+ServoComponent::ServoComponent(
+   const String& id,
+   const int& pin) :
+      Component(id),
+      pin(pin),
+      angle(0)
+{
+   // Nothing to do here.
+}
+
+ServoComponent::~ServoComponent()
+{
+   // Nothing to do here.
+}
+
+ServoComponent::ServoComponent(
+   MessagePtr message) :
+      Component(message),
+      angle(0)
+{
+   pin = message->isSet("pin") ? message->getInt("pin") : 0;
+}
+
 void ServoComponent::rotate(
    int angle)
 {

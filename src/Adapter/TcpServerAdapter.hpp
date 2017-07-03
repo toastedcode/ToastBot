@@ -20,20 +20,19 @@ public:
 
    virtual MessagePtr getRemoteMessage();
 
-protected:
+private:
+
+   static const int BUFFER_SIZE = 256;
 
    int port;
 
    WiFiServer server;
 
    WiFiClient client;
-};
 
-inline TcpServerAdapter::TcpServerAdapter(
-   const String& id,
-   Protocol* protocol,
-   const int& port) : Adapter(id, protocol),
-                      port(port),
-                      server(port)
-{
-}
+   bool isConnected;
+
+   char buffer[BUFFER_SIZE];
+
+   int readIndex = 0;
+};
