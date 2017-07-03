@@ -23,6 +23,16 @@ DistanceSensor::DistanceSensor(
    sensor = new NewPing(triggerPin, echoPin, maxCmDistance);
 }
 
+DistanceSensor::DistanceSensor(
+   MessagePtr message) :
+      Sensor(message),
+      sensorValue(0)
+{
+   sensor = new NewPing(message->getInt("triggerPin"),
+                        message->getInt("echoPin"),
+                        message->getInt("maxDistance"));
+}
+
 DistanceSensor::~DistanceSensor()
 {
    delete (sensor);

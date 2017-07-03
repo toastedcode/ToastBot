@@ -13,6 +13,7 @@
 
 #include "BasicMessage.hpp"
 #include "Connection/Connection.hpp"
+#include "Component/FactoryResetButton.hpp"
 #include "Logger.hpp"
 #include "Messaging.hpp"
 #include "SerialLogger.hpp"
@@ -141,6 +142,47 @@ void ToastBot::setup(
    //  Setup messaging.
    Messaging::setup<BasicMessage>(10);
 
+   // Creating basic messaging adapters.
+   Protocol* protocol = new JsonProtocol();
+   addComponent(new SerialAdapter("serial", protocol));
+   addComponent(new UdpAdapter("discover", protocol, properties.getInt("discoverPort")));
+   addComponent(new TcpServerAdapter("control", protocol, properties.getInt("controlPort")));
+   addComponent(new TcpServerAdapter("debug", protocol, properties.getInt("debugPort")));
+
+   // Factory reset button.
+   // TODO: Flash button conflicts with motor1 pin.
+   Button* flashButton = new FactoryResetButton("flashButton", 0);
+   //flashButton->setLongPress(5000);
+   addComponent(flashButton);
+
+   // Status LED.
+   Led* statusLed = new Led("statusled", 16);
+   addComponent(statusLed);
+
+   // Create components found in properties.
+   Message* message = MessageFactory::newMessage();
+   String componentIds[50];
+   int count = 0;
+   ToastBot::getProperties().getKeys("component", componentIds, count);
+   for (int i = 0; i < count; i++)
+   {
+      String componentDescription = ToastBot::getProperties().getString(componentIds[i]);
+
+      if (protocol->parse(componentDescription, message))
+      {
+        Logger::logDebug("ToastBot::setup: Creating %s component [%s]",
+                         message->getString("class").c_str(),
+                         message->getString("id").c_str());
+
+        Component* component = ComponentFactory::create(message->getString("class"), message);
+        if (component)
+        {
+          ToastBot::addComponent(component);
+        }
+      }
+   }
+   message->setFree();
+
    // Setup registered components.
    for (int i = 0; i < components.length(); i++)
    {
@@ -158,6 +200,7 @@ void ToastBot::setup(
    }
    Connection::setWifiConfig(properties.getString("wifi.ssid"), properties.getString("wifi.password"));
    Connection::setServerConfig(properties.getString("server.host"), properties.getString("server.clientId"), properties.getString("server.clientPassword"));
+   Connection::setStatusLed(statusLed);
    Connection::setMode(parseConnectionMode(properties.getString("mode")));
 
    initialized = true;

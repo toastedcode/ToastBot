@@ -95,7 +95,7 @@ void Connection::setApConfig(
 {
    accessPointConfig.ssid = ssid;
    accessPointConfig.password = password;
-   
+
    if (mode == ACCESS_POINT)
    {
       setup();
@@ -108,7 +108,7 @@ void Connection::setWifiConfig(
 {
    wifiConfig.ssid = ssid;
    wifiConfig.password = password;
-   
+
    if ((mode == WIFI ) || (mode == ONLINE ))
    {
       setup();
@@ -129,7 +129,7 @@ void Connection::setStatusLed(
    Led* statusLed)
 {
    Connection::statusLed = statusLed;
-   
+
    updateStatusLed();
 }
 

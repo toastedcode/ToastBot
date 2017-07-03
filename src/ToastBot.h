@@ -12,6 +12,7 @@
 #include "Component\DistanceSensor.hpp"
 #include "Component\FollowAI.hpp"
 #include "Component\FollowAI_2.hpp"
+#include "Component\HealthMonitor.hpp"
 #include "Component\Led.hpp"
 #include "Component\Motor.hpp"
 #include "Component\MotorPair.hpp"

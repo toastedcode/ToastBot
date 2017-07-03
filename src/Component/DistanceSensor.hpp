@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "ComponentFactory.hpp"
 #include "NewPing.h"
 #include "Sensor.hpp"
 
@@ -25,6 +26,11 @@ public:
       const int& triggerPin,
       const int& echoPin,
       const int& maxCmDistance);
+
+   // Constructor.
+   DistanceSensor(
+      // A message containing the parameters to use in creating the component.
+      MessagePtr message);
 
    // Destructor.
    virtual ~DistanceSensor();
@@ -59,3 +65,5 @@ private:
 
    int sensorValue;
 };
+
+REGISTER(DistanceSensor, distancesensor)

@@ -178,6 +178,16 @@ void Robox::handleMessage(
         Messaging::subscribe(component, topic);
       }
    }   
+   else if (message->getMessageId() == "health")
+   {
+      // Start the health monitor once we get a ping.
+      HealthMonitor* healthMonitor = (HealthMonitor*)ToastBot::getComponent("healthMonitor");
+      if (healthMonitor)
+      {
+         Logger::logDebug("Robox::handleMessage: Starting health monitor.");
+         healthMonitor->start();
+      } 
+   }
    else
    {
       Component::handleMessage(message);
