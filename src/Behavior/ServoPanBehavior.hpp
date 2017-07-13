@@ -1,7 +1,10 @@
 #pragma once
 
-#include "Behavior.hpp"
 #include "../Component/ServoComponent.hpp"
+#include "Behavior.hpp"
+
+// Forward declaration.
+class ServoComponent;
 
 class ServoPanBehavior : public Behavior
 {
@@ -12,6 +15,7 @@ public:
    {
       INIT,
       PAN,
+      OCILLATE,
       DONE
    };
 
@@ -27,6 +31,11 @@ public:
    virtual void loop();
 
    void panTo(
+      const int& angle,
+      const int& seconds,
+      const bool& ocillate = false);
+
+   void ocillate(
       const int& angle,
       const int& seconds);
 

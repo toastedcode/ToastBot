@@ -15,6 +15,9 @@
 #include "Component.hpp"
 #include "ComponentFactory.hpp"
 
+// Forward declaration.
+class ServoPanBehavior;
+
 class ServoComponent : public Component
 {
 
@@ -55,6 +58,8 @@ public:
    // This operation should be called on startup to prepare the sensor for polling/updating.
    virtual void setup();
 
+   virtual void loop();
+
    // This operation handles a message directed to this sensor.
    virtual void handleMessage(
       // The message to handle.
@@ -76,8 +81,7 @@ private:
    // A servo object from the Arduino library.
    Servo servo;
 
-   // The angle of the servo.
-   int angle;
+   ServoPanBehavior* servoPanBehavior;
 };
 
 REGISTER(ServoComponent, servo)

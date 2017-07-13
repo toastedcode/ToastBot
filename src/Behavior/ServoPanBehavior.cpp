@@ -31,10 +31,22 @@ void ServoPanBehavior::handleMessage(
 
       message->setFree();
    }
+   // ocillate
+   else if (message->getMessageId() == "ocillate")
+   {
+      int angle = message->getInt("angle");
+      int seconds = message->getInt("seconds");
+
+      ocillate(angle, seconds);
+
+      message->setFree();
+   }
    // stop
    else if (message->getMessageId() == "stop")
    {
       stop();
+
+      message->setFree();
    }
    else
    {
@@ -56,12 +68,56 @@ void ServoPanBehavior::loop()
 
       if (currentTime >= endTime)
       {
-         setState(DONE);
+         switch (getState())
+         {
+            case PAN:
+            {
+               setState(DONE);
+               break;
+            }
+
+            case OCILLATE:
+            {
+               // Swap start/end pwm.
+               int tempPwm = startPwm;
+               startPwm = endPwm;
+               endPwm = tempPwm;
+
+               // Set new start/end times.
+               unsigned long duration = (endTime = startTime);
+               startTime = Board::getBoard()->systemTime();
+               endTime = (startTime + duration);
+               break;
+            }
+
+            default:
+            {
+               break;
+            }
+         }
       }
    }
 }
 
 void ServoPanBehavior::panTo(
+   const int& angle,
+   const int& seconds,
+   const bool& ocillate)
+{
+   static const int MILLIS_PER_SECOND = 1000;
+
+   if (isEnabled())
+   {
+      startPwm = ServoComponent::angleToPwm(servo->getAngle());
+      endPwm = ServoComponent::angleToPwm(angle);
+      startTime = Board::getBoard()->systemTime();
+      endTime = (startTime + (seconds * MILLIS_PER_SECOND));
+
+      setState(PAN);
+   }
+}
+
+void ServoPanBehavior::ocillate(
    const int& angle,
    const int& seconds)
 {
@@ -74,7 +130,7 @@ void ServoPanBehavior::panTo(
       startTime = Board::getBoard()->systemTime();
       endTime = (startTime + (seconds * MILLIS_PER_SECOND));
 
-      setState(PAN);
+      setState(OCILLATE);
    }
 }
 

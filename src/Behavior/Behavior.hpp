@@ -58,7 +58,9 @@ private:
 
 inline Behavior::Behavior(
    const String& id) :
-      Component(id)
+      Component(id),
+      state(0),
+      enabled(false)
 {
 }
 

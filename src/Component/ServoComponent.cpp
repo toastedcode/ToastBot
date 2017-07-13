@@ -8,6 +8,7 @@
 // *****************************************************************************
 // *****************************************************************************
 
+#include "../Behavior/ServoPanBehavior.hpp"
 #include "Logger.hpp"
 #include "Messaging.hpp"
 #include "ServoComponent.hpp"
@@ -24,10 +25,9 @@ ServoComponent::ServoComponent(
    const String& id,
    const int& pin) :
       Component(id),
-      pin(pin),
-      angle(0)
+      pin(pin)
 {
-   // Nothing to do here.
+   servoPanBehavior = new ServoPanBehavior(getId() + ".pan", this);
 }
 
 ServoComponent::~ServoComponent()
@@ -37,10 +37,10 @@ ServoComponent::~ServoComponent()
 
 ServoComponent::ServoComponent(
    MessagePtr message) :
-      Component(message),
-      angle(0)
+      Component(message)
 {
    pin = message->isSet("pin") ? message->getInt("pin") : 0;
+   servoPanBehavior = new ServoPanBehavior(getId() + ".pan", this);
 }
 
 void ServoComponent::rotate(
@@ -60,6 +60,15 @@ void ServoComponent::setup()
    servo.attach(pin);
 
    Messaging::subscribe(this, "killSwitch");
+
+   servoPanBehavior->setup();
+}
+
+void ServoComponent::loop()
+{
+   Component::loop();
+
+   servoPanBehavior->loop();
 }
 
 void ServoComponent::handleMessage(
@@ -79,6 +88,13 @@ void ServoComponent::handleMessage(
       rotate(angle);
 
       message->setFree();
+   }
+   // panTo
+   // stop
+   else if ((message->getMessageId() == "panTo") ||
+            (message->getMessageId() == "stop"))
+   {
+      servoPanBehavior->handleMessage(message);
    }
    // killSwitch
    else if (message->getMessageId() == "killSwitch")
