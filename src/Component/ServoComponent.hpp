@@ -69,9 +69,9 @@ public:
 
    static const int MAX_ANGLE = 180;
 
-   static const int MIN_PWM = 1000;
+   static const int MIN_PWM = 500;
 
-   static const int MAX_PWM = 1500;
+   static const int MAX_PWM = 2200;
 
 private:
 
@@ -91,7 +91,7 @@ inline int ServoComponent::angleToPwm(
 {
    int pwm = 0;
 
-   if ((angle >= MIN_ANGLE) && (angle >= MAX_ANGLE))
+   if ((angle >= MIN_ANGLE) && (angle <= MAX_ANGLE))
    {
       pwm = map(angle, MIN_ANGLE, MAX_ANGLE, MIN_PWM, MAX_PWM);
    }

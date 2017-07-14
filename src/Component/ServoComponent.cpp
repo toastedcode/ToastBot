@@ -92,9 +92,19 @@ void ServoComponent::handleMessage(
    // panTo
    // stop
    else if ((message->getMessageId() == "panTo") ||
+		    (message->getMessageId() == "oscillate") ||
             (message->getMessageId() == "stop"))
    {
       servoPanBehavior->handleMessage(message);
+   }
+   // setPwm
+   else if (message->getMessageId() == "setPwm")
+   {
+	   int pwm = message->getInt("pwm");
+
+	   Logger::logDebug("ServoComponent::handleMessage: setPwm(%d)", pwm);
+
+      setPwm(pwm);
    }
    // killSwitch
    else if (message->getMessageId() == "killSwitch")

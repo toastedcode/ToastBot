@@ -15,7 +15,7 @@ public:
    {
       INIT,
       PAN,
-      OCILLATE,
+      OSCILLATE,
       DONE
    };
 
@@ -35,8 +35,9 @@ public:
       const int& seconds,
       const bool& ocillate = false);
 
-   void ocillate(
-      const int& angle,
+   void oscillate(
+      const int& startAngle,
+	  const int& endAngle,
       const int& seconds);
 
    void stop();

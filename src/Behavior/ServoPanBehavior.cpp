@@ -1,4 +1,5 @@
 #include "Board.hpp"
+#include "Logger.hpp"
 #include "ServoPanBehavior.hpp"
 
 ServoPanBehavior::ServoPanBehavior(
@@ -27,24 +28,31 @@ void ServoPanBehavior::handleMessage(
       int angle = message->getInt("angle");
       int seconds = message->getInt("seconds");
 
+      Logger::logDebug("ServoPanBehavior::handleMessage: panTo(%d, %d)", angle, seconds);
+
       panTo(angle, seconds);
 
       message->setFree();
    }
    // ocillate
-   else if (message->getMessageId() == "ocillate")
+   else if (message->getMessageId() == "oscillate")
    {
-      int angle = message->getInt("angle");
+      int startAngle = message->getInt("startAngle");
+      int endAngle = message->getInt("endAngle");
       int seconds = message->getInt("seconds");
 
-      ocillate(angle, seconds);
+      Logger::logDebug("ServoPanBehavior::handleMessage: oscillate(%d, %d, %d)", startAngle, endAngle, seconds);
+
+      oscillate(startAngle, endAngle, seconds);
 
       message->setFree();
    }
    // stop
    else if (message->getMessageId() == "stop")
    {
-      stop();
+	  Logger::logDebug("ServoPanBehavior::handleMessage: stop()");
+
+	  stop();
 
       message->setFree();
    }
@@ -56,13 +64,13 @@ void ServoPanBehavior::handleMessage(
 
 void ServoPanBehavior::loop()
 {
-   if (isEnabled() && (startTime != 0) && (getState() == PAN))
+   if (isEnabled() &&
+	   (startTime != 0) &&
+	   ((getState() == PAN) || (getState() == OSCILLATE)))
    {
       unsigned long currentTime = Board::getBoard()->systemTime();
 
-      int deltaTime = (currentTime - startTime);
-
-      int currentPwm = map(deltaTime, startTime, endTime, startPwm, endPwm);
+      int currentPwm = map(currentTime, startTime, endTime, startPwm, endPwm);
 
       servo->setPwm(currentPwm);
 
@@ -76,7 +84,7 @@ void ServoPanBehavior::loop()
                break;
             }
 
-            case OCILLATE:
+            case OSCILLATE:
             {
                // Swap start/end pwm.
                int tempPwm = startPwm;
@@ -84,7 +92,7 @@ void ServoPanBehavior::loop()
                endPwm = tempPwm;
 
                // Set new start/end times.
-               unsigned long duration = (endTime = startTime);
+               unsigned long duration = (endTime - startTime);
                startTime = Board::getBoard()->systemTime();
                endTime = (startTime + duration);
                break;
@@ -117,20 +125,21 @@ void ServoPanBehavior::panTo(
    }
 }
 
-void ServoPanBehavior::ocillate(
-   const int& angle,
+void ServoPanBehavior::oscillate(
+   const int& startAngle,
+   const int& endAngle,
    const int& seconds)
 {
    static const int MILLIS_PER_SECOND = 1000;
 
    if (isEnabled())
    {
-      startPwm = ServoComponent::angleToPwm(servo->getAngle());
-      endPwm = ServoComponent::angleToPwm(angle);
+      startPwm = ServoComponent::angleToPwm(startAngle);
+      endPwm = ServoComponent::angleToPwm(endAngle);
       startTime = Board::getBoard()->systemTime();
       endTime = (startTime + (seconds * MILLIS_PER_SECOND));
 
-      setState(OCILLATE);
+      setState(OSCILLATE);
    }
 }
 
