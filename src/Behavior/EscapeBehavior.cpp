@@ -78,7 +78,7 @@ void EscapeBehavior::setState(
       case FLEE:
       {
          watchTimer->stop();
-         fleeTimer = Timer::newTimer(getId() + ".watch", FLEE_TIME, Timer::ONE_SHOT, this);
+         fleeTimer = Timer::newTimer(getId() + ".flee", FLEE_TIME, Timer::ONE_SHOT, this);
          fleeTimer->start();
          rotate(ONE_HUNDRED_EIGHTY_DEGREE_ROTATE_TIME);
          break;

@@ -57,6 +57,8 @@ public:
    virtual void setState(
       const int& state)
    {
+      Logger::logDebug("%s: -> %d", getId().c_str(), state);
+
       switch (state)
       {
          case INIT:
@@ -82,8 +84,6 @@ public:
       }
 
       Behavior::setState(state);
-
-      Logger::logDebug("%s: -> %d", getId().c_str(), state);
    }
 
 private:
