@@ -23,6 +23,14 @@ void setup()
    ToastBot::setup(new Esp8266Board());
 
    ToastBot::addComponent(new Robox(), true);  // <-- default handler
+
+   // TEST CODE
+   MotorPair* motorPair = (MotorPair*)ToastBot::getComponent("motorPair");
+   DistanceSensor* distance = (DistanceSensor*)ToastBot::getComponent("distanceSensor");
+   if (motorPair && distance)
+   {
+      ToastBot::addComponent(new EscapeBehavior("escape", motorPair, distance));
+   }
 }
 
 void loop()

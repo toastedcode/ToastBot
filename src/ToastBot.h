@@ -6,6 +6,7 @@
 #include "Adapter\TcpServerAdapter.hpp"
 #include "Adapter\UdpAdapter.hpp"
 #include "Adapter\WebSocketAdapter.hpp"
+#include "Behavior\EscapeBehavior.hpp"
 #include "Behavior\ScoutBehavior.hpp"
 #include "Behavior\ServoPanBehavior.hpp"
 #include "Component\Button.hpp"

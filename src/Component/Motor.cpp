@@ -49,7 +49,6 @@ Motor::Motor(
 void Motor::setSpeed(
    int speed)
 {
-   Logger::logDebug("Motor::handleMessage: setSpeed(%d)", speed);
    this->speed = constrain(speed, MIN_SPEED, MAX_SPEED);
 
    updatePins();

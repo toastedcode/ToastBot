@@ -1,4 +1,5 @@
 #include "Behavior.hpp"
+#include "Logger.hpp"
 
 void Behavior::handleMessage(
    MessagePtr message)
@@ -6,12 +7,16 @@ void Behavior::handleMessage(
    // enable
    if (message->getMessageId() == "enable")
    {
+      Logger::logDebug("Behavior::handleMessage: %s.enable()", getId().c_str());
+
       enable();
       message->setFree();
    }
    // disable
    else if (message->getMessageId() == "disable")
    {
+      Logger::logDebug("Behavior::handleMessage: %s.disable()", getId().c_str());
+
       disable();
       message->setFree();
    }
