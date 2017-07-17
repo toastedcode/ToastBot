@@ -27,13 +27,12 @@ void setup()
    // TEST CODE
    MotorPair* motorPair = (MotorPair*)ToastBot::getComponent("motorPair");
    DistanceSensor* distance = (DistanceSensor*)ToastBot::getComponent("distanceSensor");
-   
-   //ToastBot::addComponent(new EscapeBehavior("escape", motorPair, distance));
-   //((EscapeBehavior*)ToastBot::getComponent("escape"))->enable();
 
-   ScoutBehavior* scout = new ScoutBehavior("scout", motorPair, distance);
-   //ToastBot::addComponent(scout);
-   //scout->enable();
+   if (motorPair && distance)
+   {
+      ToastBot::addComponent(new EscapeBehavior("escape", motorPair, distance));
+      ((EscapeBehavior*)ToastBot::getComponent("escape"))->enable();
+   }
 }
 
 void loop()

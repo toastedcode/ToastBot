@@ -20,23 +20,20 @@ EscapeBehavior::EscapeBehavior(
       motorPair(motorPair),
       distanceSensor(distanceSensor)
 {
-   /*
    fleeBehavior = new ScoutBehavior(id + ".flee", motorPair, distanceSensor);
    addChild(fleeBehavior);
    fleeBehavior->disable();
-   */
 
    watchTimer = Timer::newTimer(getId() + ".watch", READ_SENSOR_TIME, Timer::PERIODIC, this);
    fleeTimer = 0;
    rotateTimer = 0;
 
-   //disable();
+   disable();
 }
 
 EscapeBehavior::~EscapeBehavior()
 {
    delete (fleeBehavior);
-   delete (rotateBehavior);
 }
 
 void EscapeBehavior::enable()
@@ -55,7 +52,7 @@ void EscapeBehavior::setState(
    const int& state)
 {
 
-   Logger::logDebug("EscapeBehavior::setState: %s: -> %d", getId().c_str(), state);
+   Logger::logDebug("EscapeBehavior::setState: %s -> %d", getId().c_str(), state);
 
    switch (state)
    {
@@ -101,13 +98,11 @@ void EscapeBehavior::timeout(
       int reading = DistanceSensor::toCentimeters(distanceSensor->read());
       Logger::logDebug("EscapeBehavior::timeout: reading = %d", reading);
 
-      /*
       if ((reading != 0) && (reading < DISTANCE_THRESHOLD))
       {
          setState(FLEE);
       }
       else
-      */
       {
          // Randomly, rotate.
          if (random(100) < 25)
@@ -132,7 +127,6 @@ void EscapeBehavior::timeout(
    }
 }
 
-
 void EscapeBehavior::rotate(
    const int& rotateTime)
 {
@@ -140,4 +134,3 @@ void EscapeBehavior::rotate(
    rotateTimer = Timer::newTimer(getId() + ".rotate", rotateTime, Timer::ONE_SHOT, this);
    rotateTimer->start();
 }
-

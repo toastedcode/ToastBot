@@ -42,8 +42,6 @@ private:
 
    DistanceSensor* distanceSensor;
 
-   Behavior* rotateBehavior;
-
    Behavior* fleeBehavior;
 
    Timer* watchTimer;
