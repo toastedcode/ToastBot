@@ -258,10 +258,11 @@ ScoutBehavior::ScoutBehavior(
    reverseBehavior = new ReverseBehavior(id + ".reverse", motorPair);
    rotateBehavior = new RotateBehavior(id + ".rotate", motorPair);
 
-   forwardBehavior->addListener(this);
+   //forwardBehavior->addListener(this);
    reverseBehavior->addListener(this);
    rotateBehavior->addListener(this);
 
+   /*
    addChild(forwardBehavior);
    addChild(reverseBehavior);
    addChild(rotateBehavior);
@@ -271,6 +272,7 @@ ScoutBehavior::ScoutBehavior(
    rotateBehavior->enable();
 
    disable();
+   */
 }
 
 ScoutBehavior::~ScoutBehavior()
@@ -323,6 +325,9 @@ void ScoutBehavior::onStateChange(
 void ScoutBehavior::setState(
    const int& state)
 {
+
+   Logger::logDebug("ScoutBehavior::setState: %s: -> %d", getId().c_str(), state);
+
    switch (state)
    {
       case INIT:
@@ -351,8 +356,6 @@ void ScoutBehavior::setState(
          break;
       }
    }
-
-   Logger::logDebug("%s: -> %d", getId().c_str(), state);
 
    Behavior::setState(state);
 }
