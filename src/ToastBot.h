@@ -23,6 +23,7 @@
 #include "Connection\Connection.hpp"
 #include "Logger\RemoteLogger.hpp"
 #include "Messaging\JsonProtocol.hpp"
+#include "Program\Program.hpp"
 #include "ToastBot.hpp"
 
 #include "Adapter/TcpClientAdapter.hpp"
