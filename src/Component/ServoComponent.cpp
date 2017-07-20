@@ -49,6 +49,26 @@ void ServoComponent::rotate(
    servo.write(constrain(angle, MIN_ANGLE, MAX_ANGLE));
 }
 
+void ServoComponent::panTo(
+   const int& angle,
+   const int& seconds)
+{
+	servoPanBehavior->panTo(angle, seconds);
+}
+
+void ServoComponent::oscillate(
+   const int& startAngle,
+	  const int& endAngle,
+   const int& seconds)
+{
+	servoPanBehavior->oscillate(startAngle, endAngle, seconds);
+}
+
+void ServoComponent::stop()
+{
+	servoPanBehavior->stop();
+}
+
 void ServoComponent::setPwm(
    const int& pwm)
 {

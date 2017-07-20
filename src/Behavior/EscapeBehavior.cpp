@@ -15,12 +15,14 @@ static const int FLEE_TIME = 5000;  // milliseconds
 EscapeBehavior::EscapeBehavior(
    const String& id,
    MotorPair* motorPair,
-   DistanceSensor* distanceSensor) :
+   DistanceSensor* distanceSensor,
+   ServoComponent* servo) :
       Behavior(id),
       motorPair(motorPair),
-      distanceSensor(distanceSensor)
+      distanceSensor(distanceSensor),
+	  servo(servo)
 {
-   fleeBehavior = new ScoutBehavior(id + ".flee", motorPair, distanceSensor);
+   fleeBehavior = new ScoutBehavior(id + ".flee", motorPair, distanceSensor, servo);
    addChild(fleeBehavior);
    fleeBehavior->disable();
 

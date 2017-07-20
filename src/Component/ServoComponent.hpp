@@ -46,6 +46,17 @@ public:
       // The angle the servo should rotate to.
       int angle);
 
+   void panTo(
+      const int& angle,
+      const int& seconds);
+
+   void oscillate(
+      const int& startAngle,
+	  const int& endAngle,
+      const int& seconds);
+
+   void stop();
+
    // Retrieves the current angle of the servo.
    // Note: Non-const because it calls read() on the Servo object.
    int getAngle();

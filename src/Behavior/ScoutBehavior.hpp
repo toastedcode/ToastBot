@@ -3,6 +3,7 @@
 #include "Behavior.hpp"
 #include "../Component/DistanceSensor.hpp"
 #include "../Component/MotorPair.hpp"
+#include "../Component/ServoComponent.hpp"
 
 class ScoutBehavior : public Behavior, BehaviorListener
 {
@@ -20,7 +21,8 @@ public:
    ScoutBehavior(
       const String& id,
       MotorPair* motorPair,
-      DistanceSensor* distanceSensor);
+      DistanceSensor* distanceSensor,
+	  ServoComponent* servo);
 
    virtual ~ScoutBehavior();
 
