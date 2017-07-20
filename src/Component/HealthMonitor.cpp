@@ -44,10 +44,13 @@ void HealthMonitor::setHealth(
                        toString(health).c_str());
 
       MessagePtr message = Messaging::newMessage();
-      message->setTopic("health");
-      message->setSource(adapterId);
-      message->set("health", toString(health));
-      Messaging::publish(message);
+      if (message)
+      {
+         message->setTopic("health");
+         message->setSource(adapterId);
+         message->set("health", toString(health));
+         Messaging::publish(message);
+      }
    }
 }
 
@@ -102,10 +105,13 @@ void HealthMonitor::timeout(
 
    // Next ping.
    MessagePtr message = Messaging::newMessage();
-   message->setMessageId("ping");
-   message->setSource(getId());
-   message->setDestination(adapterId);
-   Messaging::send(message);
+   if (message)
+   {
+      message->setMessageId("ping");
+      message->setSource(getId());
+      message->setDestination(adapterId);
+      Messaging::send(message);
+   }
 
    gotReply = false;
 }

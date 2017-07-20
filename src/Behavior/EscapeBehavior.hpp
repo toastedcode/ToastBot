@@ -3,6 +3,7 @@
 #include "Behavior.hpp"
 #include "../Component/DistanceSensor.hpp"
 #include "../Component/MotorPair.hpp"
+#include "../Component/ServoComponent.hpp"
 
 class EscapeBehavior : public Behavior, TimerListener
 {
@@ -19,7 +20,8 @@ public:
    EscapeBehavior(
       const String& id,
       MotorPair* motorPair,
-      DistanceSensor* distanceSensor);
+      DistanceSensor* distanceSensor,
+	  ServoComponent* servo);
 
    virtual ~EscapeBehavior();
 
@@ -41,6 +43,8 @@ private:
    MotorPair* motorPair;
 
    DistanceSensor* distanceSensor;
+
+   ServoComponent* servo;
 
    Behavior* fleeBehavior;
 

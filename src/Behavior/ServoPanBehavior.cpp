@@ -34,7 +34,7 @@ void ServoPanBehavior::handleMessage(
 
       message->setFree();
    }
-   // ocillate
+   // oscillate
    else if (message->getMessageId() == "oscillate")
    {
       int startAngle = message->getInt("startAngle");
@@ -109,8 +109,7 @@ void ServoPanBehavior::loop()
 
 void ServoPanBehavior::panTo(
    const int& angle,
-   const int& seconds,
-   const bool& ocillate)
+   const int& seconds)
 {
    static const int MILLIS_PER_SECOND = 1000;
 

@@ -18,17 +18,21 @@ void RemoteLogger::log(
    if (adapterId.length() != 0)
    {
       Message* message = Messaging::newMessage();
+      if (message)
+      {
+         message->setMessageId("logMessage");
+         message->set("logLevel", toString(logLevel));
+         message->set("message", string);
 
-      message->setMessageId("logMessage");
-      message->set("logLevel", toString(logLevel));
-      message->set("message", string);
+         message->setDestination(adapterId);
 
-      message->setDestination(adapterId);
+         Messaging::send(message);
 
-      Messaging::send(message);
-
-      // TODO: Remove.
-      //printf("%s: %s\n", toString(logLevel).c_str(), string.c_str());
-      printf("Remotely logged: %s: %s\n", toString(logLevel).c_str(), string.c_str());
+         printf("Remotely logged: %s: %s\n", toString(logLevel).c_str(), string.c_str());
+      }
+      else
+      {
+         printf("Failed to remotely log: %s: %s\n", toString(logLevel).c_str(), string.c_str());
+      }
    }
 }

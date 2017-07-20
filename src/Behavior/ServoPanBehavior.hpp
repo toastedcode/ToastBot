@@ -32,8 +32,7 @@ public:
 
    void panTo(
       const int& angle,
-      const int& seconds,
-      const bool& ocillate = false);
+      const int& seconds);
 
    void oscillate(
       const int& startAngle,

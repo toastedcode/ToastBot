@@ -21,11 +21,13 @@ public:
    ForwardBehavior(
       const String& id,
       MotorPair* motorPair,
-      DistanceSensor* distanceSensor) :
+      DistanceSensor* distanceSensor,
+	  ServoComponent* servo) :
          Behavior(id)
    {
       this->motorPair = motorPair;
       this->distanceSensor = distanceSensor;
+      this->servo = servo;
 
       timer = Timer::newTimer("sensorTimer", 500, Timer::PERIODIC, this);
 
@@ -40,6 +42,10 @@ public:
    virtual void timeout(
       Timer* timer)
    {
+	  static const int NO_READING = 0;
+
+	  static const int DISTANCE_THRESHOLD = 20;  // cm
+
       if (isEnabled())
       {
          int reading = DistanceSensor::toCentimeters(distanceSensor->read());
@@ -47,7 +53,8 @@ public:
          Logger::logDebug("ForwardBehavior::timeout: %d\n", reading);
 
          if ((getState() == MOVING) &&
-             (reading <= 10))
+             (reading != NO_READING) &&
+			 (reading <= DISTANCE_THRESHOLD))
          {
             setState(BLOCKED);
          }
@@ -64,6 +71,8 @@ public:
          case INIT:
          {
             motorPair->drive(0, 0);
+            servo->stop();
+            servo->rotate(90);
             timer->stop();
             break;
          }
@@ -71,6 +80,7 @@ public:
          case MOVING:
          {
             motorPair->drive(100, 0);
+            servo->oscillate(0, 180, 3);
             timer->start();
             break;
          }
@@ -78,6 +88,8 @@ public:
          case BLOCKED:
          {
             motorPair->drive(0, 0);
+            servo->stop();
+            servo->rotate(90);
             timer->stop();
             break;
          }
@@ -93,6 +105,8 @@ private:
    MotorPair* motorPair;
 
    DistanceSensor* distanceSensor;
+
+   ServoComponent* servo;
 };
 
 class ReverseBehavior : public Behavior, TimerListener
@@ -147,7 +161,7 @@ public:
          case MOVING:
          {
             motorPair->drive(-100, 0);
-            Timer* timer = Timer::newTimer("moveTimer", 3000, Timer::ONE_SHOT, this);
+            Timer* timer = Timer::newTimer("moveTimer", 1000, Timer::ONE_SHOT, this);
             timer->start();
             break;
          }
@@ -219,7 +233,7 @@ public:
          case ROTATING:
          {
             motorPair->rotate(100);
-            Timer* timer = Timer::newTimer("rotateTimer", 3000, Timer::ONE_SHOT, this);
+            Timer* timer = Timer::newTimer("rotateTimer", 1000, Timer::ONE_SHOT, this);
             timer->start();
             break;
          }
@@ -251,10 +265,11 @@ private:
 ScoutBehavior::ScoutBehavior(
    const String& id,
    MotorPair* motorPair,
-   DistanceSensor* distanceSensor) :
+   DistanceSensor* distanceSensor,
+   ServoComponent* servo) :
       Behavior(id)
 {
-   forwardBehavior = new ForwardBehavior(id + ".forward", motorPair, distanceSensor);
+   forwardBehavior = new ForwardBehavior(id + ".forward", motorPair, distanceSensor, servo);
    reverseBehavior = new ReverseBehavior(id + ".reverse", motorPair);
    rotateBehavior = new RotateBehavior(id + ".rotate", motorPair);
 

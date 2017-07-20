@@ -14,25 +14,28 @@ void Robox::handleMessage(
    {
       Message* reply = Messaging::newMessage();
       
-      reply->setMessageId("pong");
-      reply->setSource(getId());
-      reply->setDestination(message->getSource());
-      reply->set("deviceId", ToastBot::getId());
-
-      if (WifiBoard::getBoard())
+      if (reply)
       {
-        unsigned char mac[6] = {0, 0, 0, 0, 0, 0};
-        WifiBoard::getBoard()->getMacAddress(mac);
-        char macAddress[18];
-        sprintf(macAddress, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-        
-        reply->set("macAddress", macAddress);
-        reply->set("ipAddress", WifiBoard::getBoard()->getIpAddress());
-      }
-      
-      Messaging::send(reply);
+         reply->setMessageId("pong");
+         reply->setSource(getId());
+         reply->setDestination(message->getSource());
+         reply->set("deviceId", ToastBot::getId());
 
-      message->setFree();   
+         if (WifiBoard::getBoard())
+         {
+           unsigned char mac[6] = {0, 0, 0, 0, 0, 0};
+           WifiBoard::getBoard()->getMacAddress(mac);
+           char macAddress[18];
+           sprintf(macAddress, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+
+           reply->set("macAddress", macAddress);
+           reply->set("ipAddress", WifiBoard::getBoard()->getIpAddress());
+         }
+
+         Messaging::send(reply);
+
+         message->setFree();
+      }
    }
    else if (message->getMessageId() == "reset")
    {
@@ -40,6 +43,13 @@ void Robox::handleMessage(
       Board::getBoard()->reset();
 
       message->setFree();
+   }
+   else if (message->getMessageId() == "properties")
+   {
+      Properties& properties = ToastBot::getProperties();
+    
+      Logger::logDebug("Robox::handleMessage: Properties:");
+      properties.log();
    }
    else if (message->getMessageId() == "property")
    {
@@ -50,7 +60,8 @@ void Robox::handleMessage(
 
       if (propertyName == "")
       {
-         Logger::logDebug("Robox::handleMessage: Properties: \n%s", properties.toString().c_str());
+         Logger::logDebug("Robox::handleMessage: Properties:");
+         properties.log();
       }
       else
       {
@@ -187,6 +198,10 @@ void Robox::handleMessage(
          Logger::logDebug("Robox::handleMessage: Starting health monitor.");
          healthMonitor->start();
       } 
+   }
+   else if (message->getMessageId() == "heap")
+   {
+      Logger::logDebug("Robox::handleMessage: heap = %u", Board::getBoard()->getFreeHeap());
    }
    else
    {

@@ -11,7 +11,7 @@ public:
    FactoryResetButton(
       // A unique identifier for this component.
       const String& id,
-      // The pin for the LED.
+      // The pin for the button.
       const int& pin,
       // A flag indicating if the pin should be configured with INPUT (false) or INPUT_PULLUP (true).
       const bool& inputPullup = false);

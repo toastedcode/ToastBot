@@ -43,6 +43,12 @@ const String ASCII_LOGO =
 "MM....MMMMMMM..MMMMMMM .MMMMMMM...MM. MM=..MMMMMMM. MMMMMMM.\n"
 "............................................................\n";
 
+// The number of simultaneous messages supported by the Messaging framework.
+const int MESSAGE_POOL_SIZE = 5;
+
+// The GPIO pin used to control the status LED.
+const int STATUS_LED_PIN = 16;
+
 String ToastBot::getId()
 {
    String id = "";
@@ -133,14 +139,15 @@ void ToastBot::setup(
 
    // Load properties.
    properties.load(PROPERTIES_FILE);
-   Logger::logDebug("ToastBot::setup: Properties: \n%s", properties.toString().c_str());
+   Logger::logDebug("ToastBot::setup: Properties:");
+   properties.log();
 
    // Setup the board.
    // TODO: Read board from properties file and create dynamically.
    Board::setBoard(board);
 
    //  Setup messaging.
-   Messaging::setup<BasicMessage>(10);
+   Messaging::setup<BasicMessage>(MESSAGE_POOL_SIZE);
 
    // Creating basic messaging adapters.
    Protocol* protocol = new JsonProtocol();
@@ -156,12 +163,12 @@ void ToastBot::setup(
    addComponent(flashButton);
 
    // Status LED.
-   Led* statusLed = new Led("statusled", 16);
+   Led* statusLed = new Led("statusLed", STATUS_LED_PIN);
    addComponent(statusLed);
 
    // Create components found in properties.
    Message* message = MessageFactory::newMessage();
-   String componentIds[50];
+   String componentIds[ToastBot::MAX_COMPONENTS];
    int count = 0;
    ToastBot::getProperties().getKeys("component", componentIds, count);
    for (int i = 0; i < count; i++)
@@ -202,6 +209,9 @@ void ToastBot::setup(
    Connection::setServerConfig(properties.getString("server.host"), properties.getString("server.clientId"), properties.getString("server.clientPassword"));
    Connection::setStatusLed(statusLed);
    Connection::setMode(parseConnectionMode(properties.getString("mode")));
+
+   // Log free memory.
+   Logger::logDebug("ToastBot::setup: Free memory = %u bytes", board->getFreeHeap());
 
    initialized = true;
 }
