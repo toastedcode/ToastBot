@@ -44,7 +44,7 @@ const String ASCII_LOGO =
 "............................................................\n";
 
 // The number of simultaneous messages supported by the Messaging framework.
-const int MESSAGE_POOL_SIZE = 5;
+const int MESSAGE_POOL_SIZE = 10;
 
 // The GPIO pin used to control the status LED.
 const int STATUS_LED_PIN = 16;

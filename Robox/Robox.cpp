@@ -109,7 +109,7 @@ void Robox::handleMessage(
       
       Logger::logDebug("Robox::handleMessage: bridge(%s, %s:%d)", name.c_str(), host.c_str(), port);
       
-      ToastBot::addComponent(new TcpClientAdapter(name, new JsonProtocol(), host, port));
+      ToastBot::addComponent(new TcpClientAdapter(name, new JsonProtocol(), host, port, 5000));
 
       message->setFree();
    }

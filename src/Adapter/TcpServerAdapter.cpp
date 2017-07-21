@@ -44,11 +44,9 @@ bool TcpServerAdapter::sendRemoteMessage(
       }
       else
       {
-#ifdef MESSAGING_DEBUG
          Logger::logWarning(
             "TcpServerAdapter::sendRemoteMessage: Failed to send message [%s] to remote host.",
             message->getMessageId().c_str());
-#endif
       }
    }
 
@@ -121,9 +119,7 @@ MessagePtr TcpServerAdapter::getRemoteMessage()
       }
       else
       {
-#ifdef MESSAGING_DEBUG
          Logger::logWarning("TcpServerAdapter::getRemoteMessage: Buffer overflow.  Discarding bytes.");
-#endif
 
          readIndex = 0;
       }
