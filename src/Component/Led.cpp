@@ -329,6 +329,50 @@ void Led::handleMessage(
 
       message->setFree();
    }
+   // instruction
+   else if (message->getMessageId() == "instruction")
+   {
+      String action = message->getString("action");
+
+      if (action == "on")
+      {
+         int brightness = message->isSet("param_0") ? message->getInt("param_0") : 100;
+
+         Logger::logDebug("Led::handleMessage: instruction:on(%d)", brightness);
+
+         setBrightness(brightness);
+      }
+      else if (action == "off")
+      {
+         Logger::logDebug("Led::handleMessage: instruction:off()");
+
+         setBrightness(0);
+      }
+      else if (action == "blink")
+      {
+         String patternString = message->getString("param_0");
+
+         Logger::logDebug("Led::handleMessage: instruction:blink(%s)", patternString.c_str());
+
+         blink(patternString);
+      }
+      else if (action == "pulse")
+      {
+         int period = message->getInt("param_0");
+
+         Logger::logDebug("Led::handleMessage: instruction:pulse(%d)", period);
+
+         pulse(period);
+      }
+      else
+      {
+         Logger::logWarning("Led::handleMessage: Illegal instruction [%s] for %s.",
+                            message->getString("action").c_str(),
+                            getId().c_str());
+      }
+
+      message->setFree();
+   }
    else
    {
       Component::handleMessage(message);

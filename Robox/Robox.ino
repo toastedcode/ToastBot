@@ -25,6 +25,11 @@ void setup()
    ToastBot::addComponent(new Robox(), true);  // <-- default handler
 
    Logger::setLogLevel(DEBUG_FINEST);
+
+   Program* program = new Program("test.rbx");
+   ToastBot::addComponent(program);
+   program->load("/test.rbx");
+   program->run(false);
 }
 
 void loop()

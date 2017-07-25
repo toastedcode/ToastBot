@@ -88,7 +88,7 @@ void Motor::handleMessage(
 
       message->setFree();
    }
-   if (message->getMessageId() == "instruction")
+   else if (message->getMessageId() == "instruction")
    {
       String action = message->getString("action");
 
@@ -102,9 +102,9 @@ void Motor::handleMessage(
       }
       else
       {
-         Logger::logDebug("Motor::handleMessage: Illegal instruction [%s] for %s.",
-                          message->getString("action").c_str(),
-                          getId().c_str());
+         Logger::logWarning("Motor::handleMessage: Illegal instruction [%s] for %s.",
+                            message->getString("action").c_str(),
+                            getId().c_str());
       }
 
       message->setFree();

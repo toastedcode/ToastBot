@@ -1,52 +1,52 @@
 #include "CommandProtocol.hpp"
+//#include "Logger.hpp"
 #include "StringUtils.hpp"
+
+// *****************************************************************************
+//                                Public
+// *****************************************************************************
+
+const String PARAM_PREFIX = "param_";
 
 CommandProtocol::CommandProtocol()
 {
-
+   // Nothing to do here.
 }
 
 CommandProtocol::~CommandProtocol()
 {
-
+   // Nothing to do here.
 }
 
 bool CommandProtocol::parse(
    const String& messageString,
    MessagePtr message)
 {
-   // componentId.action(parameter, parameter, parameter)
-
    bool success = false;
 
-   String parsedString = messageString;
-
-   int parameterCount = 0;
-   String parameters[MAX_PARAMETERS];
+   // component.action(param, param, ...);
 
    String componentId = parseComponent(messageString);
-   String action = parseAction(messageString);
-   parseParameters(messageString, parameters, parameterCount);
-
-   if (action != "")
+   if (componentId.length() > 0)
    {
-      // Syntax error.
+      message->setDestination(componentId);
    }
-   else
+
+   String action = parseAction(messageString);
+   if (action.length() > 0)
    {
       message->setMessageId("instruction");
-      message->setDestination(componentId);
       message->set("action", action);
+      success = true;  // TODO: More validation.
+   }
 
-      // Parameters.
-      int paramIndex = 0;
-      for (int index; index < parameterCount; index++)
-      {
-         String name = "param_" + String(index);
-         message->set(name, parameters[index]);
-      }
+   Parameter parameters[MAX_PARAMETERS];
+   int parameterCount = 0;
+   parseParameters(messageString, parameters, parameterCount);
 
-      success = true;
+   for (int i = 0; i < parameterCount; i++)
+   {
+      message->setParameter(parameters[i]);
    }
 
    return (success);
@@ -55,52 +55,195 @@ bool CommandProtocol::parse(
 String CommandProtocol::serialize(
    MessagePtr message) const
 {
-   String messageString = message->getDestination() + "." + message->getMessageId();
+   String serializedMessage = "";
 
-   // Parameters.
-   messageString += "(";
-   int index = 0;
-   String name = "parameter" + String(index);
-   while (message->isSet(name))
+   // component.action(param, param, ...);
+
+   // component
+   if (message->isSet("destination"))
    {
-      messageString += message->getString(name);
-      messageString += ", ";  // TODO
+      serializedMessage += message->getDestination();
+      serializedMessage += ".";
    }
-   messageString += ");";
 
-   return (messageString);
+   // action
+   serializedMessage += message->getMessageId();
+
+   //
+   // parameters
+   //
+
+   serializedMessage += "(";
+   int i = 0;
+   String paramName = PARAM_PREFIX + String(i);
+   while ((message->isSet(paramName)) &&
+          (i < MAX_PARAMETERS))
+   {
+      if (i > 0)
+      {
+         serializedMessage += ", ";
+      }
+
+      Parameter parameter = message->getParameter(paramName);
+
+      switch (parameter.getType())
+      {
+         case Parameter::BOOL:
+         {
+            serializedMessage += String(parameter.getBoolValue());
+            break;
+         }
+
+         case Parameter::DOUBLE:
+         {
+            serializedMessage += String(parameter.getDoubleValue());
+            break;
+         }
+
+         case Parameter::FLOAT:
+         {
+            serializedMessage += String(parameter.getFloatValue());
+            break;
+         }
+
+         case Parameter::INT:
+         {
+            serializedMessage += String(parameter.getIntValue());
+            break;
+         }
+
+         case Parameter::STRING:
+         {
+            serializedMessage += parameter.getStringValue();
+            break;
+         }
+
+         case Parameter::UNKNOWN:
+         default:
+         {
+            // Invalid.
+         }
+      }
+
+      i++;
+      paramName = PARAM_PREFIX + String(i);
+   }
+
+   serializedMessage += ");";
+
+   return (serializedMessage);
 }
+
+// *****************************************************************************
+//                                Private
+// *****************************************************************************
 
 String CommandProtocol::parseComponent(
    const String& messageString)
 {
-   return ("");
+   String componentId = "";
+
+   int endPos = StringUtils::findFirstOf(messageString, "(");
+   if ((endPos != -1) &&
+       (endPos != 0))
+   {
+      String commandString = messageString.substring(0, endPos - 1);
+
+      String token1 = StringUtils::tokenize(commandString, ".");
+      String token2 = StringUtils::tokenize(commandString, ".");
+
+      if (token2.length() != 0)
+      {
+         componentId = token1;
+      }
+   }
+
+   return (componentId);
 }
 
 String CommandProtocol::parseAction(
    const String& messageString)
 {
-   return ("");
+   String action = "";
+
+   int endPos = StringUtils::findFirstOf(messageString, "(");
+   if ((endPos != -1) &&
+       (endPos != 0))
+   {
+      String commandString = messageString.substring(0, endPos);
+
+      String token1 = StringUtils::tokenize(commandString, ".");
+      String token2 = StringUtils::tokenize(commandString, ".");
+
+      if (token2.length() != 0)
+      {
+         action = token2;
+      }
+      else
+      {
+         action = token1;
+      }
+   }
+
+   return (action);
 }
 
 void CommandProtocol::parseParameters(
    const String& messageString,
-   String parameters[MAX_PARAMETERS],
+   Parameter parameters[MAX_PARAMETERS],
    int& parameterCount)
 {
-   parameterCount = 0;
-
-   int startPos = StringUtils::findFirstOf(messageString, "(");
+   int startPos = StringUtils::findFirstOf(messageString, "(") + 1;
    int endPos = StringUtils::findFirstOf(messageString, ")");
-   String paramString = messageString.substring(startPos, endPos);
-
-   if (paramString != "")
+   if ((startPos != -1) &&
+       (endPos != -1) &&
+       ((endPos - startPos) > 0))
    {
-      String param = StringUtils::tokenize(paramString, ",");
-      while (param != "")
+      String paramString = messageString.substring(startPos, endPos);
+
+      int i = 0;
+      String valueString = StringUtils::tokenize(paramString, ",");
+      while ((valueString.length() > 0) &&
+             (i < MAX_PARAMETERS))
       {
-         parameters[parameterCount] = StringUtils::removeAll(param, " ");
+         valueString.trim();
+
+         String lowerCase = valueString;
+         lowerCase.toLowerCase();
+
+         String paramName = PARAM_PREFIX + String(i);
+         Parameter parameter(paramName.c_str());
+
+         if ((valueString.charAt(0) == '\"') &&
+             (valueString.charAt(valueString.length() - 1) == '\"'))
+         {
+            valueString = valueString.substring(1, (valueString.length() - 1));
+            parameter.setValue(valueString.c_str());
+         }
+         else if (StringUtils::findFirstNotOf(valueString, "0123456789.-") == -1)
+         {
+            // TODO: Parse numeric types.
+            // TODO: Fix trucation of longs.
+            long longValue = valueString.toInt();
+            parameter.setValue((int)longValue);
+         }
+         else if ((lowerCase == "true") ||
+                  (lowerCase == "false"))
+         {
+            parameter.setValue(StringUtils::toBool(valueString));
+         }
+         else
+         {
+            //Logger::logWarning("CommandProtocol::parseParameters: Bad parameter [\"%s\"].", valueString.c_str());
+            printf("CommandProtocol::parseParameters: Bad parameter [\"%s\"].\n", valueString.c_str());
+         }
+
+         parameters[i] = parameter;
          parameterCount++;
+
+         // Next token.
+         i++;
+         valueString = StringUtils::tokenize(paramString, ",");
       }
    }
 }

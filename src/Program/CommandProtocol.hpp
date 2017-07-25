@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Protocol.hpp"
 
 class CommandProtocol : public Protocol
@@ -28,6 +30,6 @@ private:
 
    static void parseParameters(
       const String& messageString,
-      String parameters[MAX_PARAMETERS],
+      Parameter parameters[MAX_PARAMETERS],
       int& parameterCount);
 };
