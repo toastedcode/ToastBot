@@ -126,6 +126,35 @@ void MotorPair::handleMessage(
 
       message->setFree();
    }
+   else if (message->getMessageId() == "instruction")
+   {
+      String action = message->getString("action");
+
+      if (action == "drive")
+      {
+         int speed = message->getInt("param_0");
+
+         Logger::logDebug("MotorPair::handleMessage: instruction:drive(%d)", speed);
+
+         drive(speed, 0);
+      }
+      else if (action == "rotate")
+      {
+         int angle = message->getInt("param_0");
+
+         Logger::logDebug("MotorPair::handleMessage: instruction:rotate(%d)", angle);
+
+         rotate(angle);
+      }
+      else
+      {
+         Logger::logWarning("MotorPair::handleMessage: Illegal instruction [%s] for %s.",
+                            message->getString("action").c_str(),
+                            getId().c_str());
+      }
+
+      message->setFree();
+   }
    else
    {
       Component::handleMessage(message);

@@ -125,9 +125,13 @@ bool Program::execute(
 
    if (message && protocol.parse(instruction, message))
    {
-      if (message->getMessageId() == "wait")
+      if (message->getString("action") == "wait")
       {
-         waitTime = Board::getBoard()->systemTime() + (message->getInt("time") * 1000);
+         int seconds = message->getInt("param_0");
+
+         Logger::logDebug("Program::execute: wait(%d)", seconds);
+
+         waitTime = Board::getBoard()->systemTime() + (seconds * 1000);
          success = true;
          message->setFree();
       }
