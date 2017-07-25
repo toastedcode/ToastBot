@@ -1,4 +1,5 @@
 #include "JsonProtocol.hpp"
+#include "Logger.hpp"
 #include "StringUtils.hpp"
 
 const int JsonProtocol::MAX_PARAMETERS;
@@ -10,30 +11,25 @@ bool JsonProtocol::parse(
    bool isSuccess = false;
 
    String remainingString = messageString;
-   ParameterSet parameters;
+   Parameter parameters[MAX_PARAMETERS];
+   int parameterCount = 0;
 
-#ifdef MESSAGING_DEBUG
-   printf("JsonProtocol::parse: Parsing: \"%s\".\n", messageString.c_str());
-#endif
+   Logger::logDebugFinest("JsonProtocol::parse: Parsing: \"%s\".\n", messageString.c_str());
 
    // Strip braces and whitespace.
    remainingString = StringUtils::removeAll(remainingString, " \n\r\t{}");
 
    // Parse parameters.
-   if (parseParameters(remainingString, parameters) == false)
+   if (parseParameters(remainingString, parameters, parameterCount) == false)
    {
-#ifdef MESSAGING_DEBUG
-      printf("JsonProtocol::parse: Failed to parse parameters.\n");
-#endif
+	   Logger::logDebugFinest("JsonProtocol::parse: Failed to parse parameters.\n");
    }
    else
    {
       // Populate message with parsed parameters.
-      for (int i = 0; i < parameters.length(); i++)
+      for (int i = 0; i < parameterCount; i++)
       {
-         Parameter parameter = parameters.item(i)->value;
-
-         message->setParameter(parameter);
+         message->setParameter(parameters[i]);
       }
 
       isSuccess = true;
@@ -53,9 +49,7 @@ String JsonProtocol::serialize(
 
    serializedMessage += "}";
 
-#ifdef MESSAGING_DEBUG
-   printf("JsonProtocol::serialize: Serialized: \"%s\".\n", serializedMessage.c_str());
-#endif
+   Logger::logDebugFinest("JsonProtocol::serialize: Serialized: \"%s\".\n", serializedMessage.c_str());
 
    return (serializedMessage);
 }
@@ -65,21 +59,55 @@ String JsonProtocol::serializeParameters(
 {
    String serializedParameters = "";
 
-   for (int i = 0; i < message->getParameterCount(); i++)
+   Parameter parameters[MAX_PARAMETERS];
+   int parameterCount = 0;
+   message->getParameters(parameters, parameterCount);
+
+   for (int i = 0; i < parameterCount; i++)
    {
-      Parameter parameter = message->getParameter(i);
+      String parameterValue = "";
 
-      String parameterValue = parameter.value;
-
-      if ((parameter.type == STRING) ||
-          (parameter.type == CHAR))
+      switch (parameters[i].getType())
       {
-         parameterValue = wrap(parameterValue, '\"');
+         case Parameter::BOOL:
+         {
+            parameterValue = String(parameters[i].getBoolValue());
+            break;
+         }
+
+         case Parameter::DOUBLE:
+         {
+            parameterValue = String(parameters[i].getDoubleValue());
+            break;
+         }
+
+         case Parameter::FLOAT:
+         {
+            parameterValue = String(parameters[i].getFloatValue());
+            break;
+         }
+
+         case Parameter::INT:
+         {
+            parameterValue = String(parameters[i].getIntValue());
+            break;
+         }
+
+         case Parameter::STRING:
+         {
+            parameterValue = wrap(parameters[i].getStringValue(), '\"');
+            break;
+         }
+
+         default:
+         {
+            break;
+         }
       }
 
-      serializedParameters += (wrap(parameter.name, '\"') + ":" + parameterValue);
+      serializedParameters += (wrap(parameters[i].getName(), '\"') + ":" + parameterValue);
 
-      if (i < (message->getParameterCount() - 1))
+      if (i < (parameterCount - 1))
       {
          serializedParameters += ", ";
       }
@@ -90,7 +118,8 @@ String JsonProtocol::serializeParameters(
 
 bool JsonProtocol::parseParameters(
    const String& parameterString,
-   ParameterSet& parameters)
+   Parameter parameters[],
+   int& count)
 {
    bool isSuccess = true;
 
@@ -103,7 +132,8 @@ bool JsonProtocol::parseParameters(
 
       if (isSuccess)
       {
-         parameters.add(parameter);
+         parameters[count] = parameter;
+         count++;
       }
    }
 
@@ -123,25 +153,63 @@ bool JsonProtocol::parseParameter(
 
    if (validName(name) && validValue(value))
    {
-      parameter.type = getType(value);
-      parameter.name = stripQuotes(name);
-      parameter.value = stripQuotes(value);
+      parameter.setName(stripQuotes(name).c_str());
+
+      switch (getType(value))
+      {
+         case Parameter::BOOL:
+         {
+            parameter.setValue(StringUtils::toBool(value));
+            break;
+         }
+
+         case Parameter::DOUBLE:
+         {
+            // TODO:
+            //parameter.setValue(value.toDouble());
+            break;
+         }
+
+         case Parameter::FLOAT:
+         {
+            parameter.setValue(value.toFloat());
+            break;
+         }
+
+         case Parameter::INT:
+         {
+            // TODO: Fix trucation of longs.
+            long longValue = value.toInt();
+            parameter.setValue((int)longValue);
+            break;
+         }
+
+         case Parameter::STRING:
+         {
+            parameter.setValue(stripQuotes(value).c_str());
+            break;
+         }
+
+         default:
+         {
+            break;
+         }
+      }
+
       isSuccess = true;
    }
    else
    {
-#ifdef MESSAGING_DEBUG
-      printf("JsonProtocol::parse: Failed to parse parameter: \"%s\".\n", parameterString.c_str());
-#endif
+	   Logger::logDebugFinest("JsonProtocol::parse: Failed to parse parameter: \"%s\".\n", parameterString.c_str());
    }
 
    return (isSuccess);
 }
 
-ParameterType JsonProtocol::getType(
+Parameter::ParameterType JsonProtocol::getType(
    const String& value)
 {
-   ParameterType type = STRING;
+   Parameter::ParameterType type = Parameter::STRING;
 
    String lowerCase = value;
    lowerCase.toLowerCase();
@@ -149,30 +217,21 @@ ParameterType JsonProtocol::getType(
    if ((value.charAt(0) == '\"') &&
        (value.charAt(value.length() - 1) == '\"'))
    {
-      if (value.length() == 3)
-      {
-         type = CHAR;
-      }
-      else
-      {
-         type = STRING;
-      }
+      type = Parameter::STRING;
    }
    else if (StringUtils::findFirstNotOf(value, "123456789.-") == -1)
    {
       // TODO: Parse numeric types.
-      type = INT;
+      type = Parameter::INT;
    }
    else if ((lowerCase == "true") ||
             (lowerCase == "false"))
    {
-      type = BOOL;
+      type = Parameter::BOOL;
    }
    else
    {
-#ifdef MESSAGING_DEBUG
-      printf("JsonProtocol::getType: Treating unquoted value [%s] as STRING.\n", value.c_str());
-#endif
+	   Logger::logDebugFinest("JsonProtocol::getType: Treating unquoted value [%s] as STRING.\n", value.c_str());
    }
 
    return (type);

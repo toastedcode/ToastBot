@@ -44,7 +44,7 @@ const String ASCII_LOGO =
 "............................................................\n";
 
 // The number of simultaneous messages supported by the Messaging framework.
-const int MESSAGE_POOL_SIZE = 5;
+const int MESSAGE_POOL_SIZE = 10;
 
 // The GPIO pin used to control the status LED.
 const int STATUS_LED_PIN = 16;
@@ -141,6 +141,12 @@ void ToastBot::setup(
    properties.load(PROPERTIES_FILE);
    Logger::logDebug("ToastBot::setup: Properties:");
    properties.log();
+
+   // Set log levels.
+   if (properties.isSet("logLevel"))
+   {
+      Logger::setLogLevel(fromString(properties.getString("logLevel")));
+   }
 
    // Setup the board.
    // TODO: Read board from properties file and create dynamically.

@@ -24,19 +24,7 @@ void setup()
 
    ToastBot::addComponent(new Robox(), true);  // <-- default handler
 
-   // TEST CODE
-   MotorPair* motorPair = (MotorPair*)ToastBot::getComponent("motorPair");
-   DistanceSensor* distance = (DistanceSensor*)ToastBot::getComponent("distanceSensor");
-   ServoComponent* servo = (ServoComponent*)ToastBot::getComponent("servo1");
-
-   if (motorPair && distance && servo)
-   {
-      ToastBot::addComponent(new ScoutBehavior("scout", motorPair, distance, servo));
-      ((ScoutBehavior*)ToastBot::getComponent("scout"))->enable();
-      
-      //ToastBot::addComponent(new EscapeBehavior("escape", motorPair, distance, servo));
-      //((EscapeBehavior*)ToastBot::getComponent("escape"))->enable();
-   }
+   Logger::setLogLevel(DEBUG_FINEST);
 }
 
 void loop()
