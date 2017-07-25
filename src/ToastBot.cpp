@@ -142,6 +142,12 @@ void ToastBot::setup(
    Logger::logDebug("ToastBot::setup: Properties:");
    properties.log();
 
+   // Set log levels.
+   if (properties.isSet("logLevel"))
+   {
+      Logger::setLogLevel(fromString(properties.getString("logLevel")));
+   }
+
    // Setup the board.
    // TODO: Read board from properties file and create dynamically.
    Board::setBoard(board);
