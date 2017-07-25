@@ -6,7 +6,7 @@
 //                                Public
 // *****************************************************************************
 
-const String PARAM_PREFIX = "param";
+const String PARAM_PREFIX = "param_";
 
 CommandProtocol::CommandProtocol()
 {
@@ -35,7 +35,8 @@ bool CommandProtocol::parse(
    String action = parseAction(messageString);
    if (action.length() > 0)
    {
-      message->setMessageId(action);
+      message->setMessageId("instruction");
+      message->set("action", action);
       success = true;  // TODO: More validation.
    }
 
@@ -196,7 +197,7 @@ void CommandProtocol::parseParameters(
    int endPos = StringUtils::findFirstOf(messageString, ")");
    if ((startPos != -1) &&
        (endPos != -1) &&
-       ((endPos - startPos) > 1))
+       ((endPos - startPos) > 0))
    {
       String paramString = messageString.substring(startPos, endPos);
 
@@ -222,12 +223,14 @@ void CommandProtocol::parseParameters(
          else if (StringUtils::findFirstNotOf(valueString, "0123456789.-") == -1)
          {
             // TODO: Parse numeric types.
-            parameter.setValue(valueString.toInt());
+            // TODO: Fix trucation of longs.
+            long longValue = valueString.toInt();
+            parameter.setValue((int)longValue);
          }
          else if ((lowerCase == "true") ||
                   (lowerCase == "false"))
          {
-            parameter.setValue(valueString.toBool());
+            parameter.setValue(StringUtils::toBool(valueString));
          }
          else
          {

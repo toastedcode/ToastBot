@@ -88,6 +88,27 @@ void Motor::handleMessage(
 
       message->setFree();
    }
+   else if (message->getMessageId() == "instruction")
+   {
+      String action = message->getString("action");
+
+      if (action == "drive")
+      {
+         int newSpeed = message->getInt("param_0");
+
+         Logger::logDebug("Motor::handleMessage: instruction:drive(%d)", newSpeed);
+
+         setSpeed(newSpeed);
+      }
+      else
+      {
+         Logger::logWarning("Motor::handleMessage: Illegal instruction [%s] for %s.",
+                            message->getString("action").c_str(),
+                            getId().c_str());
+      }
+
+      message->setFree();
+   }
    else
    {
       Component::handleMessage(message);
