@@ -14,7 +14,7 @@ bool JsonProtocol::parse(
    Parameter parameters[MAX_PARAMETERS];
    int parameterCount = 0;
 
-   Logger:logDebugFinest("JsonProtocol::parse: Parsing: \"%s\".\n", messageString.c_str());
+   Logger::logDebugFinest("JsonProtocol::parse: Parsing: \"%s\".", messageString.c_str());
 
    // Strip braces and whitespace.
    remainingString = StringUtils::removeAll(remainingString, " \n\r\t{}");
@@ -22,7 +22,7 @@ bool JsonProtocol::parse(
    // Parse parameters.
    if (parseParameters(remainingString, parameters, parameterCount) == false)
    {
-      Logger:logWarning("JsonProtocol::parse: Failed to parse parameters.\n");
+      Logger::logWarning("JsonProtocol::parse: Failed to parse parameters.");
    }
    else
    {
@@ -49,7 +49,7 @@ String JsonProtocol::serialize(
 
    serializedMessage += "}";
 
-   Logger:logDebugFinest("JsonProtocol::serialize: Serialized: \"%s\".\n", serializedMessage.c_str());
+   Logger::logDebugFinest("JsonProtocol::serialize: Serialized: \"%s\".", serializedMessage.c_str());
 
    return (serializedMessage);
 }
@@ -165,7 +165,8 @@ bool JsonProtocol::parseParameter(
 
          case Parameter::DOUBLE:
          {
-            parameter.setValue(value.toDouble());
+            // TODO: Handle double
+            parameter.setValue(value.toFloat());
             break;
          }
 
@@ -199,7 +200,7 @@ bool JsonProtocol::parseParameter(
    }
    else
    {
-      Logger:logWarning("JsonProtocol::parse: Failed to parse parameter: \"%s\".\n", parameterString.c_str());
+      Logger::logWarning("JsonProtocol::parse: Failed to parse parameter: \"%s\".", parameterString.c_str());
    }
 
    return (isSuccess);
@@ -230,7 +231,7 @@ Parameter::ParameterType JsonProtocol::getType(
    }
    else
    {
-      Logger:logDebugFinest("JsonProtocol::getType: Treating unquoted value [%s] as STRING.\n", value.c_str());
+      Logger::logDebugFinest("JsonProtocol::getType: Treating unquoted value [%s] as STRING.", value.c_str());
    }
 
    return (type);
