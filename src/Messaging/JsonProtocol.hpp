@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Protocol.hpp"
-#include "Set.hpp"
 
 class JsonProtocol : public Protocol
 {
@@ -19,20 +18,19 @@ public:
 
 private:
 
-   typedef Set<Parameter, MAX_PARAMETERS> ParameterSet;
-
    String serializeParameters(
       MessagePtr message) const;
 
    static bool parseParameters(
       const String& parameterString,
-      ParameterSet& parameters);
+      Parameter parameters[],
+      int& count);
 
    static bool parseParameter(
       const String& parameterString,
       Parameter& parameter);
 
-   static ParameterType getType(
+   static Parameter::ParameterType getType(
       const String& value);
 
    static bool validName(

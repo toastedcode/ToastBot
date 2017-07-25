@@ -1,8 +1,22 @@
+#include "Board.hpp"
 #include "Logger.hpp"
 #include "Messaging.h"
 #include "TcpClientAdapter.hpp"
 
-const int TcpClientAdapter::RETRY_DELAY = 5000;  // 5 seconds
+TcpClientAdapter::TcpClientAdapter(
+   const String& id,
+   Protocol* protocol,
+   const String& host,
+   const int& port,
+   const int& retryDelay) :
+      Adapter(id, protocol),
+      host(host),
+      port(port),
+      retryTime(0),
+      retryDelay(retryDelay),
+      readIndex(0)
+{
+}
 
 void TcpClientAdapter::setup()
 {
@@ -30,10 +44,19 @@ bool TcpClientAdapter::sendRemoteMessage(
 
    if (serializedMessage != "")
    {
-      if (client.connected())
+      serializedMessage += "\n";
+
+      if (client && client.connected())
       {
          client.write(serializedMessage.c_str(), serializedMessage.length());
+
          isSuccess = true;
+      }
+      else
+      {
+         Logger::logWarning(
+            "TcpServerAdapter::sendRemoteMessage: Failed to send message [%s] to remote host.",
+            message->getMessageId().c_str());
       }
    }
 
@@ -44,14 +67,8 @@ MessagePtr TcpClientAdapter::getRemoteMessage()
 {
    MessagePtr message = 0;
 
-   static const int BUFFER_SIZE = 256;
-
    static const char LF = '\n';
    static const char CR = '\r';
-
-   static char buffer[BUFFER_SIZE];
-
-   static int readIndex = 0;
 
    if (client && client.available())
    {
@@ -109,10 +126,14 @@ bool TcpClientAdapter::connect()
 
    if (!success)
    {
-      retryTime = millis() + RETRY_DELAY;
+      retryTime = Board::getBoard()->systemTime()+ retryDelay;
+
+      Logger::logDebug("TcpClientAdapter::connect: TCP Client Adapter [%s] failed to connect.", getId().c_str());
    }
    else
    {
+      Logger::logDebug("TcpClientAdapter::connect: TCP Client Adapter [%s] connected.", getId().c_str());
+
       retryTime = 0;
    }
 

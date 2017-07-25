@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Adapter.hpp"
+#include "ComponentFactory.hpp"
 #include "ESP8266WiFi.h"
 
 class TcpClientAdapter : public Adapter
@@ -12,7 +13,8 @@ public:
       const String& id,
       Protocol* protocol,
       const String& host,
-      const int& port);
+      const int& port,
+      const int& retryDelay);
 
    virtual void setup();
 
@@ -23,30 +25,25 @@ public:
 
    virtual MessagePtr getRemoteMessage();
 
-protected:
-
    bool connect();
 
    bool disconnect();
 
-   static const int RETRY_DELAY;
+private:
 
-   WiFiClient client;
+   static const int BUFFER_SIZE = 256;
 
    String host;
 
    int port;
 
-   int retryTime;
-};
+   WiFiClient client;
 
-inline TcpClientAdapter::TcpClientAdapter(
-   const String& id,
-   Protocol* protocol,
-   const String& host,
-   const int& port) : Adapter(id, protocol),
-                      host(host),
-                      port(port),
-                      retryTime(0)
-{
-}
+   long retryTime;
+
+   int retryDelay;  // milliseconds
+
+   char buffer[BUFFER_SIZE];
+
+   int readIndex = 0;
+};
