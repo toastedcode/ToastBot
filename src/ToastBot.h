@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Adapter\HttpServerAdapter.hpp"
 #include "Adapter\MqttClientAdapter.hpp"
 #include "Adapter\SerialAdapter.hpp"
 #include "Adapter\TcpClientAdapter.hpp"
@@ -22,10 +23,8 @@
 #include "Connection\ConnectionDefs.hpp"
 #include "Connection\Connection.hpp"
 #include "Logger\RemoteLogger.hpp"
+#include "Messaging\CommandProtocol.hpp"
 #include "Messaging\JsonProtocol.hpp"
+#include "Messaging\RestfulProtocol.hpp"
 #include "Program\Program.hpp"
 #include "ToastBot.hpp"
-
-#include "Adapter/TcpClientAdapter.hpp"
-#include "Adapter/TcpServerAdapter.hpp"
-#include "Adapter/UdpAdapter.hpp"

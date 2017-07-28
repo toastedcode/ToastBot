@@ -20,7 +20,7 @@ public:
 
    virtual MessagePtr getRemoteMessage();
 
-private:
+protected:
 
    static const int BUFFER_SIZE = 256;
 

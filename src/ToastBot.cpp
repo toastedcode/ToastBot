@@ -32,7 +32,7 @@ Set<Component*, ToastBot::MAX_COMPONENTS> ToastBot::components;
 const String PROPERTIES_FILE = "/robox.properties";
 const String DEFAULT_PROPERTIES_FILE = "/default.properties";
 
-const String ASCII_LOGO =
+const char PROGMEM ASCII_LOGO[] =
 "............................................................\n"
 "..............MMM...........................................\n"
 "..............MMM......................MM$..................\n"
@@ -132,7 +132,9 @@ void ToastBot::setup(
 #endif
 
    // Logo.
-   Serial.print("\n\n" + ASCII_LOGO + "\n");
+   Serial.print("\n\n");
+   Serial.print(FPSTR(ASCII_LOGO));
+   Serial.print("\n");
 
    // Set the logger.
    Logger::setLogger(new SerialLogger());

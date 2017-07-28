@@ -26,10 +26,8 @@ void setup()
 
    Logger::setLogLevel(DEBUG_FINEST);
 
-   Program* program = new Program("test.rbx");
-   ToastBot::addComponent(program);
-   program->load("/test.rbx");
-   program->run(false);
+   HttpServerAdapter* httpServerAdapter = new HttpServerAdapter("http");
+   ToastBot::addComponent(httpServerAdapter);
 }
 
 void loop()
