@@ -28,7 +28,7 @@ void ServoPanBehavior::handleMessage(
       int angle = message->getInt("angle");
       int seconds = message->getInt("seconds");
 
-      Logger::logDebug("ServoPanBehavior::handleMessage: panTo(%d, %d)", angle, seconds);
+      Logger::logDebug(F("ServoPanBehavior::handleMessage: panTo(%d, %d)"), angle, seconds);
 
       panTo(angle, seconds);
 
@@ -41,7 +41,7 @@ void ServoPanBehavior::handleMessage(
       int endAngle = message->getInt("endAngle");
       int seconds = message->getInt("seconds");
 
-      Logger::logDebug("ServoPanBehavior::handleMessage: oscillate(%d, %d, %d)", startAngle, endAngle, seconds);
+      Logger::logDebug(F("ServoPanBehavior::handleMessage: oscillate(%d, %d, %d)"), startAngle, endAngle, seconds);
 
       oscillate(startAngle, endAngle, seconds);
 
@@ -50,7 +50,7 @@ void ServoPanBehavior::handleMessage(
    // stop
    else if (message->getMessageId() == "stop")
    {
-	  Logger::logDebug("ServoPanBehavior::handleMessage: stop()");
+	  Logger::logDebug(F("ServoPanBehavior::handleMessage: stop()"));
 
 	  stop();
 

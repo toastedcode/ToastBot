@@ -50,7 +50,7 @@ public:
       {
          int reading = DistanceSensor::toCentimeters(distanceSensor->read());
 
-         Logger::logDebug("ForwardBehavior::timeout: %d\n", reading);
+         Logger::logDebug(F("ForwardBehavior::timeout: %d\n"), reading);
 
          if ((getState() == MOVING) &&
              (reading != NO_READING) &&
@@ -64,7 +64,7 @@ public:
    virtual void setState(
       const int& state)
    {
-      Logger::logDebug("ForwardBehavior::setState: %s -> %d", getId().c_str(), state);
+      Logger::logDebug(F("ForwardBehavior::setState: %s -> %d"), getId().c_str(), state);
 
       switch (state)
       {
@@ -148,7 +148,7 @@ public:
    virtual void setState(
       const int& state)
    {
-      Logger::logDebug("ReverseBehavior::setState: %s -> %d", getId().c_str(), state);
+      Logger::logDebug(F("ReverseBehavior::setState: %s -> %d"), getId().c_str(), state);
 
       switch (state)
       {
@@ -220,7 +220,7 @@ public:
    virtual void setState(
       const int& state)
    {
-      Logger::logDebug("RotateBehavior::setState: %s -> %d", getId().c_str(), state);
+      Logger::logDebug(F("RotateBehavior::setState: %s -> %d"), getId().c_str(), state);
 
       switch (state)
       {
@@ -339,7 +339,7 @@ void ScoutBehavior::setState(
    const int& state)
 {
 
-   Logger::logDebug("ScoutBehavior::setState: %s -> %d", getId().c_str(), state);
+   Logger::logDebug(F("ScoutBehavior::setState: %s -> %d"), getId().c_str(), state);
 
    switch (state)
    {

@@ -49,7 +49,7 @@ void Scanner::timeout(
    // Take a reading (in centimeters) at the current position.
    reading[servoPosition] = DistanceSensor::toCentimeters(sensor->read());
 
-   Logger::logDebug("%d, %d, %d, %d, %d", reading[0], reading[1], reading[2], reading[3], reading[4]);
+   Logger::logDebug(F("%d, %d, %d, %d, %d"), reading[0], reading[1], reading[2], reading[3], reading[4]);
 
    // Rotate to the new position.
    if (servoDirection == RIGHT)

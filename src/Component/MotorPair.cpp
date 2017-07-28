@@ -103,7 +103,7 @@ void MotorPair::handleMessage(
    if ((message->getMessageId() == "motorPair") ||
        (message->getMessageId() == "drive"))
    {
-      Logger::logDebug("MotorPair::handleMessage: drive()\n");
+      Logger::logDebug(F("MotorPair::handleMessage: drive()"));
 
       drive(message->getInt("speed"), message->getInt("yaw"));
 
@@ -111,7 +111,7 @@ void MotorPair::handleMessage(
    }
    else if (message->getMessageId() == "rotate")
    {
-      Logger::logDebug("MotorPair::handleMessage: rotate()\n");
+      Logger::logDebug(F("MotorPair::handleMessage: rotate()\n"));
 
       rotate(message->getInt("speed"));
 
@@ -120,7 +120,7 @@ void MotorPair::handleMessage(
    // killSwitch
    else if (message->getMessageId() == "killSwitch")
    {
-      Logger::logDebug("MotorPair::handleMessage: killSwitch");
+      Logger::logDebug(F("MotorPair::handleMessage: killSwitch"));
 
       drive(0, 0);
 
@@ -134,7 +134,7 @@ void MotorPair::handleMessage(
       {
          int speed = message->getInt("param_0");
 
-         Logger::logDebug("MotorPair::handleMessage: instruction:drive(%d)", speed);
+         Logger::logDebug(F("MotorPair::handleMessage: instruction:drive(%d)"), speed);
 
          drive(speed, 0);
       }
@@ -142,13 +142,13 @@ void MotorPair::handleMessage(
       {
          int angle = message->getInt("param_0");
 
-         Logger::logDebug("MotorPair::handleMessage: instruction:rotate(%d)", angle);
+         Logger::logDebug(F("MotorPair::handleMessage: instruction:rotate(%d)"), angle);
 
          rotate(angle);
       }
       else
       {
-         Logger::logWarning("MotorPair::handleMessage: Illegal instruction [%s] for %s.",
+         Logger::logWarning(F("MotorPair::handleMessage: Illegal instruction [%s] for %s."),
                             message->getString("action").c_str(),
                             getId().c_str());
       }

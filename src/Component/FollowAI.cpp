@@ -54,7 +54,7 @@ void FollowAI::timeout(
 
       Proximity proximity = getProximity(reading);
       Bearing bearing = getBearing(reading);
-      Logger::logDebug("FollowAI::timeout: Proximity = %d, bearing = %d", proximity, bearing);
+      Logger::logDebug(F("FollowAI::timeout: Proximity = %d, bearing = %d"), proximity, bearing);
 
       int speed = getSpeed(reading);
 

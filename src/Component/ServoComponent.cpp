@@ -103,7 +103,7 @@ void ServoComponent::handleMessage(
    {
       int angle = message->getInt("angle");
 
-      Logger::logDebug("ServoComponent::handleMessage: rotate(%d)", angle);
+      Logger::logDebug(F("ServoComponent::handleMessage: rotate(%d)"), angle);
 
       rotate(angle);
 
@@ -122,14 +122,14 @@ void ServoComponent::handleMessage(
    {
 	   int pwm = message->getInt("pwm");
 
-	   Logger::logDebug("ServoComponent::handleMessage: setPwm(%d)", pwm);
+	   Logger::logDebug(F("ServoComponent::handleMessage: setPwm(%d)"), pwm);
 
       setPwm(pwm);
    }
    // killSwitch
    else if (message->getMessageId() == "killSwitch")
    {
-      Logger::logDebug("ServoComponent::handleMessage: killSwitch");
+      Logger::logDebug(F("ServoComponent::handleMessage: killSwitch"));
 
       rotate(MIN_ANGLE);
 
@@ -143,7 +143,7 @@ void ServoComponent::handleMessage(
       {
          int angle = message->getInt("param_0");
 
-         Logger::logDebug("ServoComponent::handleMessage: instruction:rotate(%d)", angle);
+         Logger::logDebug(F("ServoComponent::handleMessage: instruction:rotate(%d)"), angle);
 
          rotate(angle);
       }
@@ -152,7 +152,7 @@ void ServoComponent::handleMessage(
          int angle = message->getInt("param_0");
          int seconds = message->getInt("param_1");
 
-         Logger::logDebug("ServoComponent::handleMessage: instruction:panTo(%d, %d)", angle, seconds);
+         Logger::logDebug(F("ServoComponent::handleMessage: instruction:panTo(%d, %d)"), angle, seconds);
 
          panTo(angle, seconds);
       }
@@ -162,19 +162,19 @@ void ServoComponent::handleMessage(
          int endAngle = message->getInt("param_1");
          int seconds = message->getInt("param_1");
 
-         Logger::logDebug("ServoComponent::handleMessage: instruction:oscillate(%d, %d, %d)", startAngle, endAngle, seconds);
+         Logger::logDebug(F("ServoComponent::handleMessage: instruction:oscillate(%d, %d, %d)"), startAngle, endAngle, seconds);
 
          oscillate(startAngle, endAngle, seconds);
       }
       else if (action == "stop")
       {
-         Logger::logDebug("ServoComponent::handleMessage: instruction:stop()");
+         Logger::logDebug(F("ServoComponent::handleMessage: instruction:stop()"));
 
          stop();
       }
       else
       {
-         Logger::logWarning("ServoComponent::handleMessage: Illegal instruction [%s] for %s.",
+         Logger::logWarning(F("ServoComponent::handleMessage: Illegal instruction [%s] for %s."),
                             message->getString("action").c_str(),
                             getId().c_str());
       }

@@ -105,13 +105,13 @@ void Button::handleMessage(
    {
       longPressTime = message->getInt("longPress");
 
-      Logger::logDebug("Button::handleMessage: longPress(%d)", longPressTime);
+      Logger::logDebug(F("Button::handleMessage: longPress(%d)"), longPressTime);
    }
    else if (message->getMessageId() == "poll")
    {
       int period = message->isSet("period") ? message->getInt("period") : 0;
 
-      Logger::logDebug("Button::handleMessage: poll(%d)", period);
+      Logger::logDebug(F("Button::handleMessage: poll(%d)"), period);
 
       poll(period);
    }
@@ -150,7 +150,7 @@ void Button::onPoll()
 
 void Button::onButtonDown()
 {
-   Logger::logDebug("Button::onButtonDown: %s", getId().c_str());
+   Logger::logDebug(F("Button::onButtonDown: %s"), getId().c_str());
    MessagePtr message = Messaging::newMessage();
    if (message)
    {
@@ -162,7 +162,7 @@ void Button::onButtonDown()
 
 void Button::onButtonUp()
 {
-   Logger::logDebug("Button::onButtonUp: %s", getId().c_str());
+   Logger::logDebug(F("Button::onButtonUp: %s"), getId().c_str());
    MessagePtr message = Messaging::newMessage();
    if (message)
    {
@@ -174,7 +174,7 @@ void Button::onButtonUp()
 
 void Button::onButtonLongPress()
 {
-   Logger::logDebug("Button::onButtonLongPress: %s", getId().c_str());
+   Logger::logDebug(F("Button::onButtonLongPress: %s"), getId().c_str());
    MessagePtr message = Messaging::newMessage();
    if (message)
    {

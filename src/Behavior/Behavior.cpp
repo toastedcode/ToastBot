@@ -7,7 +7,7 @@ void Behavior::handleMessage(
    // enable
    if (message->getMessageId() == "enable")
    {
-      Logger::logDebug("Behavior::handleMessage: %s.enable()", getId().c_str());
+      Logger::logDebug(F("Behavior::handleMessage: %s.enable()"), getId().c_str());
 
       enable();
       message->setFree();
@@ -15,7 +15,7 @@ void Behavior::handleMessage(
    // disable
    else if (message->getMessageId() == "disable")
    {
-      Logger::logDebug("Behavior::handleMessage: %s.disable()", getId().c_str());
+      Logger::logDebug(F("Behavior::handleMessage: %s.disable()"), getId().c_str());
 
       disable();
       message->setFree();

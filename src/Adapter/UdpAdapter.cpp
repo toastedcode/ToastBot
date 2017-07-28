@@ -31,7 +31,7 @@ void UdpAdapter::setup()
    if (listenPort != 0)
    {
       Logger::logDebug(
-         "UdpAdapter::setup: UDP Adapter [%s] is listening on port %d.",
+         F("UdpAdapter::setup: UDP Adapter [%s] is listening on port %d."),
          getId().c_str(),
          listenPort);
 
