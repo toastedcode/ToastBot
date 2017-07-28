@@ -38,7 +38,7 @@ void HealthMonitor::setHealth(
 
    if (adapterId.length() > 0)
    {
-      Logger::logDebug("HealthMonitor::setHealth: Adapter [%s]: %s -> %s",
+      Logger::logDebug(F("HealthMonitor::setHealth: Adapter [%s]: %s -> %s"),
                        adapterId.c_str(),
                        toString(previousHealth).c_str(),
                        toString(health).c_str());

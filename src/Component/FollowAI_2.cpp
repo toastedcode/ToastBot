@@ -137,7 +137,7 @@ void FollowAI_2::setState(
    {
       this->state = state;
 
-      Logger::logDebug("FollowAI_2::setState: state = %d", state);
+      Logger::logDebug(F("FollowAI_2::setState: state = %d"), state);
 
       switch (this->state)
       {
@@ -216,7 +216,7 @@ void FollowAI_2::onReadingTimeout()
    {
       proximity = newProximity;
 
-      Logger::logDebug("FollowAI_2::onReadingTimeout: proximity = %d", proximity);
+      Logger::logDebug(F("FollowAI_2::onReadingTimeout: proximity = %d"), proximity);
 
       onProximity(proximity);
    }
@@ -224,7 +224,7 @@ void FollowAI_2::onReadingTimeout()
 
 void FollowAI_2::onWaitingTimeout()
 {
-   Logger::logDebug("FollowAI_2::onWaitingTimeout");
+   Logger::logDebug(F("FollowAI_2::onWaitingTimeout"));
 
    if (state == WAITING)
    {
@@ -234,7 +234,7 @@ void FollowAI_2::onWaitingTimeout()
 
 void FollowAI_2::onLostTimeout()
 {
-   Logger::logDebug("FollowAI_2::onLostTimeout");
+   Logger::logDebug(F("FollowAI_2::onLostTimeout"));
 
    if (state == LOST)
    {
@@ -249,7 +249,7 @@ void FollowAI_2::onSearchTimeout()
    {
       searchDirection = (searchDirection == LEFT) ? RIGHT : LEFT;
 
-      Logger::logDebug("FollowAI_2::onSearchTimeout: direction = %d", searchDirection);
+      Logger::logDebug(F("FollowAI_2::onSearchTimeout: direction = %d"), searchDirection);
 
       motorPair->drive(SEARCH_SPEED, getYaw(searchDirection));
    }

@@ -72,7 +72,7 @@ MessagePtr SerialAdapter::getRemoteMessage()
       }
       else
       {
-         Logger::logWarning("SerialAdapter::getRemoteMessage: Buffer overflow.  Discarding bytes.");
+         Logger::logWarning(F("SerialAdapter::getRemoteMessage: Buffer overflow.  Discarding bytes."));
 
          readIndex = 0;
       }

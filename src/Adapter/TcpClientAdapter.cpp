@@ -55,7 +55,7 @@ bool TcpClientAdapter::sendRemoteMessage(
       else
       {
          Logger::logWarning(
-            "TcpServerAdapter::sendRemoteMessage: Failed to send message [%s] to remote host.",
+            F("TcpServerAdapter::sendRemoteMessage: Failed to send message [%s] to remote host."),
             message->getMessageId().c_str());
       }
    }
@@ -111,7 +111,7 @@ MessagePtr TcpClientAdapter::getRemoteMessage()
       }
       else
       {
-         Logger::logWarning("TcpClientAdapter::getRemoteMessage: Buffer overflow.  Discarding bytes.");
+         Logger::logWarning(F("TcpClientAdapter::getRemoteMessage: Buffer overflow.  Discarding bytes."));
 
          readIndex = 0;
       }
@@ -128,11 +128,11 @@ bool TcpClientAdapter::connect()
    {
       retryTime = Board::getBoard()->systemTime()+ retryDelay;
 
-      Logger::logDebug("TcpClientAdapter::connect: TCP Client Adapter [%s] failed to connect.", getId().c_str());
+      Logger::logDebug(F("TcpClientAdapter::connect: TCP Client Adapter [%s] failed to connect."), getId().c_str());
    }
    else
    {
-      Logger::logDebug("TcpClientAdapter::connect: TCP Client Adapter [%s] connected.", getId().c_str());
+      Logger::logDebug(F("TcpClientAdapter::connect: TCP Client Adapter [%s] connected."), getId().c_str());
 
       retryTime = 0;
    }

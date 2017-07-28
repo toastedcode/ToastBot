@@ -139,7 +139,7 @@ void ToastBot::setup(
 
    // Load properties.
    properties.load(PROPERTIES_FILE);
-   Logger::logDebug("ToastBot::setup: Properties:");
+   Logger::logDebug(F("ToastBot::setup: Properties:"));
    properties.log();
 
    // Set log levels.
@@ -183,7 +183,7 @@ void ToastBot::setup(
 
       if (protocol->parse(componentDescription, message))
       {
-        Logger::logDebug("ToastBot::setup: Creating %s component [%s]",
+        Logger::logDebug(F("ToastBot::setup: Creating %s component [%s]"),
                          message->getString("class").c_str(),
                          message->getString("id").c_str());
 
@@ -217,7 +217,7 @@ void ToastBot::setup(
    Connection::setMode(parseConnectionMode(properties.getString("mode")));
 
    // Log free memory.
-   Logger::logDebug("ToastBot::setup: Free memory = %u bytes", board->getFreeHeap());
+   Logger::logDebug(F("ToastBot::setup: Free memory = %u bytes"), board->getFreeHeap());
 
    initialized = true;
 }
@@ -234,7 +234,7 @@ void ToastBot::loop()
 
 void ToastBot::factoryReset()
 {
-   Logger::logDebug("ToastBot::factoryReset: Resetting device back to factory default.");
+   Logger::logDebug(F("ToastBot::factoryReset: Resetting device back to factory default."));
 
    Properties defaultProperties;
    defaultProperties.load(DEFAULT_PROPERTIES_FILE);

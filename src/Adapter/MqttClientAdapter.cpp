@@ -8,6 +8,7 @@
 // *****************************************************************************
 // *****************************************************************************
 
+#include "Logger.hpp"
 #include "MqttClientAdapter.hpp"
 #include "Messaging.h"
 
@@ -66,8 +67,8 @@ void MqttClientAdapter::loop()
          {
             retryTime = millis() + RETRY_DELAY;
 
-           printf(
-               "MqttClientAdapter::loop: Connect attempt failed.  Retrying in %d seconds.\n",
+            Logger::logDebug(
+               F("MqttClientAdapter::loop: Connect attempt failed.  Retrying in %d seconds.\n"),
                (RETRY_DELAY / 1000));
          }
       }
@@ -75,14 +76,16 @@ void MqttClientAdapter::loop()
 
    if (!wasConnected && isConnected)
    {
-      printf("MqttClientAdapter::loop: MQTT Client Adapter [%s] connected.\n", getId().c_str());
+      Logger::logDebug(
+         F("MqttClientAdapter::loop: MQTT Client Adapter [%s] connected.\n"), getId().c_str());
 
       String topic = "/toastbot/to/" + clientId;
       mqttClient->subscribe(topic.c_str());
    }
    else if (wasConnected && !isConnected)
    {
-      printf("MqttClientAdapter::loop: MQTT Client Adapter [%s] disconnected.\n", getId().c_str());
+      Logger::logDebug(
+         F("MqttClientAdapter::loop: MQTT Client Adapter [%s] disconnected.\n"), getId().c_str());
    }
 
    // Allow the MQTT client to do its processing.
@@ -111,8 +114,8 @@ bool MqttClientAdapter::sendRemoteMessage(
 
    if (!isSuccess)
    {
-      printf(
-         "MqttClientAdapter::sendRemoteMessage: Failed to send message [%s] to remote host.\n",
+      Logger::logWarning(
+         F("MqttClientAdapter::sendRemoteMessage: Failed to send message [%s] to remote host.\n"),
          message->getMessageId().c_str());
    }
 
@@ -169,11 +172,12 @@ bool MqttClientAdapter::connect()
 
    if (mqttClient)
    {
-      printf("MqttClientAdapter::connect: Connecting to MQTT broker %s:%d as client [%s].",
-             host.c_str(),
-             port,
-             clientId.c_str(),
-             userId.c_str());
+      Logger::logDebug(
+         F("MqttClientAdapter::connect: Connecting to MQTT broker %s:%d as client [%s]."),
+         host.c_str(),
+         port,
+         clientId.c_str(),
+         userId.c_str());
 
       if (userId.length() > 0)
       {

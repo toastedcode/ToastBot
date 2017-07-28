@@ -24,7 +24,7 @@ ConnectionMode Connection::getMode()
 void Connection::setMode(
    const ConnectionMode mode)
 {
-   Logger::logDebug("Connection::setMode: %s -> %s", toString(Connection::mode).c_str(), toString(mode).c_str());
+   Logger::logDebug(F("Connection::setMode: %s -> %s"), toString(Connection::mode).c_str(), toString(mode).c_str());
 
    if (Connection::mode != mode)
    {
