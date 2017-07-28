@@ -137,6 +137,7 @@ void Robox::handleMessage(
 
       if (ToastBot::getComponent(adapterId))
       {
+        Logger::setLogLevel(DEBUG);
         Logger::setLogger(new RemoteLogger(adapterId));
       }
       else

@@ -29,7 +29,8 @@ void RemoteLogger::log(
          Messaging::send(message);
 
 #ifdef ARDUINO
-         printf_P((PGM_P)F("Remotely logged: %s: %s\n"), toString(logLevel).c_str(), string.c_str());
+         // TODO: Figure out how to make this work.
+         //printf_P((PGM_P)F("Remotely logged: %s: %s\n"), toString(logLevel).c_str(), string.c_str());
 #else
          printf("Remotely logged: %s: %s\n", toString(logLevel).c_str(), string.c_str());
 #endif
@@ -37,7 +38,8 @@ void RemoteLogger::log(
       else
       {
 #ifdef ARDUINO
-         printf_P((PGM_P)F("Failed to remotely log: %s: %s\n"), toString(logLevel).c_str(), string.c_str());
+         // TODO: Figure out how to make this work.
+         //printf_P((PGM_P)F("Failed to remotely log: %s: %s\n"), toString(logLevel).c_str(), string.c_str());
 #else
          printf("Failed to remotely log: %s: %s\n", toString(logLevel).c_str(), string.c_str());
 #endif
