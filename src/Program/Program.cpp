@@ -68,11 +68,11 @@ bool Program::load(
    File file = SPIFFS.open(path, "r");
    if (!file)
    {
-      Logger::logWarning("Program::load: Failed to load program file: %s", path.c_str());
+      Logger::logWarning(F("Program::load: Failed to load program file: %s"), path.c_str());
    }
    else
    {
-      Logger::logWarning("Program::load: Loading program file: %s", path.c_str());
+      Logger::logWarning(F("Program::load: Loading program file: %s"), path.c_str());
 
       int index = 0;
       String line = file.readStringUntil('\n');
@@ -99,7 +99,7 @@ bool Program::load(
 void Program::run(
    const bool& loopProgram)
 {
-   Logger::logDebug("Program::run: Running program %s", getId().c_str());
+   Logger::logDebug(F("Program::run: Running program %s"), getId().c_str());
 
    instructionIndex = 0;
    running = true;
@@ -108,7 +108,7 @@ void Program::run(
 
 void Program::stop()
 {
-   Logger::logDebug("Program::stop: Stopping program %s", getId().c_str());
+   Logger::logDebug(F("Program::stop: Stopping program %s"), getId().c_str());
 
    instructionIndex = 0;
    running = false;
@@ -129,7 +129,7 @@ bool Program::execute(
       {
          int seconds = message->getInt("param_0");
 
-         Logger::logDebug("Program::execute: wait(%d)", seconds);
+         Logger::logDebug(F("Program::execute: wait(%d)"), seconds);
 
          waitTime = Board::getBoard()->systemTime() + (seconds * 1000);
          success = true;
@@ -142,7 +142,7 @@ bool Program::execute(
    }
    else
    {
-      Logger::logWarning("Failed to execute program [%s] instruction: %s", getId().c_str(), instruction.c_str());
+      Logger::logWarning(F("Failed to execute program [%s] instruction: %s"), getId().c_str(), instruction.c_str());
    }
 
    return (success);

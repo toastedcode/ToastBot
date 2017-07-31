@@ -1,5 +1,5 @@
 #include "CommandProtocol.hpp"
-//#include "Logger.hpp"
+#include "Logger.hpp"
 #include "StringUtils.hpp"
 
 // *****************************************************************************
@@ -35,7 +35,7 @@ bool CommandProtocol::parse(
    String action = parseAction(messageString);
    if (action.length() > 0)
    {
-      message->setMessageId("instruction");
+      message->setMessageId(FPSTR(INSTRUCTION));
       message->set("action", action);
       success = true;  // TODO: More validation.
    }
@@ -60,7 +60,7 @@ String CommandProtocol::serialize(
    // component.action(param, param, ...);
 
    // component
-   if (message->isSet("destination"))
+   if (message->isSet(FPSTR(DESTINATION)))
    {
       serializedMessage += message->getDestination();
       serializedMessage += ".";
@@ -234,8 +234,7 @@ void CommandProtocol::parseParameters(
          }
          else
          {
-            //Logger::logWarning("CommandProtocol::parseParameters: Bad parameter [\"%s\"].", valueString.c_str());
-            printf("CommandProtocol::parseParameters: Bad parameter [\"%s\"].\n", valueString.c_str());
+            Logger::logWarning(F("CommandProtocol::parseParameters: Bad parameter [\"%s\"]."), valueString.c_str());
          }
 
          parameters[i] = parameter;

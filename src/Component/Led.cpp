@@ -244,7 +244,7 @@ void Led::blink(
 
    if (foundPos != -1)
    {
-      Logger::logWarning("Led::blink: Invalid pattern specified [\"%s\"]", patternString.c_str());
+      Logger::logWarning(F("Led::blink: Invalid pattern specified [\"%s\"]"), patternString.c_str());
    }
    else
    {
@@ -292,7 +292,7 @@ void Led::handleMessage(
    {
       brightness = message->getInt("brightness");
 
-      Logger::logDebug("Led::handleMessage: setBrightness(%d)", brightness);
+      Logger::logDebug(F("Led::handleMessage: setBrightness(%d)"), brightness);
 
       setBrightness(brightness);
 
@@ -303,7 +303,7 @@ void Led::handleMessage(
    {
       String patternString = message->getString("pattern");
 
-      Logger::logDebug("Led::handleMessage: blink(\"%s\")", patternString.c_str());
+      Logger::logDebug(F("Led::handleMessage: blink(\"%s\")"), patternString.c_str());
 
       blink(patternString);
 
@@ -314,7 +314,7 @@ void Led::handleMessage(
    {
       int period = message->getInt("period");
 
-      Logger::logDebug("Led::handleMessage: pulse(\"%d\")", period);
+      Logger::logDebug(F("Led::handleMessage: pulse(\"%d\")"), period);
 
       pulse(period);
 
@@ -323,7 +323,7 @@ void Led::handleMessage(
    // killSwitch
    else if (message->getMessageId() == "killSwitch")
    {
-      Logger::logDebug("Led::handleMessage: killSwitch");
+      Logger::logDebug(F("Led::handleMessage: killSwitch"));
 
       setBrightness(MIN_BRIGHTNESS);
 
@@ -338,13 +338,13 @@ void Led::handleMessage(
       {
          int brightness = message->isSet("param_0") ? message->getInt("param_0") : 100;
 
-         Logger::logDebug("Led::handleMessage: instruction:on(%d)", brightness);
+         Logger::logDebug(F("Led::handleMessage: instruction:on(%d)"), brightness);
 
          setBrightness(brightness);
       }
       else if (action == "off")
       {
-         Logger::logDebug("Led::handleMessage: instruction:off()");
+         Logger::logDebug(F("Led::handleMessage: instruction:off()"));
 
          setBrightness(0);
       }
@@ -352,7 +352,7 @@ void Led::handleMessage(
       {
          String patternString = message->getString("param_0");
 
-         Logger::logDebug("Led::handleMessage: instruction:blink(%s)", patternString.c_str());
+         Logger::logDebug(F("Led::handleMessage: instruction:blink(%s)"), patternString.c_str());
 
          blink(patternString);
       }
@@ -360,13 +360,13 @@ void Led::handleMessage(
       {
          int period = message->getInt("param_0");
 
-         Logger::logDebug("Led::handleMessage: instruction:pulse(%d)", period);
+         Logger::logDebug(F("Led::handleMessage: instruction:pulse(%d)"), period);
 
          pulse(period);
       }
       else
       {
-         Logger::logWarning("Led::handleMessage: Illegal instruction [%s] for %s.",
+         Logger::logWarning(F("Led::handleMessage: Illegal instruction [%s] for %s."),
                             message->getString("action").c_str(),
                             getId().c_str());
       }

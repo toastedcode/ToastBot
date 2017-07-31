@@ -54,7 +54,7 @@ void EscapeBehavior::setState(
    const int& state)
 {
 
-   Logger::logDebug("EscapeBehavior::setState: %s -> %d", getId().c_str(), state);
+   Logger::logDebug(F("EscapeBehavior::setState: %s -> %d"), getId().c_str(), state);
 
    switch (state)
    {
@@ -92,13 +92,13 @@ void EscapeBehavior::setState(
 void EscapeBehavior::timeout(
    Timer* timer)
 {
-   Logger::logDebug("EscapeBehavior::timeout: %s", timer->getId().c_str());
+   Logger::logDebug(F("EscapeBehavior::timeout: %s"), timer->getId().c_str());
 
    if ((getState() == WATCH) &&
        (timer == watchTimer))
    {
       int reading = DistanceSensor::toCentimeters(distanceSensor->read());
-      Logger::logDebug("EscapeBehavior::timeout: reading = %d", reading);
+      Logger::logDebug(F("EscapeBehavior::timeout: reading = %d"), reading);
 
       if ((reading != 0) && (reading < DISTANCE_THRESHOLD))
       {

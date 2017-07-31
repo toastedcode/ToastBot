@@ -18,7 +18,7 @@ TcpServerAdapter::TcpServerAdapter(
 void TcpServerAdapter::setup()
 {
    Logger::logDebug(
-      "TcpServerAdapter::setup: TCP Server Adapter [%s] is listening on port %d.",
+      F("TcpServerAdapter::setup: TCP Server Adapter [%s] is listening on port %d."),
       getId().c_str(),
       port);
 
@@ -45,7 +45,7 @@ bool TcpServerAdapter::sendRemoteMessage(
       else
       {
          Logger::logWarning(
-            "TcpServerAdapter::sendRemoteMessage: Failed to send message [%s] to remote host.",
+            F("TcpServerAdapter::sendRemoteMessage: Failed to send message [%s] to remote host."),
             message->getMessageId().c_str());
       }
    }
@@ -71,11 +71,11 @@ MessagePtr TcpServerAdapter::getRemoteMessage()
 
    if (!wasConnected && isConnected)
    {
-      Logger::logDebug("TcpServerAdapter::getRemoteMessage: TCP Server Adapter [%s] connected.", getId().c_str());
+      Logger::logDebug(F("TcpServerAdapter::getRemoteMessage: TCP Server Adapter [%s] connected."), getId().c_str());
    }
    else if (wasConnected && !isConnected)
    {
-      Logger::logDebug("TcpServerAdapter::getRemoteMessage: TCP Server Adapter [%s] disconnected.", getId().c_str());
+      Logger::logDebug(F("TcpServerAdapter::getRemoteMessage: TCP Server Adapter [%s] disconnected."), getId().c_str());
    }
 
    while (client && client.available())
@@ -119,7 +119,7 @@ MessagePtr TcpServerAdapter::getRemoteMessage()
       }
       else
       {
-         Logger::logWarning("TcpServerAdapter::getRemoteMessage: Buffer overflow.  Discarding bytes.");
+         Logger::logWarning(F("TcpServerAdapter::getRemoteMessage: Buffer overflow.  Discarding bytes."));
 
          readIndex = 0;
       }

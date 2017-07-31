@@ -41,7 +41,6 @@ Motor::Motor(
       Component(message),
       speed(0)
 {
-   id = message->isSet("id") ? message->getString("id") : "motor";
    directionPin = message->isSet("directionPin") ? message->getInt("directionPin") : 0;
    speedPin = message->isSet("speedPin") ? message->getInt("speedPin") : 0;
 }
@@ -73,7 +72,7 @@ void Motor::handleMessage(
    {
       int newSpeed = message->getInt("speed");
 
-      Logger::logDebug("Motor::handleMessage: setSpeed(%d)", newSpeed);
+      Logger::logDebug(F("Motor::handleMessage: setSpeed(%d)"), newSpeed);
 
       setSpeed(newSpeed);
 
@@ -82,7 +81,7 @@ void Motor::handleMessage(
    // killSwitch
    else if (message->getMessageId() == "killSwitch")
    {
-      Logger::logDebug("Motor::handleMessage: killSwitch");
+      Logger::logDebug(F("Motor::handleMessage: killSwitch"));
 
       setSpeed(NO_SPEED);
 
@@ -96,13 +95,13 @@ void Motor::handleMessage(
       {
          int newSpeed = message->getInt("param_0");
 
-         Logger::logDebug("Motor::handleMessage: instruction:drive(%d)", newSpeed);
+         Logger::logDebug(F("Motor::handleMessage: instruction:drive(%d)"), newSpeed);
 
          setSpeed(newSpeed);
       }
       else
       {
-         Logger::logWarning("Motor::handleMessage: Illegal instruction [%s] for %s.",
+         Logger::logWarning(F("Motor::handleMessage: Illegal instruction [%s] for %s."),
                             message->getString("action").c_str(),
                             getId().c_str());
       }

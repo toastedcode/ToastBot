@@ -8,13 +8,14 @@
 // *****************************************************************************
 // *****************************************************************************
 
-#include "WebSocketAdapter.hpp"
+#include "Logger.hpp"
 #include "Messaging.h"
+#include "WebSocketAdapter.hpp"
 
 void WebSocketAdapter::setup()
 {
-   printf(
-      "WebSocketAdapter::setup: Web Socket Adapter [%s] is listening on port %d.\n",
+   Logger::logDebug(
+      F("WebSocketAdapter::setup: Web Socket Adapter [%s] is listening on port %d.\n"),
       getId().c_str(),
       port);
 
@@ -40,11 +41,15 @@ void WebSocketAdapter::loop()
 
    if (!wasConnected && isConnected)
    {
-      printf("WebSocketAdapter::loop: Web Socket Server Adapter [%s] connected.\n", getId().c_str());
+      Logger::logDebug(
+         F("WebSocketAdapter::loop: Web Socket Server Adapter [%s] connected.\n"),
+         getId().c_str());
    }
    else if (wasConnected && !isConnected)
    {
-      printf("WebSocketAdapter::loop: Web Socket Server Adapter [%s] disconnected.\n", getId().c_str());
+      Logger::logDebug(
+         F("WebSocketAdapter::loop: Web Socket Server Adapter [%s] disconnected.\n"),
+         getId().c_str());
 
       isNegotiated = false;
    }
@@ -61,11 +66,15 @@ void WebSocketAdapter::loop()
 
       if (!wasNegotiated && isNegotiated)
       {
-         printf("WebSocketAdapter::loop: Web Socket Server Adapter [%s] negotiated.\n", getId().c_str());
+         Logger::logDebug(
+            F("WebSocketAdapter::loop: Web Socket Server Adapter [%s] negotiated.\n"),
+            getId().c_str());
       }
       else
       {
-         printf("WebSocketAdapter::loop: Web Socket Server Adapter [%s] failed negotiation.\n", getId().c_str());
+         Logger::logDebug(
+            F("WebSocketAdapter::loop: Web Socket Server Adapter [%s] failed negotiation.\n"),
+            getId().c_str());
       }
    }
 
@@ -90,8 +99,8 @@ bool WebSocketAdapter::sendRemoteMessage(
    }
    else
    {
-      printf(
-         "IpServerAdapter::sendRemoteMessage: Failed to send message [%s] to remote host.\n",
+      Logger::logWarning(
+         F("IpServerAdapter::sendRemoteMessage: Failed to send message [%s] to remote host.\n"),
          message->getMessageId().c_str());
    }
 
