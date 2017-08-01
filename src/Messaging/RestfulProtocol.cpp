@@ -49,6 +49,42 @@ bool RestfulProtocol::parse(
    return (success);
 }
 
+bool RestfulProtocol::parse(
+   ESP8266WebServer& server,
+   MessagePtr message)
+{
+   bool success = false;
+
+   // /component/action?param=value;param=value ...
+
+   // component
+   String componentId = parseComponent(server.uri());
+   if (componentId.length() > 0)
+   {
+      message->setDestination(componentId);
+   }
+
+   // action
+   String action = parseAction(server.uri());
+   if (action.length() > 0)
+   {
+      message->setMessageId(action);
+      success = true;  // TODO: More validation.
+   }
+
+   // paramters
+   int argCount = server.args();
+   for (int i = 0; i < argCount; i++)
+   {
+      String name = server.argName(i);
+      String value = server.arg(i);
+
+      message->setParameter(parseParameter(name, value));
+   }
+
+   return (success);
+}
+
 String RestfulProtocol::serialize(
    MessagePtr message) const
 {
@@ -220,29 +256,8 @@ void RestfulProtocol::parseParameters(
       {
          String paramName = StringUtils::tokenize(keyValueString, "=");
          String valueString = StringUtils::tokenize(keyValueString, "=");
-         Parameter parameter(paramName.c_str());
 
-         String lowerCase = valueString;
-         lowerCase.toLowerCase();
-
-         if (StringUtils::findFirstNotOf(valueString, "0123456789.-") == -1)
-         {
-            // TODO: Parse numeric types.
-            // TODO: Fix trucation of longs.
-            long longValue = valueString.toInt();
-            parameter.setValue((int)longValue);
-         }
-         else if ((lowerCase == "true") ||
-                  (lowerCase == "false"))
-         {
-            parameter.setValue(StringUtils::toBool(valueString));
-         }
-         else
-         {
-            parameter.setValue(valueString.c_str());
-         }
-
-         parameters[i] = parameter;
+         parameters[i] = parseParameter(paramName, valueString);
          parameterCount++;
 
          // Next token.
@@ -250,4 +265,35 @@ void RestfulProtocol::parseParameters(
          keyValueString = StringUtils::tokenize(paramString, "&");
       }
    }
+}
+
+Parameter RestfulProtocol::parseParameter(
+   const String& name,
+   const String& value)
+{
+   Parameter parameter;
+
+   String lowerCase = value;
+   lowerCase.toLowerCase();
+
+   parameter.setName(name.c_str());
+
+   if (StringUtils::findFirstNotOf(value, "0123456789.-") == -1)
+   {
+      // TODO: Parse numeric types.
+      // TODO: Fix trucation of longs.
+      long longValue = value.toInt();
+      parameter.setValue((int)longValue);
+   }
+   else if ((lowerCase == "true") ||
+            (lowerCase == "false"))
+   {
+      parameter.setValue(StringUtils::toBool(value));
+   }
+   else
+   {
+      parameter.setValue(value.c_str());
+   }
+
+   return (parameter);
 }

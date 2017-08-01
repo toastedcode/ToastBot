@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Adapter\HttpServerAdapter.hpp"
 #include "Adapter\MqttClientAdapter.hpp"
 #include "Adapter\SerialAdapter.hpp"
 #include "Adapter\TcpClientAdapter.hpp"
@@ -28,3 +27,5 @@
 #include "Messaging\RestfulProtocol.hpp"
 #include "Program\Program.hpp"
 #include "ToastBot.hpp"
+
+#include "Adapter/WebServerAdapter.hpp"

@@ -26,8 +26,8 @@ void setup()
 
    Logger::setLogLevel(DEBUG_FINEST);
 
-   HttpServerAdapter* httpServerAdapter = new HttpServerAdapter("http");
-   ToastBot::addComponent(httpServerAdapter);
+   WebServerAdapter* webServerAdapter = new WebServerAdapter("web", 80);
+   ToastBot::addComponent(webServerAdapter);
 }
 
 void loop()
