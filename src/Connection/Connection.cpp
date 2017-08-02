@@ -89,6 +89,11 @@ void Connection::setup()
    updateStatusLed();
 }
 
+WifiConfig Connection::getApConfig()
+{
+   return (accessPointConfig);
+}
+
 void Connection::setApConfig(
    const String& ssid,
    const String& password)
@@ -102,6 +107,11 @@ void Connection::setApConfig(
    }
 }
 
+WifiConfig Connection::getWifiConfig()
+{
+   return (wifiConfig);
+}
+
 void Connection::setWifiConfig(
    const String& ssid,
    const String& password)
@@ -113,6 +123,11 @@ void Connection::setWifiConfig(
    {
       setup();
    }
+}
+
+ServerConfig Connection::getServerConfig()
+{
+   return (serverConfig);
 }
 
 void Connection::setServerConfig(
