@@ -15,13 +15,19 @@ public:
 
    static void setup();
 
+   static WifiConfig getApConfig();
+
    static void setApConfig(
       const String& ssid,
       const String& password);
 
+   static WifiConfig getWifiConfig();
+
    static void setWifiConfig(
       const String& ssid,
       const String& password);
+
+   static ServerConfig getServerConfig();
 
    static void setServerConfig(
       const String& host,

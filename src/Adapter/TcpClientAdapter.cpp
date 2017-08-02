@@ -70,7 +70,7 @@ MessagePtr TcpClientAdapter::getRemoteMessage()
    static const char LF = '\n';
    static const char CR = '\r';
 
-   if (client && client.available())
+   while (client && client.available())
    {
       if (readIndex < BUFFER_SIZE)
       {

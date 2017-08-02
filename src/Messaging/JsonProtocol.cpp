@@ -219,7 +219,7 @@ Parameter::ParameterType JsonProtocol::getType(
    {
       type = Parameter::STRING;
    }
-   else if (StringUtils::findFirstNotOf(value, "123456789.-") == -1)
+   else if (StringUtils::findFirstNotOf(value, "0123456789.-") == -1)
    {
       // TODO: Parse numeric types.
       type = Parameter::INT;

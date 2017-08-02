@@ -1,7 +1,8 @@
 #pragma once
 
+#include <ESP8266WebServer.h>
+
 #include "Protocol.hpp"
-#include "Set.hpp"
 
 class RestfulProtocol : public Protocol
 {
@@ -10,8 +11,16 @@ public:
 
    static const int MAX_PARAMETERS = 10;
 
+   RestfulProtocol();
+
+   virtual ~RestfulProtocol();
+
    bool parse(
       const String& messageString,
+      MessagePtr message);
+
+   bool parse(
+      ESP8266WebServer& server,
       MessagePtr message);
 
    String serialize(
@@ -19,16 +28,18 @@ public:
 
 private:
 
-   typedef Set<Parameter, MAX_PARAMETERS> ParameterSet;
+   static String parseComponent(
+      const String& messageString);
 
-   String serializeParameters(
-      MessagePtr message) const;
+   static String parseAction(
+      const String& messageString);
 
-   static bool parseParameters(
-      const String& parameterString,
-      ParameterSet& parameters);
+   static void parseParameters(
+      const String& messageString,
+      Parameter parameters[MAX_PARAMETERS],
+      int& parameterCount);
 
-   static bool parseParameter(
-      const String& parameterString,
-      Parameter& parameter);
+   static Parameter parseParameter(
+      const String& name,
+      const String& value);
 };

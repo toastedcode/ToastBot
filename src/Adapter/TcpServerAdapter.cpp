@@ -78,7 +78,7 @@ MessagePtr TcpServerAdapter::getRemoteMessage()
       Logger::logDebug(F("TcpServerAdapter::getRemoteMessage: TCP Server Adapter [%s] disconnected."), getId().c_str());
    }
 
-   if (client && client.available())
+   while (client && client.available())
    {
       if (readIndex < BUFFER_SIZE)
       {

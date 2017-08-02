@@ -1,6 +1,6 @@
 #include <FS.h>
 
-#include "CommandProtocol.hpp"
+#include "../Messaging/CommandProtocol.hpp"
 #include "Board.hpp"
 #include "Logger.hpp"
 #include "Messaging.hpp"
