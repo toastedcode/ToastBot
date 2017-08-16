@@ -120,9 +120,9 @@ void ServoComponent::handleMessage(
    // setPwm
    else if (message->getMessageId() == "setPwm")
    {
-	   int pwm = message->getInt("pwm");
+      int pwm = message->getInt("pwm");
 
-	   Logger::logDebug(F("ServoComponent::handleMessage: setPwm(%d)"), pwm);
+      Logger::logDebug(F("ServoComponent::handleMessage: setPwm(%d)"), pwm);
 
       setPwm(pwm);
    }
