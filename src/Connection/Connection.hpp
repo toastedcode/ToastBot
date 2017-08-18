@@ -31,8 +31,10 @@ public:
 
    static void setServerConfig(
       const String& host,
-      const String& clientId,
-      const String& clientPassword);
+      const int& port,
+      const String& userId,
+      const String& password,
+      const String& clientId);
 
    static void setStatusLed(
       Led* statusLed);

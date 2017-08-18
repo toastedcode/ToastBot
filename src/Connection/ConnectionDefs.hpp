@@ -68,24 +68,34 @@ struct ServerConfig
 {
    String host;
 
-   String clientId;
+   int port;
 
-   String clientPassword;
+   String userId;
+
+   String password;
+
+   String clientId;
 
    inline ServerConfig() :
       host(""),
-      clientId(""),
-      clientPassword("")
+      port(0),
+      userId(""),
+      password(""),
+      clientId("")
    {
    }
 
    inline ServerConfig(
       const String& host,
-      const String& clientId,
-      const String& clientPassword) :
-      host(host),
-      clientId(clientId),
-      clientPassword(clientPassword)
+      const int& port,
+      const String& userId,
+      const String& password,
+      const String& clientId) :
+         host(host),
+         port(port),
+         userId(userId),
+         password(password),
+         clientId(clientId)
    {
    }
 };

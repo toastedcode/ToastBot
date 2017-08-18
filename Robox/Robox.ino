@@ -60,6 +60,10 @@ void ConfigPage::replaceContent(
   content.replace("%name", ToastBot::getId());
   content.replace("%ssid", Connection::getWifiConfig().ssid);
   content.replace("%password", Connection::getWifiConfig().password);
+  content.replace("%server.host", Connection::getServerConfig().host);
+  content.replace("%server.userId", Connection::getServerConfig().userId);
+  content.replace("%server.password", Connection::getServerConfig().password);
+  content.replace("%server.clientId", Connection::getServerConfig().clientId);
   content.replace("%info", "Successfully updated.");
 }
    

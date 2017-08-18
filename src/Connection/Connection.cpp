@@ -132,12 +132,16 @@ ServerConfig Connection::getServerConfig()
 
 void Connection::setServerConfig(
    const String& host,
-   const String& clientId,
-   const String& clientPassword)
+   const int& port,
+   const String& userId,
+   const String& password,
+   const String& clientId)
 {
    serverConfig.host = host;
+   serverConfig.port = port;
+   serverConfig.userId = userId;
+   serverConfig.password = password;
    serverConfig.clientId = clientId;
-   serverConfig.clientPassword = clientPassword;
 }
 
 void Connection::setStatusLed(

@@ -214,7 +214,12 @@ void ToastBot::setup(
       Connection::setApConfig(getId(), "");
    }
    Connection::setWifiConfig(properties.getString("wifi.ssid"), properties.getString("wifi.password"));
-   Connection::setServerConfig(properties.getString("server.host"), properties.getString("server.clientId"), properties.getString("server.clientPassword"));
+   Connection::setServerConfig(
+      properties.getString("server.host"),
+      properties.getInt("server.port"),
+      properties.getString("server.userId"),
+      properties.getString("server.password"),
+      properties.getString("server.clientId"));
    Connection::setStatusLed(statusLed);
    Connection::setMode(parseConnectionMode(properties.getString("mode")));
 
