@@ -54,6 +54,8 @@ public:
 
 private:
 
+   static void configureConnections();
+
    static String getUniqueId();
 
    static Properties properties;

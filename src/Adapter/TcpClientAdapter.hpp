@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Adapter.hpp"
+#include "ClientAdapter.hpp"
 #include "ComponentFactory.hpp"
 #include "ESP8266WiFi.h"
 
-class TcpClientAdapter : public Adapter
+class TcpClientAdapter : public ClientAdapter
 {
 
 public:
@@ -16,18 +16,31 @@ public:
       const int& port,
       const int& retryDelay);
 
+   // **************************************************************************
+   //                            Component interface
+
    virtual void setup();
 
    virtual void loop();
+
+   // **************************************************************************
+   //                            Adapter interface
 
    virtual bool sendRemoteMessage(
       MessagePtr message);
 
    virtual MessagePtr getRemoteMessage();
 
-   bool connect();
+   // **************************************************************************
+   //                          ClientAdapter interface
 
-   bool disconnect();
+   virtual bool connect();
+
+   virtual bool disconnect();
+
+   virtual bool isConnected();
+
+   // **************************************************************************
 
 private:
 

@@ -1,7 +1,8 @@
 #pragma once
 
-#include "ConnectionDefs.hpp"
+#include  "../Adapter/ClientAdapter.hpp"
 #include "../Component/Led.hpp"
+#include "ConnectionDefs.hpp"
 
 class Connection
 {
@@ -36,6 +37,9 @@ public:
       const String& password,
       const String& clientId);
 
+   static void setOnlineAdapter(
+      ClientAdapter* onlineAdapter);
+
    static void setStatusLed(
       Led* statusLed);
 
@@ -54,4 +58,6 @@ private:
    static ServerConfig serverConfig;
 
    static Led* statusLed;
+
+   static ClientAdapter* onlineAdapter;
 };

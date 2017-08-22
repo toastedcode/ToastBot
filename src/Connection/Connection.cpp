@@ -16,6 +16,8 @@ ServerConfig Connection::serverConfig;
 
 Led* Connection::statusLed = 0;
 
+ClientAdapter* Connection::onlineAdapter = 0;
+
 ConnectionMode Connection::getMode()
 {
    return (mode);
@@ -44,9 +46,15 @@ void Connection::setup()
          case OFFLINE:
          {
             board->stopAccessPoint();
+
             if (board->isConnected())
             {
                board->disconnectWifi();
+            }
+
+            if (onlineAdapter)
+            {
+               onlineAdapter->disconnect();
             }
             break;
          }
@@ -54,11 +62,17 @@ void Connection::setup()
          case ACCESS_POINT:
          {
             board->stopAccessPoint();
+
             if (board->isConnected())
             {
                board->disconnectWifi();
             }
             
+            if (onlineAdapter)
+            {
+               onlineAdapter->disconnect();
+            }
+
             board->startAccessPoint(accessPointConfig.ssid, accessPointConfig.password);
             break;
          }
@@ -66,12 +80,17 @@ void Connection::setup()
          case WIFI:
          {
             board->stopAccessPoint();
+
             if (board->isConnected())
             {
                board->disconnectWifi();
             }
-
             
+            if (onlineAdapter)
+            {
+               onlineAdapter->disconnect();
+            }
+
             if (board->connectWifi(wifiConfig.ssid, wifiConfig.password, WIFI_RETRY_TIME) == false)  // blocks
             {
                board->startAccessPoint(accessPointConfig.ssid, accessPointConfig.password);
@@ -81,7 +100,26 @@ void Connection::setup()
          
          case ONLINE:
          {
-            // TODO:
+            board->stopAccessPoint();
+
+            if (board->isConnected())
+            {
+               board->disconnectWifi();
+            }
+
+            if (onlineAdapter)
+            {
+               onlineAdapter->disconnect();
+            }
+
+            if (board->connectWifi(wifiConfig.ssid, wifiConfig.password, WIFI_RETRY_TIME) == false)  // blocks
+            {
+               board->startAccessPoint(accessPointConfig.ssid, accessPointConfig.password);
+            }
+            else if (onlineAdapter)
+            {
+               onlineAdapter->connect();
+            }
          }
       }
    }
@@ -152,6 +190,13 @@ void Connection::setStatusLed(
    updateStatusLed();
 }
 
+void Connection::setOnlineAdapter(
+   ClientAdapter* onlineAdapter)
+{
+   Connection::onlineAdapter = onlineAdapter;
+}
+
+
 void Connection::updateStatusLed()
 {
    if (statusLed)
@@ -186,7 +231,24 @@ void Connection::updateStatusLed()
          
          case ONLINE:
          {
-            // TODO:
+            WifiBoard* board = WifiBoard::getBoard();
+            if (board && board->isConnected())
+            {
+               if (onlineAdapter && onlineAdapter->isConnected())
+               {
+                  statusLed->blink("_--_-----");  // 2-second, double blink
+               }
+               else
+               {
+                  statusLed->blink("_--------");  // 2-second blink
+               }
+            }
+            else
+            {
+               statusLed->pulse(2000);  // 2-second pulse
+            }
+            break;
+
             break;
          }
       }
