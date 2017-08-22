@@ -68,8 +68,6 @@ public:
 
 private:
 
-   bool retryConnect();
-
    bool connectMqttClient();
 
    static const int RETRY_DELAY;

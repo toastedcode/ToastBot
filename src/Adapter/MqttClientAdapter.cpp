@@ -74,7 +74,7 @@ void MqttClientAdapter::loop()
        (retryTime != 0) &&
        (Board::getBoard()->systemTime() > retryTime))
    {
-      retryConnect();
+      connectMqttClient();
    }
 
    if (!wasConnected && isConnected())
@@ -184,19 +184,22 @@ bool MqttClientAdapter::connect()
       port,
       clientId.c_str());
 
-   return (retryConnect());
+   connectionDesired = true;
+   retryTime = 0;
+
+   return (connectMqttClient());
 }
 
 
 bool MqttClientAdapter::disconnect()
 {
-   Logger::logDebug(
-      F("MqttClientAdapter::connect: Disconnecting from MQTT broker %s:%d."),
-      host.c_str(),
-      port);
-
    if (isConnected())
    {
+		Logger::logDebug(
+		  F("MqttClientAdapter::disconnect: Disconnecting from MQTT broker %s:%d."),
+		  host.c_str(),
+		  port);
+
       mqttClient->disconnect();
    }
 
@@ -274,7 +277,7 @@ void MqttClientAdapter::setUser(
    }
 }
 
-bool MqttClientAdapter::retryConnect()
+bool MqttClientAdapter::connectMqttClient()
 {
    bool success = false;
 
@@ -284,7 +287,7 @@ bool MqttClientAdapter::retryConnect()
       // Note: Use user ID and password if provided.
       if (userId.length() == 0)
       {
-         Logger::logDebug("MqttClientAdapter::connectMqttClient: user = %s, password = %s, clientId = %s", userId.c_str(), password.c_str(), clientId.c_str());
+         Logger::logDebug("MqttClientAdapter::retryConnect: user = %s, password = %s, clientId = %s", userId.c_str(), password.c_str(), clientId.c_str());
          success = mqttClient->connect(clientId.c_str());
       }
       else
@@ -304,31 +307,9 @@ bool MqttClientAdapter::retryConnect()
             mqttClient->state(),
             (RETRY_DELAY / 1000));
 
-         retryTime = retryTime = Board::getBoard()->systemTime() + RETRY_DELAY;
+         retryTime = Board::getBoard()->systemTime() + RETRY_DELAY;
       }
    }
 
    return  (success);
-}
-
-bool MqttClientAdapter::connectMqttClient()
-{
-   bool success = false;
-
-   if (mqttClient )
-   {
-      // Attempt to connect to broker.
-      // Note: Use user ID and password if provided.
-      if (userId.length() == 0)
-      {
-         Logger::logDebug("MqttClientAdapter::connectMqttClient: user = %s, password = %s, clientId = %s", userId.c_str(), password.c_str(), clientId.c_str());
-         success = mqttClient->connect(clientId.c_str());
-      }
-      else
-      {
-         success = mqttClient->connect(clientId.c_str(), userId.c_str(), password.c_str());
-      }
-   }
-
-   return (success);
 }
