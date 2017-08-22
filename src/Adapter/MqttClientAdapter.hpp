@@ -10,15 +10,19 @@
 
 #pragma once
 
-#include "Adapter.hpp"
+#include "ClientAdapter.hpp"
 #include "ESP8266WiFi.h"
 #include "PubSubClient.h"
 #include "PubSubListener.h"
 
-class MqttClientAdapter : public Adapter, PubSubListener
+class MqttClientAdapter : public ClientAdapter, PubSubListener
 {
 
 public:
+
+   MqttClientAdapter(
+      const String& id,
+      Protocol* protocol);
 
    MqttClientAdapter(
       const String& id,
@@ -32,7 +36,7 @@ public:
    ~MqttClientAdapter();
 
    virtual void setup();
-   
+
    virtual void loop();
 
    virtual bool sendRemoteMessage(
@@ -45,11 +49,30 @@ public:
       unsigned char* payload,
       unsigned int length);
 
+   virtual bool connect();
+
+   virtual bool disconnect();
+
+   virtual bool isConnected();
+
+   void setServer(
+      const String& host,
+      const int& port);
+
+   void setClientId(
+      const String& clientId);
+
+   void setUser(
+      const String& userId,
+      const String& password);
+
 private:
 
-   static const int RETRY_DELAY;
+   bool retryConnect();
 
-   bool connect();
+   bool connectMqttClient();
+
+   static const int RETRY_DELAY;
 
    String host;
 
@@ -61,7 +84,7 @@ private:
 
    String password;
    
-   bool isConnected;
+   bool connectionDesired;
    
    WiFiClient client;
 
