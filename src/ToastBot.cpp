@@ -164,9 +164,9 @@ void ToastBot::setup(
    // Creating basic messaging adapters.
    Protocol* protocol = new JsonProtocol();
    addComponent(new SerialAdapter("serial", protocol));
-   addComponent(new UdpAdapter("discover", protocol, properties.getInt("discoverPort")));
-   addComponent(new TcpServerAdapter("control", protocol, properties.getInt("controlPort")));
-   addComponent(new TcpServerAdapter("debug", protocol, properties.getInt("debugPort")));
+   //addComponent(new UdpAdapter("discover", protocol, properties.getInt("discoverPort")));
+   //addComponent(new TcpServerAdapter("control", protocol, properties.getInt("controlPort")));
+   //addComponent(new TcpServerAdapter("debug", protocol, properties.getInt("debugPort")));
    addComponent(new MqttClientAdapter("online", protocol));
 
    // Factory reset button.
@@ -179,6 +179,7 @@ void ToastBot::setup(
    addComponent(new Led("statusLed", STATUS_LED_PIN));
 
    // Create components found in properties.
+   /*
    Message* message = MessageFactory::newMessage();
    String componentIds[ToastBot::MAX_COMPONENTS];
    int count = 0;
@@ -201,6 +202,7 @@ void ToastBot::setup(
       }
    }
    message->setFree();
+   */
 
    // Setup registered components.
    for (int i = 0; i < components.length(); i++)
@@ -276,30 +278,21 @@ void ToastBot::configureConnections()
    {
       ServerConfig serverConfig = Connection::getServerConfig();
 
-      Logger::logDebug("ToastBot::configureConnections: topic = %s", serverConfig.topic.c_str());
-      Logger::logDebug("ToastBot::configureConnections: getId() = %s", getId().c_str());
-      //Logger::logDebug("ToastBot::configureConnections: clientId = %s", serverConfig.clientId.c_str());
-      String clientId = getUniqueId();
-      Logger::logDebug("ToastBot::configureConnections: clientId = %s", clientId.c_str());
-
       // MQTT topic format:
       // Sending:     /robox/user-supplied-topic/robox-id/from
       // Subscribing: /robox/user-supplied-topic/robox-id/to
-      //String topic = "/robox/";
-      //topic += serverConfig.topic;
-      //topic += "/";
-      //topic += getId();
+      String topic = "/robox/" + serverConfig.topic + "/" + getId();
 
-      //onlineAdapter->setServer(serverConfig.host, serverConfig.port);
-      //onlineAdapter->setClientId(serverConfig.clientId);
+      onlineAdapter->setServer(serverConfig.host, serverConfig.port);
+      onlineAdapter->setClientId(serverConfig.clientId);
       onlineAdapter->setUser(serverConfig.userId, serverConfig.password);
-      //onlineAdapter->setTopic(topic);
+      onlineAdapter->setTopic(topic);
 
-      //Connection::setOnlineAdapter(onlineAdapter);
+      Connection::setOnlineAdapter(onlineAdapter);
    }
    else
    {
-      Logger::logWarning("ToastBot::configureConnections: No online adapter available.");
+      Logger::logWarning(F("ToastBot::configureConnections: No online adapter available."));
    }
 
    // Configure the status LED.
@@ -310,7 +303,7 @@ void ToastBot::configureConnections()
    }
 
    // Set the connection mode and attempt to make connections.
-   //Connection::setMode(parseConnectionMode(properties.getString("mode")));
+   Connection::setMode(parseConnectionMode(properties.getString("mode")));
 }
 
 String ToastBot::getUniqueId()
