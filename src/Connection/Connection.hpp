@@ -35,7 +35,8 @@ public:
       const int& port,
       const String& userId,
       const String& password,
-      const String& clientId);
+      const String& clientId,
+      const String& topic);
 
    static void setOnlineAdapter(
       ClientAdapter* onlineAdapter);

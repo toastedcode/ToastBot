@@ -66,6 +66,9 @@ public:
       const String& userId,
       const String& password);
 
+   void setTopic(
+      const String& topic);
+
 private:
 
    bool connectMqttClient();
@@ -82,6 +85,8 @@ private:
 
    String password;
    
+   String topic;
+
    bool connectionDesired;
    
    WiFiClient client;

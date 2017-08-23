@@ -20,8 +20,7 @@ MqttClientAdapter::MqttClientAdapter(
    Protocol* protocol) : ClientAdapter(id, protocol),
                          port(0),
                          connectionDesired(false),
-                         retryTime(0),
-                         mqttClient(0)
+                         retryTime(0)
 {
    mqttClient = new PubSubClient(client);
 }
@@ -79,16 +78,11 @@ void MqttClientAdapter::loop()
 
    if (!wasConnected && isConnected())
    {
-      Logger::logDebug(
-         F("MqttClientAdapter::loop: MQTT Client Adapter [%s] connected."), getId().c_str());
-
-      String topic = "/toastbot/to/" + clientId;
-      mqttClient->subscribe(topic.c_str());
+      Logger::logDebug(F("MqttClientAdapter::loop: MQTT Client Adapter [%s] connected."), getId().c_str());
    }
    else if (wasConnected && !isConnected())
    {
-      Logger::logDebug(
-         F("MqttClientAdapter::loop: MQTT Client Adapter [%s] disconnected."), getId().c_str());
+      Logger::logDebug(F("MqttClientAdapter::loop: MQTT Client Adapter [%s] disconnected."), getId().c_str());
    }
 
    // Allow the MQTT client to do its processing.
@@ -109,16 +103,16 @@ bool MqttClientAdapter::sendRemoteMessage(
 
       if (serializedMessage != "")
       {
-         String topic = "/toastbot/from/" + clientId;
+         String fromTopic = topic + "/from";
 
-         isSuccess = mqttClient->publish(topic.c_str(), serializedMessage.c_str());
+         isSuccess = mqttClient->publish(fromTopic.c_str(), serializedMessage.c_str());
       }
    }
 
    if (!isSuccess)
    {
       Logger::logWarning(
-         F("MqttClientAdapter::sendRemoteMessage: Failed to send message [%s] to remote host.\n"),
+         F("MqttClientAdapter::sendRemoteMessage: Failed to send message [%s] to remote host."),
          message->getMessageId().c_str());
    }
 
@@ -195,10 +189,10 @@ bool MqttClientAdapter::disconnect()
 {
    if (isConnected())
    {
-		Logger::logDebug(
-		  F("MqttClientAdapter::disconnect: Disconnecting from MQTT broker %s:%d."),
-		  host.c_str(),
-		  port);
+      Logger::logDebug(
+         F("MqttClientAdapter::disconnect: Disconnecting from MQTT broker %s:%d."),
+         host.c_str(),
+         port);
 
       mqttClient->disconnect();
    }
@@ -219,62 +213,38 @@ void MqttClientAdapter::setServer(
    const String& host,
    const int& port)
 {
-   if ((this->host != host) ||
-       (this->port != port))
-   {
-      Logger::logDebug("MqttClientAdapter::setServer: host = %s, port = %d", host.c_str(), port);
+   Logger::logDebug(F("MqttClientAdapter::setServer: host = %s, port = %d"), host.c_str(), port);  // REMOVE
 
-      this->host = host;
-      this->port = port;
+   this->host = host;
+   this->port = port;
 
-      mqttClient->setServer(host.c_str(), port);
-
-      // Reconnect.
-      if (isConnected())
-      {
-         disconnect();
-         connect();
-      }
-   }
+   mqttClient->setServer(host.c_str(), port);
 }
 
 void MqttClientAdapter::setClientId(
    const String& clientId)
 {
-   if (this->clientId != clientId)
-   {
-      Logger::logDebug("MqttClientAdapter::setClientId: clientId = %s", clientId.c_str());
+   Logger::logDebug(F("MqttClientAdapter::setClientId: clientId = %s"), clientId.c_str());  // REMOVE
 
-      this->clientId = clientId;
-
-      // Reconnect.
-      if (isConnected())
-      {
-         disconnect();
-         connect();
-      }
-   }
+   this->clientId = clientId;
 }
 
 void MqttClientAdapter::setUser(
    const String& userId,
    const String& password)
 {
-   if ((this->userId != userId) ||
-       (this->password != password))
-   {
-      Logger::logDebug("MqttClientAdapter::setUser: userId = %s", userId.c_str());
+   Logger::logDebug(F("MqttClientAdapter::setUser: userId = %s, password = %s"), userId.c_str(), password.c_str());  // REMOVE
 
-      this->userId = userId;
-      this->password = password;
+   this->userId = userId;
+   this->password = password;
+}
 
-      // Reconnect.
-      if (isConnected())
-      {
-         disconnect();
-         connect();
-      }
-   }
+void MqttClientAdapter::setTopic(
+   const String& topic)
+{
+   Logger::logDebug(F("MqttClientAdapter::setTopic: topic = %s"), topic.c_str());  // REMOVE
+
+   this->topic = topic;
 }
 
 bool MqttClientAdapter::connectMqttClient()
@@ -287,7 +257,7 @@ bool MqttClientAdapter::connectMqttClient()
       // Note: Use user ID and password if provided.
       if (userId.length() == 0)
       {
-         Logger::logDebug("MqttClientAdapter::retryConnect: user = %s, password = %s, clientId = %s", userId.c_str(), password.c_str(), clientId.c_str());
+         Logger::logDebug("MqttClientAdapter::retryConnect: user = %s, password = %s, clientId = %s", userId.c_str(), password.c_str(), clientId.c_str());  // REMOVE
          success = mqttClient->connect(clientId.c_str());
       }
       else
@@ -299,6 +269,15 @@ bool MqttClientAdapter::connectMqttClient()
       if (success)
       {
          retryTime = 0;
+
+         String toTopic = topic + "/to";
+
+         Logger::logDebug(
+            F("MqttClientAdapter::connectMqttClient: Subscribing MQTT adapter [%s] to topic [%s]"),
+            getId().c_str(),
+            toTopic.c_str(), port);
+
+         mqttClient->subscribe(topic.c_str());
       }
       else
       {

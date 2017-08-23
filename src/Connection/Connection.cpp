@@ -173,13 +173,15 @@ void Connection::setServerConfig(
    const int& port,
    const String& userId,
    const String& password,
-   const String& clientId)
+   const String& clientId,
+   const String& topic)
 {
    serverConfig.host = host;
    serverConfig.port = port;
    serverConfig.userId = userId;
    serverConfig.password = password;
    serverConfig.clientId = clientId;
+   serverConfig.topic = topic;
 }
 
 void Connection::setStatusLed(

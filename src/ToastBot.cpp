@@ -268,18 +268,34 @@ void ToastBot::configureConnections()
       properties.getInt("server.port"),
       properties.getString("server.userId"),
       properties.getString("server.password"),
-      properties.getString("server.clientId"));
+      getUniqueId(),  // clientId
+      properties.getString("server.topic"));
 
    MqttClientAdapter* onlineAdapter = (MqttClientAdapter*)getComponent("online");
    if (onlineAdapter)
    {
       ServerConfig serverConfig = Connection::getServerConfig();
 
-      onlineAdapter->setServer(serverConfig.host, serverConfig.port);
-      onlineAdapter->setClientId(getUniqueId());
-      onlineAdapter->setUser(serverConfig.userId, serverConfig.password);
+      Logger::logDebug("ToastBot::configureConnections: topic = %s", serverConfig.topic.c_str());
+      Logger::logDebug("ToastBot::configureConnections: getId() = %s", getId().c_str());
+      //Logger::logDebug("ToastBot::configureConnections: clientId = %s", serverConfig.clientId.c_str());
+      String clientId = getUniqueId();
+      Logger::logDebug("ToastBot::configureConnections: clientId = %s", clientId.c_str());
 
-      Connection::setOnlineAdapter(onlineAdapter);
+      // MQTT topic format:
+      // Sending:     /robox/user-supplied-topic/robox-id/from
+      // Subscribing: /robox/user-supplied-topic/robox-id/to
+      //String topic = "/robox/";
+      //topic += serverConfig.topic;
+      //topic += "/";
+      //topic += getId();
+
+      //onlineAdapter->setServer(serverConfig.host, serverConfig.port);
+      //onlineAdapter->setClientId(serverConfig.clientId);
+      onlineAdapter->setUser(serverConfig.userId, serverConfig.password);
+      //onlineAdapter->setTopic(topic);
+
+      //Connection::setOnlineAdapter(onlineAdapter);
    }
    else
    {
@@ -294,7 +310,7 @@ void ToastBot::configureConnections()
    }
 
    // Set the connection mode and attempt to make connections.
-   Connection::setMode(parseConnectionMode(properties.getString("mode")));
+   //Connection::setMode(parseConnectionMode(properties.getString("mode")));
 }
 
 String ToastBot::getUniqueId()

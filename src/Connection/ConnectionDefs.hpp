@@ -95,12 +95,15 @@ struct ServerConfig
 
    String clientId;
 
+   String topic;
+
    inline ServerConfig() :
       host(""),
       port(0),
       userId(""),
       password(""),
-      clientId("")
+      clientId(""),
+      topic("")
    {
    }
 
@@ -109,12 +112,14 @@ struct ServerConfig
       const int& port,
       const String& userId,
       const String& password,
-      const String& clientId) :
+      const String& clientId,
+      const String& topic) :
          host(host),
          port(port),
          userId(userId),
          password(password),
-         clientId(clientId)
+         clientId(clientId),
+         topic(topic)
    {
    }
 
@@ -126,6 +131,7 @@ struct ServerConfig
       userId = serverConfig.userId;
       password = serverConfig.password;
       clientId = serverConfig.clientId;
+      topic = serverConfig.topic;
    }
 
    inline ServerConfig& operator=(
@@ -138,6 +144,7 @@ struct ServerConfig
          userId = rhs.userId;
          password = rhs.password;
          clientId = rhs.clientId;
+         topic = rhs.topic;
       }
 
       return (*this);
