@@ -25,10 +25,16 @@ public:
    static WifiConfig getWifiConfig();
 
    static void setWifiConfig(
+      const WifiConfig& wifiConfig);
+
+   static void setWifiConfig(
       const String& ssid,
       const String& password);
 
    static ServerConfig getServerConfig();
+
+   static void setServerConfig(
+      const ServerConfig& serverConfig);
 
    static void setServerConfig(
       const String& host,

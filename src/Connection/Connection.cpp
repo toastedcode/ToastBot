@@ -31,9 +31,9 @@ void Connection::setMode(
    if (Connection::mode != mode)
    {
       Connection::mode = mode;
-   }
 
-   setup();
+      setup();
+   }
 }
 
 void Connection::setup()
@@ -151,6 +151,17 @@ WifiConfig Connection::getWifiConfig()
 }
 
 void Connection::setWifiConfig(
+   const WifiConfig& wifiConfig)
+{
+   Connection::wifiConfig = wifiConfig;
+
+   if ((mode == WIFI ) || (mode == ONLINE ))
+   {
+      setup();
+   }
+}
+
+void Connection::setWifiConfig(
    const String& ssid,
    const String& password)
 {
@@ -166,6 +177,17 @@ void Connection::setWifiConfig(
 ServerConfig Connection::getServerConfig()
 {
    return (serverConfig);
+}
+
+void Connection::setServerConfig(
+   const ServerConfig& serverConfig)
+{
+   Connection::serverConfig = serverConfig;
+
+   if (mode == ONLINE)
+   {
+      setup();
+   }
 }
 
 void Connection::setServerConfig(

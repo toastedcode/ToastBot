@@ -73,8 +73,6 @@ private:
 
    bool connectMqttClient();
 
-   static const int RETRY_DELAY;
-
    String host;
 
    int port;
@@ -85,13 +83,11 @@ private:
 
    String password;
    
-   String topic;
+   String publishTopic;
 
-   bool connectionDesired;
+   String subscribeTopic;
    
    WiFiClient client;
 
    PubSubClient* mqttClient;
-
-   long retryTime;
 };

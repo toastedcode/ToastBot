@@ -172,7 +172,7 @@ void ToastBot::setup(
    addComponent(new SerialAdapter("serial", protocol));
    addComponent(new UdpAdapter("discover", protocol, properties.getInt("discoverPort")));
    addComponent(new TcpServerAdapter("control", protocol, properties.getInt("controlPort")));
-   addComponent(new TcpServerAdapter("debug", protocol, properties.getInt("debugPort")));
+   //addComponent(new TcpServerAdapter("debug", protocol, properties.getInt("debugPort")));
    addComponent(new MqttClientAdapter("online", protocol));
 
    // Factory reset button.
