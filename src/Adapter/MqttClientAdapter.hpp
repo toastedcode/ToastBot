@@ -33,7 +33,7 @@ public:
       const String& userId,
       const String& password);
 
-   ~MqttClientAdapter();
+   virtual ~MqttClientAdapter();
 
    virtual void setup();
 

@@ -215,7 +215,7 @@ void ToastBot::setup(
    }
 
    // Configure the connection manager.
-   //configureConnections();
+   configureConnections();
 
    // Log free memory.
    Logger::logDebug(F("ToastBot::setup: Free memory = %u bytes"), board->getFreeHeap());
@@ -285,7 +285,7 @@ void ToastBot::configureConnections()
       // MQTT topic format:
       // Sending:     /robox/user-supplied-topic/robox-id/from
       // Subscribing: /robox/user-supplied-topic/robox-id/to
-      String topic = "/robox/" + serverConfig.topic + "/" + getId();
+      String topic = "robox/" + serverConfig.topic + "/" + getId();
 
       onlineAdapter->setServer(serverConfig.host, serverConfig.port);
       onlineAdapter->setClientId(serverConfig.clientId);
