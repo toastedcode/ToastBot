@@ -12,6 +12,7 @@
 #include <ToastBot.h>
 #include <WebSocketServer.h>
 
+#include "AjaxTextPage.h"
 #include "Robox.h"
 
 class ConfigPage : public Webpage
@@ -112,6 +113,8 @@ void setup()
    WebServerAdapter* webServerAdapter = new WebServerAdapter("web", 80);
    ToastBot::addComponent(webServerAdapter);
    webServerAdapter->addPage(new ConfigPage());
+   webServerAdapter->addPage(new Webpage("/ajax.html", "/ajax.html"));
+   webServerAdapter->addPage(new AjaxTestPage());
 }
 
 void loop()
