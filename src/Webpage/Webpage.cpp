@@ -71,8 +71,6 @@ bool Webpage::handle(
          }
          else
          {
-            Logger::logDebug("Webpage::getContent");
-
             // Line by line, read from the template file and create the content file.
             String line = file.readStringUntil('\n');
             while (line.length() > 0)
@@ -86,6 +84,9 @@ bool Webpage::handle(
 
             success = true;
          }
+
+         file.close();
+         responseFile.close();
       }
    }
 

@@ -8,11 +8,20 @@
 // *****************************************************************************
 // *****************************************************************************
 
+#include "Board.hpp"
 #include "Logger.hpp"
 #include "MqttClientAdapter.hpp"
 #include "Messaging.h"
 
-const int MqttClientAdapter::RETRY_DELAY = 3000;  // milliseconds
+MqttClientAdapter::MqttClientAdapter(
+   const String& id,
+   Protocol* protocol) : ClientAdapter(id, protocol),
+                         port(0)
+{
+   mqttClient = new PubSubClient(client);
+   mqttClient->setListener(this);
+}
+
 
 MqttClientAdapter::MqttClientAdapter(
    const String& id,
@@ -21,16 +30,17 @@ MqttClientAdapter::MqttClientAdapter(
    const int& port,
    const String& clientId,
    const String& userId,
-   const String& password) : Adapter(id, protocol),
+   const String& password) : ClientAdapter(id, protocol),
                              host(host),
                              port(port),
                              clientId(clientId),
                              userId(userId),
-                             password(password),
-                             isConnected(false),
-                             retryTime(0)
+                             password(password)
 {
    mqttClient = new PubSubClient(client);
+
+   mqttClient->setServer(host.c_str(), port);
+   mqttClient->setListener(this);
 }
 
 MqttClientAdapter::~MqttClientAdapter()
@@ -40,54 +50,11 @@ MqttClientAdapter::~MqttClientAdapter()
 
 void MqttClientAdapter::setup()
 {
-   mqttClient->setServer(host.c_str(), port);
-   mqttClient->setListener(this);
-   retryTime = millis();
+   Adapter::setup();
 }
 
 void MqttClientAdapter::loop()
 {
-   //
-   // MQTT connection
-   //
-
-   // Check connection state.
-   bool wasConnected = isConnected;
-   isConnected = mqttClient->connected();
-
-   if (!isConnected)
-   {
-      // Connection retry.
-      if ((retryTime != 0) &&
-          (millis() > retryTime))
-      {
-         isConnected = connect();
-
-         if (isConnected == false)
-         {
-            retryTime = millis() + RETRY_DELAY;
-
-            Logger::logDebug(
-               F("MqttClientAdapter::loop: Connect attempt failed.  Retrying in %d seconds.\n"),
-               (RETRY_DELAY / 1000));
-         }
-      }
-   }
-
-   if (!wasConnected && isConnected)
-   {
-      Logger::logDebug(
-         F("MqttClientAdapter::loop: MQTT Client Adapter [%s] connected.\n"), getId().c_str());
-
-      String topic = "/toastbot/to/" + clientId;
-      mqttClient->subscribe(topic.c_str());
-   }
-   else if (wasConnected && !isConnected)
-   {
-      Logger::logDebug(
-         F("MqttClientAdapter::loop: MQTT Client Adapter [%s] disconnected.\n"), getId().c_str());
-   }
-
    // Allow the MQTT client to do its processing.
    mqttClient->loop();
 
@@ -100,22 +67,20 @@ bool MqttClientAdapter::sendRemoteMessage(
 {
    bool isSuccess = false;
 
-   if (isConnected)
+   if (isConnected() && (publishTopic != ""))
    {
       String serializedMessage = protocol->serialize(message);
 
       if (serializedMessage != "")
       {
-         String topic = "/toastbot/from/" + clientId;
-
-         isSuccess = mqttClient->publish(topic.c_str(), serializedMessage.c_str());
+         isSuccess = mqttClient->publish(publishTopic.c_str(), serializedMessage.c_str());
       }
    }
 
    if (!isSuccess)
    {
       Logger::logWarning(
-         F("MqttClientAdapter::sendRemoteMessage: Failed to send message [%s] to remote host.\n"),
+         F("MqttClientAdapter::sendRemoteMessage: Failed to send message [%s] to remote host."),
          message->getMessageId().c_str());
    }
 
@@ -141,6 +106,8 @@ void MqttClientAdapter::callback(
       memcpy(buffer, payload, length);
       buffer[length] = 0;
       String serializedMessage(buffer);
+
+      Logger::logDebug("MqttClientAdapter::callback: %s", serializedMessage.c_str());
 
       if (serializedMessage.length() > 0)
       {
@@ -170,24 +137,129 @@ bool MqttClientAdapter::connect()
 {
    bool success = false;
 
-   if (mqttClient)
+   if (isConnected())
+   {
+      disconnect();
+   }
+
+   Logger::logDebug(
+      F("MqttClientAdapter::connect: Connecting to MQTT broker %s:%d as client [%s]."),
+      host.c_str(),
+      port,
+      clientId.c_str());
+
+   return (connectMqttClient());
+}
+
+
+bool MqttClientAdapter::disconnect()
+{
+   if (isConnected())
    {
       Logger::logDebug(
-         F("MqttClientAdapter::connect: Connecting to MQTT broker %s:%d as client [%s]."),
+         F("MqttClientAdapter::disconnect: Disconnecting from MQTT broker %s:%d."),
          host.c_str(),
-         port,
-         clientId.c_str(),
-         userId.c_str());
+         port);
 
-      if (userId.length() > 0)
-      {
-         success = mqttClient->connect(clientId.c_str(), userId.c_str(), password.c_str());
-      }
-      else
+      mqttClient->disconnect();
+   }
+
+   return (true);
+}
+
+bool MqttClientAdapter::isConnected()
+{
+   return (mqttClient && mqttClient->connected());
+}
+
+
+void MqttClientAdapter::setServer(
+   const String& host,
+   const int& port)
+{
+   Logger::logDebug(F("MqttClientAdapter::setServer: host = %s, port = %d"), host.c_str(), port);  // REMOVE
+
+   this->host = host;
+   this->port = port;
+
+   mqttClient->setServer(this->host.c_str(), this->port);
+}
+
+void MqttClientAdapter::setClientId(
+   const String& clientId)
+{
+   Logger::logDebug(F("MqttClientAdapter::setClientId: clientId = %s"), clientId.c_str());  // REMOVE
+
+   this->clientId = clientId;
+}
+
+void MqttClientAdapter::setUser(
+   const String& userId,
+   const String& password)
+{
+   Logger::logDebug(F("MqttClientAdapter::setUser: userId = %s, password = %s"), userId.c_str(), password.c_str());  // REMOVE
+
+   this->userId = userId;
+   this->password = password;
+}
+
+void MqttClientAdapter::setTopic(
+   const String& topic)
+{
+   Logger::logDebug(F("MqttClientAdapter::setTopic: topic = %s"), topic.c_str());  // REMOVE
+
+   this->subscribeTopic = topic + "/to";
+   this->publishTopic = topic + "/from";
+}
+
+bool MqttClientAdapter::connectMqttClient()
+{
+   bool success = false;
+
+   if (mqttClient && (clientId != ""))
+   {
+      // Attempt to connect to broker.
+      // Note: Use user ID and password if provided.
+      if (userId.length() == 0)
       {
          success = mqttClient->connect(clientId.c_str());
       }
+      else
+      {
+         success = mqttClient->connect(clientId.c_str(), userId.c_str(), password.c_str());
+      }
+
+      if (success)
+      {
+         Logger::logDebug(
+            F("MqttClientAdapter::connectMqttClient: Successfully connected MQTT adapter [%s] to host [%s:%d]"),
+            getId().c_str(),
+            host.c_str(),
+            port);
+
+         if (subscribeTopic != "")
+         {
+            Logger::logDebug(
+               F("MqttClientAdapter::connectMqttClient: Subscribing MQTT adapter [%s] to topic [%s]"),
+               getId().c_str(),
+               subscribeTopic.c_str());
+
+            mqttClient->subscribe(subscribeTopic.c_str());
+         }
+         else
+         {
+            Logger::logWarning(
+               F("MqttClientAdapter::connectMqttClient: No subscribe topic specified for MQTT adapter [%s]."),
+               getId().c_str());
+         }
+      }
+      else
+      {
+         Logger::logDebug(
+            F("MqttClientAdapter::connectMqttClient: Connect attempt failed.  (Reply code = %d)."),
+            mqttClient->state());
+      }
    }
 
-   return (success);
+   return  (success);
 }

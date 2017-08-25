@@ -62,30 +62,91 @@ struct WifiConfig
       password(password)
    {
    }
+
+   inline WifiConfig(
+      const WifiConfig& wifiConfig)
+   {
+      ssid = wifiConfig.ssid;
+      password = wifiConfig.password;
+   }
+
+   inline WifiConfig& operator=(
+      const WifiConfig& rhs)
+   {
+      if (this != &rhs)
+      {
+         ssid = rhs.ssid;
+         password = rhs.password;
+      }
+
+      return (*this);
+   }
 };
 
 struct ServerConfig
 {
    String host;
 
+   int port;
+
+   String userId;
+
+   String password;
+
    String clientId;
 
-   String clientPassword;
+   String topic;
 
    inline ServerConfig() :
       host(""),
+      port(0),
+      userId(""),
+      password(""),
       clientId(""),
-      clientPassword("")
+      topic("")
    {
    }
 
    inline ServerConfig(
       const String& host,
+      const int& port,
+      const String& userId,
+      const String& password,
       const String& clientId,
-      const String& clientPassword) :
-      host(host),
-      clientId(clientId),
-      clientPassword(clientPassword)
+      const String& topic) :
+         host(host),
+         port(port),
+         userId(userId),
+         password(password),
+         clientId(clientId),
+         topic(topic)
    {
+   }
+
+   inline ServerConfig(
+      const ServerConfig& serverConfig)
+   {
+      host = serverConfig.host;
+      port = serverConfig.port;
+      userId = serverConfig.userId;
+      password = serverConfig.password;
+      clientId = serverConfig.clientId;
+      topic = serverConfig.topic;
+   }
+
+   inline ServerConfig& operator=(
+      const ServerConfig& rhs)
+   {
+      if (this != &rhs)
+      {
+         host = rhs.host;
+         port = rhs.port;
+         userId = rhs.userId;
+         password = rhs.password;
+         clientId = rhs.clientId;
+         topic = rhs.topic;
+      }
+
+      return (*this);
    }
 };

@@ -46,8 +46,15 @@ const char PROGMEM ASCII_LOGO[] =
 // The number of simultaneous messages supported by the Messaging framework.
 const int MESSAGE_POOL_SIZE = 10;
 
+// The number of simultaneous timers supported by the Timer framework.
+const int TIMER_POOL_SIZE = 10;
+
 // The GPIO pin used to control the status LED.
 const int STATUS_LED_PIN = 16;
+
+// *****************************************************************************
+//                               Public
+// *****************************************************************************
 
 String ToastBot::getId()
 {
@@ -139,6 +146,9 @@ void ToastBot::setup(
    // Set the logger.
    Logger::setLogger(new SerialLogger());
 
+   // Create the timer pool.
+   Timer::setup(TIMER_POOL_SIZE);
+
    // Load properties.
    properties.load(PROPERTIES_FILE);
    Logger::logDebug(F("ToastBot::setup: Properties:"));
@@ -162,7 +172,8 @@ void ToastBot::setup(
    addComponent(new SerialAdapter("serial", protocol));
    addComponent(new UdpAdapter("discover", protocol, properties.getInt("discoverPort")));
    addComponent(new TcpServerAdapter("control", protocol, properties.getInt("controlPort")));
-   addComponent(new TcpServerAdapter("debug", protocol, properties.getInt("debugPort")));
+   //addComponent(new TcpServerAdapter("debug", protocol, properties.getInt("debugPort")));
+   addComponent(new MqttClientAdapter("online", protocol));
 
    // Factory reset button.
    // TODO: Flash button conflicts with motor1 pin.
@@ -171,8 +182,7 @@ void ToastBot::setup(
    addComponent(flashButton);
 
    // Status LED.
-   Led* statusLed = new Led("statusLed", STATUS_LED_PIN);
-   addComponent(statusLed);
+   addComponent(new Led("statusLed", STATUS_LED_PIN));
 
    // Create components found in properties.
    Message* message = MessageFactory::newMessage();
@@ -205,18 +215,7 @@ void ToastBot::setup(
    }
 
    // Configure the connection manager.
-   if (properties.isSet("ap.ssid"))
-   {
-      Connection::setApConfig(properties.getString("ap.ssid"), properties.getString("ap.password"));
-   }
-   else
-   {
-      Connection::setApConfig(getId(), "");
-   }
-   Connection::setWifiConfig(properties.getString("wifi.ssid"), properties.getString("wifi.password"));
-   Connection::setServerConfig(properties.getString("server.host"), properties.getString("server.clientId"), properties.getString("server.clientPassword"));
-   Connection::setStatusLed(statusLed);
-   Connection::setMode(parseConnectionMode(properties.getString("mode")));
+   configureConnections();
 
    // Log free memory.
    Logger::logDebug(F("ToastBot::setup: Free memory = %u bytes"), board->getFreeHeap());
@@ -248,6 +247,67 @@ void ToastBot::factoryReset()
    {
       board->reset();
    }
+}
+
+// *****************************************************************************
+//                               Private
+// *****************************************************************************
+
+void ToastBot::configureConnections()
+{
+   // Configure the AP.
+   if (properties.isSet("ap.ssid"))
+   {
+      Connection::setApConfig(properties.getString("ap.ssid"), properties.getString("ap.password"));
+   }
+   else
+   {
+      Connection::setApConfig(getId(), "");
+   }
+
+   // Configure the Wifi connection.
+   Connection::setWifiConfig(properties.getString("wifi.ssid"), properties.getString("wifi.password"));
+
+   // Configure the server connection.
+   Connection::setServerConfig(
+      properties.getString("server.host"),
+      properties.getInt("server.port"),
+      properties.getString("server.userId"),
+      properties.getString("server.password"),
+      getUniqueId(),  // clientId
+      properties.getString("server.topic"));
+
+   MqttClientAdapter* onlineAdapter = (MqttClientAdapter*)getComponent("online");
+   if (onlineAdapter)
+   {
+      ServerConfig serverConfig = Connection::getServerConfig();
+
+      // MQTT topic format:
+      // Sending:     /robox/user-supplied-topic/robox-id/from
+      // Subscribing: /robox/user-supplied-topic/robox-id/to
+      String topic = "robox/" + serverConfig.topic + "/" + getId();
+
+      onlineAdapter->setServer(serverConfig.host, serverConfig.port);
+      onlineAdapter->setClientId(serverConfig.clientId);
+      onlineAdapter->setUser(serverConfig.userId, serverConfig.password);
+      onlineAdapter->setTopic(topic);
+
+      Connection::setOnlineAdapter(onlineAdapter);
+   }
+   else
+   {
+      Logger::logWarning(F("ToastBot::configureConnections: No online adapter available."));
+   }
+
+   // Configure the status LED.
+   Led* statusLed = (Led*)getComponent("statusLed");
+   if (statusLed)
+   {
+      Connection::setStatusLed(statusLed);
+   }
+
+   // Set the connection mode and attempt to make connections.
+   Connection::setMode(parseConnectionMode(properties.getString("mode")));
 }
 
 String ToastBot::getUniqueId()

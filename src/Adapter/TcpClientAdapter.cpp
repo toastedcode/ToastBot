@@ -9,7 +9,7 @@ TcpClientAdapter::TcpClientAdapter(
    const String& host,
    const int& port,
    const int& retryDelay) :
-      Adapter(id, protocol),
+      ClientAdapter(id, protocol),
       host(host),
       port(port),
       retryTime(0),
@@ -122,19 +122,24 @@ MessagePtr TcpClientAdapter::getRemoteMessage()
 
 bool TcpClientAdapter::connect()
 {
-   bool success = client.connect(host.c_str(), port);
+   bool success = false;
 
-   if (!success)
+   if (host.length() > 0)
    {
-      retryTime = Board::getBoard()->systemTime()+ retryDelay;
+      success = client.connect(host.c_str(), port);
 
-      Logger::logDebug(F("TcpClientAdapter::connect: TCP Client Adapter [%s] failed to connect."), getId().c_str());
-   }
-   else
-   {
-      Logger::logDebug(F("TcpClientAdapter::connect: TCP Client Adapter [%s] connected."), getId().c_str());
+      if (!success)
+      {
+         retryTime = Board::getBoard()->systemTime() + retryDelay;
 
-      retryTime = 0;
+         Logger::logDebug(F("TcpClientAdapter::connect: TCP Client Adapter [%s] failed to connect."), getId().c_str());
+      }
+      else
+      {
+         Logger::logDebug(F("TcpClientAdapter::connect: TCP Client Adapter [%s] connected."), getId().c_str());
+
+         retryTime = 0;
+      }
    }
 
    return (success);
@@ -144,4 +149,10 @@ bool TcpClientAdapter::disconnect()
 {
    // TODO
    return (false);
+}
+
+
+bool TcpClientAdapter::isConnected()
+{
+   return (client.connected());
 }
