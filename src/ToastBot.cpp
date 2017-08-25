@@ -46,6 +46,9 @@ const char PROGMEM ASCII_LOGO[] =
 // The number of simultaneous messages supported by the Messaging framework.
 const int MESSAGE_POOL_SIZE = 10;
 
+// The number of simultaneous timers supported by the Timer framework.
+const int TIMER_POOL_SIZE = 10;
+
 // The GPIO pin used to control the status LED.
 const int STATUS_LED_PIN = 16;
 
@@ -143,6 +146,9 @@ void ToastBot::setup(
    // Set the logger.
    Logger::setLogger(new SerialLogger());
 
+   // Create the timer pool.
+   Timer::setup(TIMER_POOL_SIZE);
+
    // Load properties.
    properties.load(PROPERTIES_FILE);
    Logger::logDebug(F("ToastBot::setup: Properties:"));
@@ -164,9 +170,9 @@ void ToastBot::setup(
    // Creating basic messaging adapters.
    Protocol* protocol = new JsonProtocol();
    addComponent(new SerialAdapter("serial", protocol));
-   //addComponent(new UdpAdapter("discover", protocol, properties.getInt("discoverPort")));
-   //addComponent(new TcpServerAdapter("control", protocol, properties.getInt("controlPort")));
-   //addComponent(new TcpServerAdapter("debug", protocol, properties.getInt("debugPort")));
+   addComponent(new UdpAdapter("discover", protocol, properties.getInt("discoverPort")));
+   addComponent(new TcpServerAdapter("control", protocol, properties.getInt("controlPort")));
+   addComponent(new TcpServerAdapter("debug", protocol, properties.getInt("debugPort")));
    addComponent(new MqttClientAdapter("online", protocol));
 
    // Factory reset button.
@@ -179,7 +185,6 @@ void ToastBot::setup(
    addComponent(new Led("statusLed", STATUS_LED_PIN));
 
    // Create components found in properties.
-   /*
    Message* message = MessageFactory::newMessage();
    String componentIds[ToastBot::MAX_COMPONENTS];
    int count = 0;
@@ -202,7 +207,6 @@ void ToastBot::setup(
       }
    }
    message->setFree();
-   */
 
    // Setup registered components.
    for (int i = 0; i < components.length(); i++)
@@ -211,7 +215,7 @@ void ToastBot::setup(
    }
 
    // Configure the connection manager.
-   configureConnections();
+   //configureConnections();
 
    // Log free memory.
    Logger::logDebug(F("ToastBot::setup: Free memory = %u bytes"), board->getFreeHeap());
