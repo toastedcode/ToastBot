@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+
+#controller_div
+{
+    border-radius: 25px;
+    border: 2px solid #73AD21;
+    padding: 20px;
+    width: 770px;
+    height: 260px;
+}
+
+#joystick_div
+{
+    border-radius: 25px;
+    border: 2px solid #73AD21;
+    width: 200px;
+    height: 200px;
+    float: left;
+    margin-right: 20px;
+}
+
+#controls_div
+{
+    width: 310px;
+    height: 310px;
+    float: left;
+    margin-right: 20px;
+}
+
+#gamepad_div
+{
+    border-radius: 25px;
+    border: 2px solid #73AD21;
+    width: 200px;
+    height: 200px;
+    float: left;
+    margin-right: 20px;
+}
+
+.gamepad_button_div
+{
+    border-radius: 25px;
+    border: 2px solid #73AD21;
+    padding: 5px;
+    width: 40px;
+    height: 40px;
+    float: left;
+    margin: 5px;
+}
+
+.hidden
+{
+   visibility: hidden;
+}
+
+.slider_div
+{
+    border-radius: 25px;
+    border: 2px solid #73AD21;
+    padding: 20px;
+    width: 270px;
+    height: 30px;
+    float: left;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.slider
+{
+    width: 100%;
+}
+
+#buttons_div
+{
+    border-radius: 25px;
+    border: 2px solid #73AD21;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding: 15px;
+    width: 270px;
+    height: 50px;
+    float: left;
+}
+
+.button
+{
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 15px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 2px;
+}
+
+.button_pressed
+{
+    color: orange;
+}
+
+</style>
+</head>
+
+<body>
+<div id="controller_div">
+   <div id="gamepad_div">
+      <div class="gamepad_button_div hidden"></div>
+      <div id="up_button" class="gamepad_button_div"></div>
+      <div class="gamepad_button_div hidden"></div>
+      <div id="left_button" class="gamepad_button_div"></div>
+      <div class="gamepad_button_div  hidden"></div>
+      <div id="right_button" class="gamepad_button_div"></div>
+      <div class="gamepad_button_div hidden"></div>
+      <div id="down_button" class="gamepad_button_div"></div>
+      <div class="gamepad_button_div hidden"></div>
+   </div>
+   <div id="controls_div">
+      <div class="slider_div"><input id="slider1" class="slider" type="range" value="0" min="0" max="180"></div>
+      <div class="slider_div"><input id="slider2" class="slider" type="range" value="0" min="0" max="180"></div>
+   </div>
+</div>
+<div id="message_div"></div>
+
+<script src="robox.js"></script>
+<script>
+
+// Robox object
+var robox = new Robox();
+  
+document.getElementById("up_button").onmousedown = function()
+{
+   console.log("Up - Pressed");
+   robox.drive(100);
+}
+ 
+document.getElementById("up_button").onmouseup = function()
+{
+   console.log("Up - Released");
+   robox.drive(0);
+}
+ 
+document.getElementById("down_button").onmousedown = function()
+{
+   console.log("Down - Pressed");
+   robox.drive(-100);
+}
+ 
+document.getElementById("down_button").onmouseup = function()
+{
+   console.log("Down - Released");
+   robox.drive(0);
+}
+ 
+document.getElementById("left_button").onmousedown = function()
+{
+   console.log("Left - Pressed");
+   robox.rotate(-100);
+}
+ 
+document.getElementById("left_button").onmouseup = function()
+{
+   console.log("Left - Released");
+   robox.drive(0);
+}
+ 
+document.getElementById("right_button").onmousedown = function()
+{
+   console.log("Right - Pressed");
+   robox.rotate(100);
+}
+ 
+document.getElementById("right_button").onmouseup = function()
+{
+   console.log("Right - Released");
+   robox.drive(0);
+}
+  
+</script>
+</body>
+</html>
