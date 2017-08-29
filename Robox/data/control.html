@@ -181,6 +181,31 @@ document.getElementById("right_button").onmouseup = function()
    console.log("Right - Released");
    robox.drive(0);
 }
+
+var MIN_UPDATE_TIME = 250;
+var lastUpdate = 0;
+
+document.getElementById("slider1").oninput = function()
+{
+   var currentTime = Date.now();
+   
+   if ((currentTime - lastUpdate) > MIN_UPDATE_TIME)
+   {
+      robox.setAngle("servo1", this.value);
+      lastUpdate = currentTime;
+   }
+}
+
+document.getElementById("slider2").oninput = function()
+{
+   var currentTime = Date.now();
+   
+   if ((currentTime - lastUpdate) > MIN_UPDATE_TIME)
+   {
+      robox.setAngle("servo1", this.value);
+      lastUpdate = currentTime;
+   }
+}
   
 </script>
 </body>
