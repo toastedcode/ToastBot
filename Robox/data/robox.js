@@ -71,4 +71,12 @@ function Robox()
    {
       return (this.sendRawMessage("/motorPair/rotate?speed=" + speed));
    }
+   
+   // **************************************************************************
+   //                             Servo
+   
+   Robox.prototype.setAngle = function(componentId, angle)
+   {
+      return (this.sendRawMessage("/" + componentId + "/rotate?angle=" + angle));
+   }   
 };
