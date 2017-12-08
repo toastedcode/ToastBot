@@ -57,7 +57,7 @@ ConfigPage::ConfigPage() :
    
    Connection::setWifiConfig(wifiConfig);
    ToastBot::setProperty("wifi.ssid", wifiConfig.ssid);
-   ToastBot::setProperty("wifi.ssid", wifiConfig.password);
+   ToastBot::setProperty("wifi.password", wifiConfig.password);
    
    //
    // Update server config.
@@ -95,7 +95,6 @@ void ConfigPage::replaceContent(
   content.replace("%server.topic", Connection::getServerConfig().topic);
   content.replace("%info", "Successfully updated.");
 }
-   
 
 // *****************************************************************************
 //                                  Arduino
@@ -109,9 +108,11 @@ void setup()
 
    Logger::setLogLevel(DEBUG_FINEST);
 
+   /*
    WebServerAdapter* webServerAdapter = new WebServerAdapter("web", 80);
    ToastBot::addComponent(webServerAdapter);
    webServerAdapter->addPage(new ConfigPage());
+   */
 }
 
 void loop()

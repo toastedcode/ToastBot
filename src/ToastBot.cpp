@@ -44,7 +44,7 @@ const char PROGMEM ASCII_LOGO[] =
 "............................................................\n";
 
 // The number of simultaneous messages supported by the Messaging framework.
-const int MESSAGE_POOL_SIZE = 10;
+const int MESSAGE_POOL_SIZE = 3;
 
 // The number of simultaneous timers supported by the Timer framework.
 const int TIMER_POOL_SIZE = 10;
@@ -138,6 +138,8 @@ void ToastBot::setup(
    SPIFFS.begin();
 #endif
 
+   ESP.wdtDisable();
+
    // Logo.
    Serial.print("\n\n");
    Serial.print(FPSTR(ASCII_LOGO));
@@ -221,6 +223,8 @@ void ToastBot::setup(
    Logger::logDebug(F("ToastBot::setup: Free memory = %u bytes"), board->getFreeHeap());
 
    initialized = true;
+
+   ESP.wdtEnable(WDTO_8S);
 }
 
 void ToastBot::loop()
