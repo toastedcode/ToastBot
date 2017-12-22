@@ -5,7 +5,7 @@
 
 #include "../Webpage/Webpage.hpp"
 #include "Adapter.hpp"
-#include "List.hpp"
+#include "LinkedList.hpp"
 
 class WebServerAdapter : public Adapter, RequestHandler
 {
@@ -98,7 +98,7 @@ private:
 
    ESP8266WebServer* server;
 
-   List<Webpage*, MAX_WEBPAGES> webpages;
+   LinkedList<Webpage*> webpages;
 
    PendingRequest pendingRequest;
 

@@ -124,9 +124,9 @@ Webpage* WebServerAdapter::getPage(
 {
    Webpage* webpage = 0;
 
-   for (int i = 0; i < webpages.length(); i++)
+   for (List<Webpage*>::Iterator it = webpages.begin(); it != webpages.end(); it++)
    {
-      Webpage* tempPage = webpages.item(i)->value;
+      Webpage* tempPage = (*it);
       if (tempPage->getUri() == uri)
       {
          webpage = tempPage;
