@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Adapter\MqttClientAdapter.hpp"
+#include "Adapter\HttpClientAdapter.hpp"
 #include "Adapter\SerialAdapter.hpp"
 #include "Adapter\TcpClientAdapter.hpp"
 #include "Adapter\TcpServerAdapter.hpp"

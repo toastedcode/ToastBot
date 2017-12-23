@@ -93,7 +93,7 @@ String RestfulProtocol::serialize(
    // /component/action?param=value;param=value ...
 
    // component
-   if (message->isSet("destination"))
+   if (message->isSet("destination") && (message->getDestination() != ""))
    {
       serializedMessage += "/";
       serializedMessage += message->getDestination();
@@ -124,7 +124,7 @@ String RestfulProtocol::serialize(
          }
          else
          {
-            serializedMessage += ";";
+            serializedMessage += "&";
          }
 
          serializedMessage += String(parameter.getName());
