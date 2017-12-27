@@ -137,19 +137,15 @@ Webpage* WebServerAdapter::getPage(
    return (webpage);
 }
 
-bool WebServerAdapter::removePage(
+void WebServerAdapter::removePage(
    const String& uri)
 {
-   bool success = false;
-
    Webpage* webpage = getPage(uri);
 
    if (webpage != 0)
    {
-      success = webpages.remove(webpage);
+      webpages.remove(webpage);
    }
-
-   return (success);
 }
 
 bool WebServerAdapter::servePage(

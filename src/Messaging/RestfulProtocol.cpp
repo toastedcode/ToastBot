@@ -107,16 +107,15 @@ String RestfulProtocol::serialize(
    // parameters
    //
 
-   Parameter parameters[MAX_PARAMETERS];
-   int paramCount = 0;
-   message->getParameters(parameters, paramCount);
+   const List<Parameter>& parameters = message->getParameters();
+   int paramIndex = 0;
 
-   for (int i = 0, paramIndex = 0; i < paramCount; i++)
+   for (List<Parameter>::Iterator it = parameters.begin(); it != parameters.end(); it++, paramIndex++)
    {
-      Parameter& parameter = parameters[i];
+      Parameter& parameter = *it;
 
-      if ((strncmp(parameter.getName(), "messageId", sizeof(Parameter::ParameterName)) != 0) &&
-          (strncmp(parameter.getName(), "destination", sizeof(Parameter::ParameterName)) != 0))
+      if ((parameter.getName() != "messageId") &&
+          (parameter.getName() != "destination"))
       {
          if (paramIndex == 0)
          {
@@ -127,7 +126,7 @@ String RestfulProtocol::serialize(
             serializedMessage += "&";
          }
 
-         serializedMessage += String(parameter.getName());
+         serializedMessage += parameter.getName();
          serializedMessage += "=";
 
          switch (parameter.getType())

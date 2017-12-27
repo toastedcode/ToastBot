@@ -59,43 +59,42 @@ String JsonProtocol::serializeParameters(
 {
    String serializedParameters = "";
 
-   Parameter parameters[MAX_PARAMETERS];
-   int parameterCount = 0;
-   message->getParameters(parameters, parameterCount);
+   const List<Parameter>& parameters = message->getParameters();
+   int paramIndex = 0;
 
-   for (int i = 0; i < parameterCount; i++)
+   for (List<Parameter>::Iterator it = parameters.begin(); it != parameters.end(); it++, paramIndex++)
    {
       String parameterValue = "";
 
-      switch (parameters[i].getType())
+      switch (it->getType())
       {
          case Parameter::BOOL:
          {
-            parameterValue = String(parameters[i].getBoolValue());
+            parameterValue = String(it->getBoolValue());
             break;
          }
 
          case Parameter::DOUBLE:
          {
-            parameterValue = String(parameters[i].getDoubleValue());
+            parameterValue = String(it->getDoubleValue());
             break;
          }
 
          case Parameter::FLOAT:
          {
-            parameterValue = String(parameters[i].getFloatValue());
+            parameterValue = String(it->getFloatValue());
             break;
          }
 
          case Parameter::INT:
          {
-            parameterValue = String(parameters[i].getIntValue());
+            parameterValue = String(it->getIntValue());
             break;
          }
 
          case Parameter::STRING:
          {
-            parameterValue = wrap(parameters[i].getStringValue(), '\"');
+            parameterValue = wrap(it->getStringValue(), '\"');
             break;
          }
 
@@ -105,9 +104,9 @@ String JsonProtocol::serializeParameters(
          }
       }
 
-      serializedParameters += (wrap(parameters[i].getName(), '\"') + ":" + parameterValue);
+      serializedParameters += (wrap(it->getName(), '\"') + ":" + parameterValue);
 
-      if (i < (parameterCount - 1))
+      if (paramIndex < (parameters.length() - 1))
       {
          serializedParameters += ", ";
       }

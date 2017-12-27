@@ -52,7 +52,7 @@ public:
    Webpage* getPage(
       const String& uri);
 
-   bool removePage(
+   void removePage(
       const String& uri);
 
 protected:
