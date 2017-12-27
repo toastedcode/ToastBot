@@ -16,15 +16,16 @@ bool HttpClientAdapter::sendRemoteMessage(
 
 	if (url != "")
 	{
+	   //message->clearParameter("url");
 	   String serializedMessage = sendProtocol.serialize(message);
 
 	   String httpRequest = "http://" + url + serializedMessage;
 
 	   // Setup the request.
-	   http.begin("http://" + url + serializedMessage);
+	   http.begin(httpRequest);
 
 	   // Send the request.
-	   int httpCode = 0;//http.GET();
+	   int httpCode = http.GET();
 
 	   if (httpCode > 0)
 	   {
