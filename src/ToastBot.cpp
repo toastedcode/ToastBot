@@ -21,13 +21,11 @@
 #include "ToastBot.hpp"
 #include "WifiBoard.hpp"
 
-const int ToastBot::MAX_COMPONENTS;
-
 Properties ToastBot::properties;
 
 bool ToastBot::initialized = false;
 
-Set<Component*, ToastBot::MAX_COMPONENTS> ToastBot::components;
+ListSet<Component*> ToastBot::components;
 
 const String PROPERTIES_FILE = "/robox.properties";
 const String DEFAULT_PROPERTIES_FILE = "/default.properties";
@@ -76,9 +74,10 @@ bool ToastBot::addComponent(
    Component* component,
    const bool& setDefaultHandler)
 {
-   bool isSuccess = false;
+   bool isSuccess = true;
 
-   if (components.add(component) == true)
+   components.insert(component);
+   if (true)  // TODO: Change insert() to return an iterator and a bool
    {
       MessageRouter::registerHandler(component, setDefaultHandler);
 
@@ -98,7 +97,8 @@ bool ToastBot::removeComponent(
 {
    bool isSuccess = false;
 
-   if (components.remove(component) == true)
+   components.erase(component);
+   if (true)  // TODO: Change erase() to return the number of elements erased
    {
       MessageRouter::unregisterHandler(component);
       isSuccess = true;
@@ -112,11 +112,11 @@ Component* ToastBot::getComponent(
 {
    Component* component = 0;
 
-   for (int i = 0; i < components.length(); i++)
+   for (Set<Component*>::Iterator it = components.begin(); it != components.end(); it++)
    {
-      if (components.item(i)->value->getId() == id)
+      if ((*it)->getId() == id)
       {
-         component = components.item(i)->value;
+         component = (*it);
          break;
       }
    }
@@ -170,10 +170,22 @@ void ToastBot::setup(
    // Creating basic messaging adapters.
    Protocol* protocol = new JsonProtocol();
    addComponent(new SerialAdapter("serial", protocol));
-   addComponent(new UdpAdapter("discover", protocol, properties.getInt("discoverPort")));
-   addComponent(new TcpServerAdapter("control", protocol, properties.getInt("controlPort")));
-   //addComponent(new TcpServerAdapter("debug", protocol, properties.getInt("debugPort")));
-   addComponent(new MqttClientAdapter("online", protocol));
+   if (properties.isSet("discoverPort"))
+   {
+      addComponent(new UdpAdapter("discover", protocol, properties.getInt("discoverPort")));
+   }
+   if (properties.isSet("controlPort"))
+   {
+      addComponent(new TcpServerAdapter("control", protocol, properties.getInt("controlPort")));
+   }
+   if (properties.isSet("debugPort"))
+   {
+      addComponent(new TcpServerAdapter("debug", protocol, properties.getInt("debugPort")));
+   }
+   if (properties.isSet("server.host") && properties.isSet("server.port"))
+   {
+      addComponent(new MqttClientAdapter("online", protocol));
+   }
 
    // Factory reset button.
    // TODO: Flash button conflicts with motor1 pin.
@@ -184,14 +196,18 @@ void ToastBot::setup(
    // Status LED.
    addComponent(new Led("statusLed", STATUS_LED_PIN));
 
+   //
    // Create components found in properties.
+   //
+
    Message* message = MessageFactory::newMessage();
-   String componentIds[ToastBot::MAX_COMPONENTS];
-   int count = 0;
-   ToastBot::getProperties().getKeys("component", componentIds, count);
-   for (int i = 0; i < count; i++)
+
+   ListSet<String> propertyKeys;
+   properties.getKeys("component", propertyKeys);
+
+   for (Set<String>::Iterator it = propertyKeys.begin(); it != propertyKeys.end(); it++)
    {
-      String componentDescription = ToastBot::getProperties().getString(componentIds[i]);
+      String componentDescription = ToastBot::getProperties().getString(*it);
 
       if (protocol->parse(componentDescription, message))
       {
@@ -209,9 +225,9 @@ void ToastBot::setup(
    message->setFree();
 
    // Setup registered components.
-   for (int i = 0; i < components.length(); i++)
+   for (Set<Component*>::Iterator it = components.begin(); it != components.end(); it++)
    {
-      components.item(i)->value->setup();
+      (*it)->setup();
    }
 
    // Configure the connection manager.
@@ -227,9 +243,9 @@ void ToastBot::loop()
 {
    Timer::loop();
 
-   for (int i = 0; i < components.length(); i++)
+   for (Set<Component*>::Iterator it = components.begin(); it != components.end(); it++)
    {
-      components.item(i)->value->loop();
+      (*it)->loop();
    }
 }
 

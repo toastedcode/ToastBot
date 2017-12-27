@@ -2,8 +2,7 @@
 
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
-
-#include "../Webpage/Webpage.hpp"
+#include "Webpage.hpp"
 #include "Adapter.hpp"
 #include "LinkedList.hpp"
 

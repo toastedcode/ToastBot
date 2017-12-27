@@ -30,9 +30,9 @@ void Behavior::setup()
 {
    Component::setup();
 
-   for (int i = 0; i < children.length(); i++)
+   for (Set<Behavior*>::Iterator it = children.begin(); it != children.end(); it++)
    {
-      children.item(i)->value->setup();
+      (*it)->setup();
    }
 }
 
@@ -42,9 +42,9 @@ void Behavior::loop()
 
    if (isEnabled())
    {
-      for (int i = 0; i < children.length(); i++)
+      for (Set<Behavior*>::Iterator it = children.begin(); it != children.end(); it++)
       {
-         children.item(i)->value->loop();
+         (*it)->loop();
       }
    }
 }
@@ -57,9 +57,9 @@ void Behavior::setState(
       int previousState = this->state;
       this->state = state;
 
-      for (int i = 0; i < listeners.length(); i++)
+      for (Set<BehaviorListener*>::Iterator it = listeners.begin(); it != listeners.end(); it++)
       {
-         listeners.item(i)->value->onStateChange(this, previousState, state);
+         (*it)->onStateChange(this, previousState, state);
       }
    }
 }

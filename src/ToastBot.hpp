@@ -13,14 +13,12 @@
 #include "Board.hpp"
 #include "Component.hpp"
 #include "Properties.hpp"
-#include "Set.hpp"
+#include "ListSet.hpp"
 
 class ToastBot
 {
 
 public:
-
-   static const int MAX_COMPONENTS = 30;
 
    static String getId();
 
@@ -60,7 +58,7 @@ private:
 
    static Properties properties;
 
-   static Set<Component*, MAX_COMPONENTS> components;
+   static ListSet<Component*> components;
 
    static bool initialized;
 };

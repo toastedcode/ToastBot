@@ -1,7 +1,7 @@
 #include "Board.h"
 #include "Logger.h"
 #include "Properties.h"
-#include "Robox.h"
+#include "Robox.hpp"
 #include "ToastBot.h"
 
 void Robox::handleMessage(
