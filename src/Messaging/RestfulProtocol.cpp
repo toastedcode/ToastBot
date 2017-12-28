@@ -110,7 +110,7 @@ String RestfulProtocol::serialize(
    const List<Parameter>& parameters = message->getParameters();
    int paramIndex = 0;
 
-   for (List<Parameter>::Iterator it = parameters.begin(); it != parameters.end(); it++, paramIndex++)
+   for (List<Parameter>::Iterator it = parameters.begin(); it != parameters.end(); it++)
    {
       Parameter& parameter = *it;
 

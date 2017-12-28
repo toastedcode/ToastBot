@@ -12,14 +12,19 @@ HttpClientAdapter::HttpClientAdapter(
 bool HttpClientAdapter::sendRemoteMessage(
    MessagePtr message)
 {
-	String url = message->getString("url");
+   static String url =  "";
+   static String serializedMessage = "";
+   static String httpRequest =  "";
+   static String httpResponse = "";
+
+	url = message->getString("url");
 
 	if (url != "")
 	{
 	   //message->clearParameter("url");
-	   String serializedMessage = sendProtocol.serialize(message);
+	   serializedMessage = sendProtocol.serialize(message);
 
-	   String httpRequest = "http://" + url + serializedMessage;
+	   httpRequest = "http://" + url + serializedMessage;
 
 	   // Setup the request.
 	   http.begin(httpRequest);
@@ -29,10 +34,10 @@ bool HttpClientAdapter::sendRemoteMessage(
 
 	   if (httpCode > 0)
 	   {
-	      String httpResponse = http.getString();
+	      httpResponse = http.getString();
 
 	      // TODO: Parse response.
-	      Logger::logDebug("HttpClientAdapter::sendRemoteMessage: Response [%d] = %s", httpCode, httpResponse.c_str());
+	      Logger::logDebug("HttpClientAdapter::sendRemoteMessage: Response code [%d].", httpCode);
 	   }
 	   else
 	   {
