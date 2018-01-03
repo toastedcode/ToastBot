@@ -13,7 +13,7 @@
 #include "Board.hpp"
 #include "Component.hpp"
 #include "Properties.hpp"
-#include "ListSet.hpp"
+#include "Set.hpp"
 
 class ToastBot
 {
@@ -58,7 +58,7 @@ private:
 
    static Properties properties;
 
-   static ListSet<Component*> components;
+   static Set<Component*> components;
 
    static bool initialized;
 };

@@ -106,7 +106,7 @@ String JsonProtocol::serializeParameters(
 
       serializedParameters += (wrap(it->getName(), '\"') + ":" + parameterValue);
 
-      if (paramIndex < (parameters.length() - 1))
+      if (paramIndex < (parameters.size() - 1))
       {
          serializedParameters += ", ";
       }

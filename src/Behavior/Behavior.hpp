@@ -1,9 +1,8 @@
 #pragma once
 
-
-#include "Component.hpp"
 #include "BehaviorListener.hpp"
-#include "ListSet.hpp"
+#include "Component.hpp"
+#include "Set.hpp"
 
 class Behavior : public Component
 {
@@ -51,9 +50,9 @@ private:
 
    int state;
 
-   ListSet<Behavior*> children;
+   Set<Behavior*> children;
 
-   ListSet<BehaviorListener*> listeners;
+   Set<BehaviorListener*> listeners;
 };
 
 inline Behavior::Behavior(

@@ -25,7 +25,7 @@ Properties ToastBot::properties;
 
 bool ToastBot::initialized = false;
 
-ListSet<Component*> ToastBot::components;
+Set<Component*> ToastBot::components;
 
 const String PROPERTIES_FILE = "/robox.properties";
 const String DEFAULT_PROPERTIES_FILE = "/default.properties";
@@ -202,7 +202,7 @@ void ToastBot::setup(
 
    Message* message = MessageFactory::newMessage();
 
-   ListSet<String> propertyKeys;
+   Set<String> propertyKeys;
    properties.getKeys("component", propertyKeys);
 
    for (Set<String>::Iterator it = propertyKeys.begin(); it != propertyKeys.end(); it++)

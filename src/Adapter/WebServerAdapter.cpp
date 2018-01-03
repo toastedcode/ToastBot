@@ -113,10 +113,10 @@ void WebServerAdapter::handleNotFound(
    server.send(404, "text/plain", "File not found.");
 }
 
-bool WebServerAdapter::addPage(
+void WebServerAdapter::addPage(
    Webpage* webpage)
 {
-   return (webpages.add(webpage));
+   webpages.push_back(webpage);
 }
 
 Webpage* WebServerAdapter::getPage(
