@@ -12,8 +12,7 @@ public:
   virtual bool handle(
       const HTTPMethod& requestMethod,
       const String& requestUri,
-      Argument arguments[],
-      int& numArguments,
+      const Dictionary&, arguments,
       String& responsePath);
 
 protected:
