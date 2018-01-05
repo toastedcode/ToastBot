@@ -21,7 +21,8 @@ bool HttpClientAdapter::sendRemoteMessage(
 
 	if (url != "")
 	{
-	   //message->clearParameter("url");
+	   message->clearParameter("url");
+
 	   serializedMessage = sendProtocol.serialize(message);
 
 	   httpRequest = "http://" + url + serializedMessage;
@@ -34,9 +35,9 @@ bool HttpClientAdapter::sendRemoteMessage(
 
 	   if (httpCode > 0)
 	   {
-	      httpResponse = http.getString();
-
 	      // TODO: Parse response.
+	      //httpResponse = http.getString(); // TODO: Can fragment heap!
+
 	      Logger::logDebug("HttpClientAdapter::sendRemoteMessage: Response code [%d].", httpCode);
 	   }
 	   else
