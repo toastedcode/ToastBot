@@ -2,8 +2,6 @@
 #include "Logger.hpp"
 #include "StringUtils.hpp"
 
-const int JsonProtocol::MAX_PARAMETERS;
-
 bool JsonProtocol::parse(
    const String& messageString,
    MessagePtr message)
@@ -11,8 +9,7 @@ bool JsonProtocol::parse(
    bool isSuccess = false;
 
    String remainingString = messageString;
-   Parameter parameters[MAX_PARAMETERS];
-   int parameterCount = 0;
+   List<Parameter> parameters;
 
    Logger::logDebugFinest(F("JsonProtocol::parse: Parsing: \"%s\"."), messageString.c_str());
 
@@ -20,16 +17,16 @@ bool JsonProtocol::parse(
    remainingString = StringUtils::removeAll(remainingString, " \n\r\t{}");
 
    // Parse parameters.
-   if (parseParameters(remainingString, parameters, parameterCount) == false)
+   if (parseParameters(remainingString, parameters) == false)
    {
       Logger::logWarning(F("JsonProtocol::parse: Failed to parse parameters."));
    }
    else
    {
       // Populate message with parsed parameters.
-      for (int i = 0; i < parameterCount; i++)
+      for (List<Parameter>::Iterator it = parameters.begin(); it != parameters.end(); it++)
       {
-         message->setParameter(parameters[i]);
+         message->setParameter(*it);
       }
 
       isSuccess = true;
@@ -117,8 +114,7 @@ String JsonProtocol::serializeParameters(
 
 bool JsonProtocol::parseParameters(
    const String& parameterString,
-   Parameter parameters[],
-   int& count)
+   List<Parameter>& parameters)
 {
    bool isSuccess = true;
 
@@ -131,8 +127,7 @@ bool JsonProtocol::parseParameters(
 
       if (isSuccess)
       {
-         parameters[count] = parameter;
-         count++;
+         parameters.push_back(parameter);
       }
    }
 
@@ -185,7 +180,7 @@ bool JsonProtocol::parseParameter(
 
          case Parameter::STRING:
          {
-            parameter.setValue(stripQuotes(value).c_str());
+            parameter.setValue(stripQuotes(value));
             break;
          }
 

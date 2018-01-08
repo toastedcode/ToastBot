@@ -1,0 +1,26 @@
+<html>
+
+<head>
+   <link rel="stylesheet" type="text/css" href="properties.css"/>
+   <script src="properties.js"></script>
+</head>
+
+<body>
+<div class="flex-col stretch">
+   <div class="flex-row header">
+      <div>roboxes</div>
+      <img src="roboxes-icon.png" width="50px"><img>
+   </div>
+   <div class="flex-col content">
+      %properties
+      <div class="flex-row card property-card">
+         <input id="property-name" type="text" name="property-name"></input>
+	     <input id="property-value" type="text" name="property-value"></input>
+         <div class="add-button" onclick="addProperty('property-name', 'property-value')"><img class="action-icon" src="check.png"/></div>
+      </div>
+      <div class="reset-div"><button onclick="reset()">Reset</button></div>
+   </div>
+</div>
+</body>
+
+</html>

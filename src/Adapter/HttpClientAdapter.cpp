@@ -38,18 +38,18 @@ bool HttpClientAdapter::sendRemoteMessage(
 	      // TODO: Parse response.
 	      //httpResponse = http.getString(); // TODO: Can fragment heap!
 
-	      Logger::logDebug("HttpClientAdapter::sendRemoteMessage: Response code [%d].", httpCode);
+	      Logger::logDebug(F("HttpClientAdapter::sendRemoteMessage: Response code [%d]."), httpCode);
 	   }
 	   else
 	   {
-	      Logger::logWarning("No response from request: %s.", httpRequest.c_str());
+	      Logger::logWarning(F("No response from request: %s."), httpRequest.c_str());
 	   }
 
 	   http.end();
 	}
 	else
 	{
-	   Logger::logWarning("No URL specified in HTTP request [%s].", message->getMessageId().c_str());
+	   Logger::logWarning(F("No URL specified in HTTP request [%s]."), message->getMessageId().c_str());
 	}
 
    return (true);

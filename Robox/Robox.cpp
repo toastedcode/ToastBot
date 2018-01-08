@@ -72,7 +72,7 @@ void Robox::handleMessage(
          }
          else
          {
-            properties.remove(propertyName);
+            properties.erase(propertyName);
             Logger::logDebug("Robox::handleMessage: Removed property: %s", propertyName.c_str());
          }
 

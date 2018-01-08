@@ -82,7 +82,7 @@ bool WebServerAdapter::handle(
 {
    bool success = true;
 
-   Logger::logDebug("WebServerAdapter::handle: %s", requestUri.c_str());
+   Logger::logDebug(F("WebServerAdapter::handle: %s"), requestUri.c_str());
 
    success = servePage(server, requestMethod, requestUri);
 
@@ -163,7 +163,7 @@ bool WebServerAdapter::servePage(
 
    if ((webpage != 0) && (webpage->canHandle(requestMethod, requestUri)))
    {
-      Logger::logDebug("WebServerAdapter::servePage: %s", requestUri.c_str());
+      Logger::logDebug(F("WebServerAdapter::servePage: %s"), requestUri.c_str());
 
       MessagePtr message = Messaging::newMessage();
       if (message && (restfulProtocol.parse(server, message)))
@@ -196,7 +196,7 @@ bool WebServerAdapter::serveFile(
 
    if (file)
    {
-      Logger::logDebug("WebServerAdapter::serveFile: %s", requestUri.c_str());
+      Logger::logDebug(F("WebServerAdapter::serveFile: %s"), requestUri.c_str());
 
       if (server.hasArg("download"))
       {
@@ -206,7 +206,7 @@ bool WebServerAdapter::serveFile(
       // Send the file contents.
       if (server.streamFile(file, dataType) != file.size())
       {
-         Logger::logWarning("WebServerAdapter::serveFile: Sent less data than expected.");
+         Logger::logWarning(F("WebServerAdapter::serveFile: Sent less data than expected."));
          success = true;
       }
       else
@@ -232,7 +232,7 @@ bool WebServerAdapter::serveRestfulRequest(
    MessagePtr message = Messaging::newMessage();
    if ((message) && (restfulProtocol.parse(server, message)))
    {
-      Logger::logDebug("WebServerAdapter::serveRestfulRequest: %s", requestUri.c_str());
+      Logger::logDebug(F("WebServerAdapter::serveRestfulRequest: %s"), requestUri.c_str());
 
       pendingRequest.requestMethod = requestMethod;
       pendingRequest.requestUri = requestUri;

@@ -107,8 +107,6 @@ void MqttClientAdapter::callback(
       buffer[length] = 0;
       String serializedMessage(buffer);
 
-      Logger::logDebug("MqttClientAdapter::callback: %s", serializedMessage.c_str());
-
       if (serializedMessage.length() > 0)
       {
          // Create a new message.

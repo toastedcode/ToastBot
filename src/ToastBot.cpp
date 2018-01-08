@@ -136,6 +136,8 @@ void ToastBot::setup(
    // Arduino library setup.
    Serial.begin(9600);
    SPIFFS.begin();
+
+   ESP.wdtDisable();  // To prevent WDT reset
 #endif
 
    // Logo.
@@ -237,6 +239,10 @@ void ToastBot::setup(
    Logger::logDebug(F("ToastBot::setup: Free memory = %u bytes"), board->getFreeHeap());
 
    initialized = true;
+
+#ifdef ARDUINO
+   ESP.wdtEnable(1000);
+#endif
 }
 
 void ToastBot::loop()

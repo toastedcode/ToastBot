@@ -7,8 +7,6 @@ class JsonProtocol : public Protocol
 
 public:
 
-   static const int MAX_PARAMETERS = 10;
-
    bool parse(
       const String& messageString,
       MessagePtr message);
@@ -23,8 +21,7 @@ private:
 
    static bool parseParameters(
       const String& parameterString,
-      Parameter parameters[],
-      int& count);
+      List<Parameter>&  parameters);
 
    static bool parseParameter(
       const String& parameterString,
