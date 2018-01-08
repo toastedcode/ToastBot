@@ -21,7 +21,7 @@ bool HttpClientAdapter::sendRemoteMessage(
 
 	if (url != "")
 	{
-	   message->clearParameter("url");
+	   message->erase("url");
 
 	   serializedMessage = sendProtocol.serialize(message);
 

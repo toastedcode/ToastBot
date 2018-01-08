@@ -9,8 +9,6 @@ class RestfulProtocol : public Protocol
 
 public:
 
-   static const int MAX_PARAMETERS = 10;
-
    RestfulProtocol();
 
    virtual ~RestfulProtocol();
@@ -36,10 +34,5 @@ private:
 
    static void parseParameters(
       const String& messageString,
-      Parameter parameters[MAX_PARAMETERS],
-      int& parameterCount);
-
-   static Parameter parseParameter(
-      const String& name,
-      const String& value);
+      MessagePtr message);
 };

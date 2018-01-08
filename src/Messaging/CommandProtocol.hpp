@@ -7,8 +7,6 @@ class CommandProtocol : public Protocol
 
 public:
 
-   static const int MAX_PARAMETERS = 10;
-
    CommandProtocol();
 
    virtual ~CommandProtocol();
@@ -30,6 +28,5 @@ private:
 
    static void parseParameters(
       const String& messageString,
-      Parameter parameters[MAX_PARAMETERS],
-      int& parameterCount);
+      MessagePtr message);
 };

@@ -21,20 +21,11 @@ private:
 
    static bool parseParameters(
       const String& parameterString,
-      List<Parameter>&  parameters);
+      MessagePtr message);
 
    static bool parseParameter(
       const String& parameterString,
-      Parameter& parameter);
-
-   static Parameter::ParameterType getType(
-      const String& value);
-
-   static bool validName(
-      const String& name);
-
-   static bool validValue(
-      const String& value);
+      MessagePtr message);
 
    static String stripQuotes(
       const String& value);

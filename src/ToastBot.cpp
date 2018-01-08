@@ -11,7 +11,6 @@
 #include "Arduino.h"
 #include "FS.h"
 
-#include "BasicMessage.hpp"
 #include "Connection/Connection.hpp"
 #include "Component/FactoryResetButton.hpp"
 #include "Logger.hpp"
@@ -167,7 +166,7 @@ void ToastBot::setup(
    Board::setBoard(board);
 
    //  Setup messaging.
-   Messaging::setup<BasicMessage>(MESSAGE_POOL_SIZE);
+   Messaging::setup<Message>(MESSAGE_POOL_SIZE);
 
    // Creating basic messaging adapters.
    Protocol* protocol = new JsonProtocol();
