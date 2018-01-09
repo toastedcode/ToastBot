@@ -123,7 +123,7 @@ void MqttClientAdapter::callback(
             else
             {
                // Parse failed.  Set the message free.
-               message->setFree();
+               Messaging::freeMessage(message);
                message = 0;
             }
          }

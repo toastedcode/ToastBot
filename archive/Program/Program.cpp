@@ -134,7 +134,7 @@ bool Program::execute(
 
          waitTime = Board::getBoard()->systemTime() + (seconds * 1000);
          success = true;
-         message->setFree();
+         Messaging::freeMessage(message);
       }
       else
       {

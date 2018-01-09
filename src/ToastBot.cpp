@@ -166,7 +166,7 @@ void ToastBot::setup(
    Board::setBoard(board);
 
    //  Setup messaging.
-   Messaging::setup<Message>(MESSAGE_POOL_SIZE);
+   Messaging::setup(MESSAGE_POOL_SIZE);
 
    // Creating basic messaging adapters.
    Protocol* protocol = new JsonProtocol();
@@ -201,29 +201,32 @@ void ToastBot::setup(
    // Create components found in properties.
    //
 
-   Message* message = MessageFactory::newMessage();
-
-   Set<String> propertyKeys;
-   properties.getKeys("component", propertyKeys);
-
-   for (Set<String>::Iterator it = propertyKeys.begin(); it != propertyKeys.end(); it++)
+   Message* message = Messaging::newMessage();
+   if (message)
    {
-      String componentDescription = ToastBot::getProperties().getString(*it);
+      Set<String> propertyKeys;
+      properties.getKeys("component", propertyKeys);
 
-      if (protocol->parse(componentDescription, message))
+      for (Set<String>::Iterator it = propertyKeys.begin(); it != propertyKeys.end(); it++)
       {
-        Logger::logDebug(F("ToastBot::setup: Creating %s component [%s]"),
-                         message->getString("class").c_str(),
-                         message->getString("id").c_str());
+         String componentDescription = ToastBot::getProperties().getString(*it);
 
-        Component* component = ComponentFactory::create(message->getString("class"), message);
-        if (component)
-        {
-          ToastBot::addComponent(component);
-        }
+         if (protocol->parse(componentDescription, message))
+         {
+           Logger::logDebug(F("ToastBot::setup: Creating %s component [%s]"),
+                            message->getString("class").c_str(),
+                            message->getString("id").c_str());
+
+           Component* component = ComponentFactory::create(message->getString("class"), message);
+           if (component)
+           {
+             ToastBot::addComponent(component);
+           }
+         }
       }
+
+      Messaging::freeMessage(message);
    }
-   message->setFree();
 
    // Setup registered components.
    for (Set<Component*>::Iterator it = components.begin(); it != components.end(); it++)

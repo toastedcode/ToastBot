@@ -107,7 +107,7 @@ void ServoComponent::handleMessage(
 
       rotate(angle);
 
-      message->setFree();
+      Messaging::freeMessage(message);
    }
    // panTo
    // stop
@@ -133,7 +133,7 @@ void ServoComponent::handleMessage(
 
       rotate(MIN_ANGLE);
 
-      message->setFree();
+      Messaging::freeMessage(message);
    }
    else if (message->getMessageId() == "instruction")
    {
@@ -179,7 +179,7 @@ void ServoComponent::handleMessage(
                             getId().c_str());
       }
 
-      message->setFree();
+      Messaging::freeMessage(message);
    }
    else
    {

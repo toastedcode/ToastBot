@@ -32,7 +32,7 @@ void ServoPanBehavior::handleMessage(
 
       panTo(angle, seconds);
 
-      message->setFree();
+      Messaging::freeMessage(message);
    }
    // oscillate
    else if (message->getMessageId() == "oscillate")
@@ -45,7 +45,7 @@ void ServoPanBehavior::handleMessage(
 
       oscillate(startAngle, endAngle, seconds);
 
-      message->setFree();
+      Messaging::freeMessage(message);
    }
    // stop
    else if (message->getMessageId() == "stop")
@@ -54,7 +54,7 @@ void ServoPanBehavior::handleMessage(
 
 	  stop();
 
-      message->setFree();
+      Messaging::freeMessage(message);
    }
    else
    {

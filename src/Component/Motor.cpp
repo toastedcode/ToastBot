@@ -76,7 +76,7 @@ void Motor::handleMessage(
 
       setSpeed(newSpeed);
 
-      message->setFree();
+      Messaging::freeMessage(message);
    }
    // killSwitch
    else if (message->getMessageId() == "killSwitch")
@@ -85,7 +85,7 @@ void Motor::handleMessage(
 
       setSpeed(NO_SPEED);
 
-      message->setFree();
+      Messaging::freeMessage(message);
    }
    else if (message->getMessageId() == "instruction")
    {
@@ -106,7 +106,7 @@ void Motor::handleMessage(
                             getId().c_str());
       }
 
-      message->setFree();
+      Messaging::freeMessage(message);
    }
    else
    {

@@ -296,7 +296,7 @@ void Led::handleMessage(
 
       setBrightness(brightness);
 
-      message->setFree();
+      Messaging::freeMessage(message);
    }
    // blink
    else if (message->getMessageId() == "blink")
@@ -307,7 +307,7 @@ void Led::handleMessage(
 
       blink(patternString);
 
-      message->setFree();
+      Messaging::freeMessage(message);
    }
    // pulse
    else if (message->getMessageId() == "pulse")
@@ -318,7 +318,7 @@ void Led::handleMessage(
 
       pulse(period);
 
-      message->setFree();
+      Messaging::freeMessage(message);
    }
    // killSwitch
    else if (message->getMessageId() == "killSwitch")
@@ -327,7 +327,7 @@ void Led::handleMessage(
 
       setBrightness(MIN_BRIGHTNESS);
 
-      message->setFree();
+      Messaging::freeMessage(message);
    }
    // instruction
    else if (message->getMessageId() == "instruction")
@@ -371,7 +371,7 @@ void Led::handleMessage(
                             getId().c_str());
       }
 
-      message->setFree();
+      Messaging::freeMessage(message);
    }
    else
    {

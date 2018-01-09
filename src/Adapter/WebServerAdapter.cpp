@@ -175,7 +175,7 @@ bool WebServerAdapter::servePage(
          }
       }
 
-      message->setFree();
+      Messaging::freeMessage(message);
    }
 
    return (success);

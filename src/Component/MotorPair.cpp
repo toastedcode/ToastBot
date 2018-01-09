@@ -107,7 +107,7 @@ void MotorPair::handleMessage(
 
       drive(message->getInt("speed"), message->getInt("yaw"));
 
-      message->setFree();
+      Messaging::freeMessage(message);
    }
    else if (message->getMessageId() == "rotate")
    {
@@ -115,7 +115,7 @@ void MotorPair::handleMessage(
 
       rotate(message->getInt("speed"));
 
-      message->setFree();
+      Messaging::freeMessage(message);
    }
    // killSwitch
    else if (message->getMessageId() == "killSwitch")
@@ -124,7 +124,7 @@ void MotorPair::handleMessage(
 
       drive(0, 0);
 
-      message->setFree();
+      Messaging::freeMessage(message);
    }
    else if (message->getMessageId() == "instruction")
    {
@@ -153,7 +153,7 @@ void MotorPair::handleMessage(
                             getId().c_str());
       }
 
-      message->setFree();
+      Messaging::freeMessage(message);
    }
    else
    {
