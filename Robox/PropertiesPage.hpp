@@ -19,9 +19,6 @@ public:
 
 protected:
 
-  virtual void replaceContent(
-     String& content);
-
   void getPropertyDiv(
      const String& propertyName,
      const String& propertyValue,

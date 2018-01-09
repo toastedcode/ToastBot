@@ -1,3 +1,5 @@
+#include <FS.h>
+
 #include "Board.hpp"
 #include "CommonDefs.hpp"
 #include "Logger.hpp"
@@ -23,50 +25,89 @@ bool PropertiesPage::handle(
    const Dictionary& arguments,
    String& responsePath)
 {
-   Properties& properties = ToastBot::getProperties();
+   bool success = false;
+   responsePath = "";
 
-   String action = arguments.getString("action");
-
-   if ((action == "add") ||
-       (action == "update"))
+   if (canHandle(requestMethod, requestUri))
    {
-      String propertyName = arguments.getString("propertyName");
-      String propertyValue = arguments.getString("propertyValue");
+       Properties& properties = ToastBot::getProperties();
 
-      if (propertyName != "")
+       String action = arguments.getString("action");
+    
+       if ((action == "add") ||
+           (action == "update"))
+       {
+          String propertyName = arguments.getString("propertyName");
+          String propertyValue = arguments.getString("propertyValue");
+    
+          if (propertyName != "")
+          {
+             properties.set(propertyName, propertyValue);
+             properties.save();
+          }
+       }
+       else if (action == "delete")
+       {
+          String propertyName = arguments.getString("propertyName");
+          
+          properties.erase(propertyName);
+          properties.save();
+       }
+       else if (action == "reset")
+       {
+          Board::getBoard()->reset();
+       }
+   
+      if (getPath() != "")
       {
-         properties.set(propertyName, propertyValue);
-         properties.save();
+         responsePath = "/tmp" + getPath();
+
+         File file = SPIFFS.open(getPath(), "r");
+         File responseFile = SPIFFS.open(responsePath, "w");
+
+         if (!file)
+         {
+            Logger::logWarning(F("Webpage::handle: Failed to load webpage file: %s"), getPath().c_str());
+            responsePath = "";
+         }
+         else if (!responseFile)
+         {
+            Logger::logWarning(F("Webpage::handle: Failed to create temp file: %s"), getPath().c_str());
+            responsePath = "";
+         }
+         else
+         {
+            // Line by line, read from the template file and create the content file.
+            String line = file.readStringUntil('\n');
+            while (line.length() > 0)
+            {
+               // Look for the %properties tag and replace.
+               if (line.indexOf("%properties") != -1)
+               {
+                  for (Properties::Iterator it = properties.begin(); it != properties.end(); it++)
+                  {
+                     String propertyDiv = "";
+                     getPropertyDiv(it->first, it->second, propertyDiv);   
+                     responseFile.println(propertyDiv);   
+                  }
+               }
+               else
+               {
+                  responseFile.println(line);
+               }
+
+               line = file.readStringUntil('\n');
+            }
+
+            success = true;
+         }
+
+         file.close();
+         responseFile.close();
       }
    }
-   else if (action == "delete")
-   {
-      String propertyName = arguments.getString("propertyName");
-      
-      properties.erase(propertyName);
-      properties.save();
-   }
-   else if (action == "reset")
-   {
-      Board::getBoard()->reset();
-   }
 
-   return (Webpage::handle(requestMethod, requestUri, arguments, responsePath));
-}
-
-void PropertiesPage::replaceContent(
-   String& content)
-{
-  String propertiesContent = "";
-
-  Properties& properties = ToastBot::getProperties();
-
-  for (Properties::Iterator it = properties.begin(); it != properties.end(); it++)
-  {
-     getPropertyDiv(it->first, it->second, propertiesContent);
-  }
-
-  content.replace("%properties", propertiesContent);
+   return (success);
 }
 
 void PropertiesPage::getPropertyDiv(
