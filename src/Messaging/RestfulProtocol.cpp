@@ -22,7 +22,7 @@ bool RestfulProtocol::parse(
 {
    bool success = false;
 
-   // /component/action?param=value;param=value ...
+   // /component/action?param=value&param=value ...
 
    String componentId = parseComponent(messageString);
    if (componentId.length() > 0)
@@ -48,7 +48,7 @@ bool RestfulProtocol::parse(
 {
    bool success = false;
 
-   // /component/action?param=value;param=value ...
+   // /component/action?param=value&param=value ...
 
    // component
    String componentId = parseComponent(server.uri());
@@ -195,7 +195,7 @@ void RestfulProtocol::parseParameters(
    {
       String paramString = messageString.substring(startPos + 1);
 
-      String keyValueString = StringUtils::tokenize(paramString, ";");
+      String keyValueString = StringUtils::tokenize(paramString, "&");
 
       while (keyValueString.length() > 0)
       {
