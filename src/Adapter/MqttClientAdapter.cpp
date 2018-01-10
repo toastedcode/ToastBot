@@ -107,8 +107,6 @@ void MqttClientAdapter::callback(
       buffer[length] = 0;
       String serializedMessage(buffer);
 
-      Logger::logDebug("MqttClientAdapter::callback: %s", serializedMessage.c_str());
-
       if (serializedMessage.length() > 0)
       {
          // Create a new message.
@@ -125,7 +123,7 @@ void MqttClientAdapter::callback(
             else
             {
                // Parse failed.  Set the message free.
-               message->setFree();
+               Messaging::freeMessage(message);
                message = 0;
             }
          }

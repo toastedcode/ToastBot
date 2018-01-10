@@ -12,37 +12,44 @@ HttpClientAdapter::HttpClientAdapter(
 bool HttpClientAdapter::sendRemoteMessage(
    MessagePtr message)
 {
-	String url = message->getString("url");
+   static String url =  "";
+   static String serializedMessage = "";
+   static String httpRequest =  "";
+   static String httpResponse = "";
+
+	url = message->getString("url");
 
 	if (url != "")
 	{
-	   String serializedMessage = sendProtocol.serialize(message);
+	   message->erase("url");
 
-	   String httpRequest = "http://" + url + serializedMessage;
+	   serializedMessage = sendProtocol.serialize(message);
+
+	   httpRequest = "http://" + url + serializedMessage;
 
 	   // Setup the request.
-	   http.begin("http://" + url + serializedMessage);
+	   http.begin(httpRequest);
 
 	   // Send the request.
-	   int httpCode = 0;//http.GET();
+	   int httpCode = http.GET();
 
 	   if (httpCode > 0)
 	   {
-	      String httpResponse = http.getString();
-
 	      // TODO: Parse response.
-	      Logger::logDebug("HttpClientAdapter::sendRemoteMessage: Response [%d] = %s", httpCode, httpResponse.c_str());
+	      //httpResponse = http.getString(); // TODO: Can fragment heap!
+
+	      Logger::logDebug(F("HttpClientAdapter::sendRemoteMessage: Response code [%d]."), httpCode);
 	   }
 	   else
 	   {
-	      Logger::logWarning("No response from request: %s.", httpRequest.c_str());
+	      Logger::logWarning(F("No response from request: %s."), httpRequest.c_str());
 	   }
 
 	   http.end();
 	}
 	else
 	{
-	   Logger::logWarning("No URL specified in HTTP request [%s].", message->getMessageId().c_str());
+	   Logger::logWarning(F("No URL specified in HTTP request [%s]."), message->getMessageId().c_str());
 	}
 
    return (true);

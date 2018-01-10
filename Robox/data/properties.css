@@ -1,0 +1,61 @@
+@CHARSET "ISO-8859-1";
+
+.flex-row {
+   display: flex;
+   flex-direction: row;     /* horizontal orientation */
+   align-items:center;      /* center vertically */
+   justify-content: center; /* center horizontally */
+}
+
+.flex-col {
+   display: flex;
+   flex-direction: column;     /* horizontal orientation */
+   align-items:center;         /* center vertically */
+   justify-content: center;    /* center horizontally */
+}
+
+.stretch {
+   align-items: stretch;
+}
+
+.header
+{
+   padding-left: 25px;
+   justify-content: flex-start;
+   background: #33920C;
+   color: #ffffff;
+   font-size: 25px;
+   margin-bottom: 50px;
+}
+
+.card {
+   background: #ffffff;
+   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+   padding: 20px;
+   justify-content: flex-start;
+ }
+
+ .property-card {
+    width: 400px;
+    height: 30px;
+
+    border-style: solid none none none;
+   border-color: #e3e3e3;
+    border-width: 1px;
+ }
+
+ .update-button:hover {
+    cursor: pointer;
+ }
+
+ .delete-button:hover {
+   cursor: pointer;
+ }
+
+ .action-icon {
+    width: 30px;
+ }
+ 
+ .reset-div {
+    margin-top: 30px;
+ }

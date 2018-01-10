@@ -20,8 +20,6 @@ class ToastBot
 
 public:
 
-   static const int MAX_COMPONENTS = 30;
-
    static String getId();
 
    static bool addComponent(
@@ -60,7 +58,7 @@ private:
 
    static Properties properties;
 
-   static Set<Component*, MAX_COMPONENTS> components;
+   static Set<Component*> components;
 
    static bool initialized;
 };

@@ -1,7 +1,7 @@
 #include "Board.h"
 #include "Logger.h"
 #include "Properties.h"
-#include "Robox.h"
+#include "Robox.hpp"
 #include "ToastBot.h"
 
 void Robox::handleMessage(
@@ -34,7 +34,7 @@ void Robox::handleMessage(
 
          Messaging::send(reply);
 
-         message->setFree();
+         Messaging::freeMessage(message);
       }
    }
    else if (message->getMessageId() == "reset")
@@ -42,7 +42,7 @@ void Robox::handleMessage(
       Logger::logDebug("Resetting ...");
       Board::getBoard()->reset();
 
-      message->setFree();
+      Messaging::freeMessage(message);
    }
    else if (message->getMessageId() == "properties")
    {
@@ -72,14 +72,14 @@ void Robox::handleMessage(
          }
          else
          {
-            properties.remove(propertyName);
+            properties.erase(propertyName);
             Logger::logDebug("Robox::handleMessage: Removed property: %s", propertyName.c_str());
          }
 
          properties.save();
       }
 
-      message->setFree();
+      Messaging::freeMessage(message);
    }
    else if (message->getMessageId() == "digitalWrite")
    {
@@ -89,7 +89,7 @@ void Robox::handleMessage(
       Logger::logDebug("Robox::handleMessage: digitalWrite(%d, %d)", pin, value);
       Board::getBoard()->digitalWrite(pin, value);
 
-      message->setFree();
+      Messaging::freeMessage(message);
    }
    else if (message->getMessageId() == "analogWrite")
    {
@@ -99,7 +99,7 @@ void Robox::handleMessage(
       Logger::logDebug("Robox::handleMessage: analogWrite(%d, %d)", pin, value);
       Board::getBoard()->analogWrite(pin, value);
 
-      message->setFree();
+      Messaging::freeMessage(message);
    }
    else if (message->getMessageId() == "bridge")
    {
@@ -111,7 +111,7 @@ void Robox::handleMessage(
       
       ToastBot::addComponent(new TcpClientAdapter(name, new JsonProtocol(), host, port, 5000));
 
-      message->setFree();
+      Messaging::freeMessage(message);
    }
    else if (message->getMessageId() == "create")
    {
@@ -127,7 +127,7 @@ void Robox::handleMessage(
          ToastBot::addComponent(component);
       }
 
-      message->setFree();
+      Messaging::freeMessage(message);
    }
    else if (message->getMessageId() == "setLogger")
    {
@@ -145,7 +145,7 @@ void Robox::handleMessage(
         Logger::logDebug("Robox::handleMessage: No adapter [%s] available.", adapterId.c_str());
       }
 
-      message->setFree();
+      Messaging::freeMessage(message);
    }
    else if (message->getMessageId() == "setLogLevel")
    {
@@ -155,7 +155,7 @@ void Robox::handleMessage(
 
       Logger::setLogLevel(logLevel);
 
-      message->setFree();
+      Messaging::freeMessage(message);
    }
    else if (message->getMessageId() == "wifiConfig")
    {

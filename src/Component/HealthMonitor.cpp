@@ -83,7 +83,7 @@ void HealthMonitor::handleMessage(
    if (message->getMessageId() == "pong")
    {
       gotReply = true;
-      message->setFree();
+      Messaging::freeMessage(message);
    }
    else
    {

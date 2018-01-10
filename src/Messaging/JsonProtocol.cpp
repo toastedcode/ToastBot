@@ -2,8 +2,6 @@
 #include "Logger.hpp"
 #include "StringUtils.hpp"
 
-const int JsonProtocol::MAX_PARAMETERS;
-
 bool JsonProtocol::parse(
    const String& messageString,
    MessagePtr message)
@@ -11,8 +9,6 @@ bool JsonProtocol::parse(
    bool isSuccess = false;
 
    String remainingString = messageString;
-   Parameter parameters[MAX_PARAMETERS];
-   int parameterCount = 0;
 
    Logger::logDebugFinest(F("JsonProtocol::parse: Parsing: \"%s\"."), messageString.c_str());
 
@@ -20,18 +16,12 @@ bool JsonProtocol::parse(
    remainingString = StringUtils::removeAll(remainingString, " \n\r\t{}");
 
    // Parse parameters.
-   if (parseParameters(remainingString, parameters, parameterCount) == false)
+   if (parseParameters(remainingString, message) == false)
    {
       Logger::logWarning(F("JsonProtocol::parse: Failed to parse parameters."));
    }
    else
    {
-      // Populate message with parsed parameters.
-      for (int i = 0; i < parameterCount; i++)
-      {
-         message->setParameter(parameters[i]);
-      }
-
       isSuccess = true;
    }
 
@@ -59,55 +49,34 @@ String JsonProtocol::serializeParameters(
 {
    String serializedParameters = "";
 
-   Parameter parameters[MAX_PARAMETERS];
-   int parameterCount = 0;
-   message->getParameters(parameters, parameterCount);
+   int paramIndex = 0;
 
-   for (int i = 0; i < parameterCount; i++)
+   for (Message::Iterator it = message->begin(); it != message->end(); it++, paramIndex++)
    {
-      String parameterValue = "";
+      String paramName = it->first;
+      String paramValue = it->second;
 
-      switch (parameters[i].getType())
+      String lowerCase = paramValue;
+      lowerCase.toLowerCase();
+
+      if (StringUtils::findFirstNotOf(paramValue, "0123456789.-") == -1)
       {
-         case Parameter::BOOL:
-         {
-            parameterValue = String(parameters[i].getBoolValue());
-            break;
-         }
-
-         case Parameter::DOUBLE:
-         {
-            parameterValue = String(parameters[i].getDoubleValue());
-            break;
-         }
-
-         case Parameter::FLOAT:
-         {
-            parameterValue = String(parameters[i].getFloatValue());
-            break;
-         }
-
-         case Parameter::INT:
-         {
-            parameterValue = String(parameters[i].getIntValue());
-            break;
-         }
-
-         case Parameter::STRING:
-         {
-            parameterValue = wrap(parameters[i].getStringValue(), '\"');
-            break;
-         }
-
-         default:
-         {
-            break;
-         }
+         // Numeric type.  No extra processing.
+      }
+      else if ((lowerCase == "true") ||
+               (lowerCase == "false"))
+      {
+         // Bool type.  No extra processing.
+      }
+      else
+      {
+         // String type.  Wrap in quotes.
+         paramValue = wrap(paramValue, '\"');
       }
 
-      serializedParameters += (wrap(parameters[i].getName(), '\"') + ":" + parameterValue);
+      serializedParameters += (wrap(paramName, '\"') + ":" + paramValue);
 
-      if (i < (parameterCount - 1))
+      if (paramIndex < (message->size() - 1))
       {
          serializedParameters += ", ";
       }
@@ -118,23 +87,15 @@ String JsonProtocol::serializeParameters(
 
 bool JsonProtocol::parseParameters(
    const String& parameterString,
-   Parameter parameters[],
-   int& count)
+   MessagePtr message)
 {
    bool isSuccess = true;
 
    String remainingString = parameterString;
-   Parameter parameter;
 
    while (isSuccess && (remainingString != ""))
    {
-      isSuccess = parseParameter(StringUtils::tokenize(remainingString, ","), parameter);
-
-      if (isSuccess)
-      {
-         parameters[count] = parameter;
-         count++;
-      }
+      isSuccess = parseParameter(StringUtils::tokenize(remainingString, ","), message);
    }
 
    return (isSuccess);
@@ -142,59 +103,18 @@ bool JsonProtocol::parseParameters(
 
 bool JsonProtocol::parseParameter(
    const String& parameterString,
-   Parameter& parameter)
+   MessagePtr message)
 {
    bool isSuccess = false;
 
    String remainingString = parameterString;
 
-   String name = StringUtils::tokenize(remainingString, ":");
-   String value = remainingString;
+   String paramName = StringUtils::tokenize(remainingString, ":");
+   String paramValue = remainingString;
 
-   if (validName(name) && validValue(value))
+   if ((paramName != "") && (paramValue != ""))
    {
-      parameter.setName(stripQuotes(name).c_str());
-
-      switch (getType(value))
-      {
-         case Parameter::BOOL:
-         {
-            parameter.setValue(StringUtils::toBool(value));
-            break;
-         }
-
-         case Parameter::DOUBLE:
-         {
-            // TODO: Handle double
-            parameter.setValue(value.toFloat());
-            break;
-         }
-
-         case Parameter::FLOAT:
-         {
-            parameter.setValue(value.toFloat());
-            break;
-         }
-
-         case Parameter::INT:
-         {
-            // TODO: Fix trucation of longs.
-            long longValue = value.toInt();
-            parameter.setValue((int)longValue);
-            break;
-         }
-
-         case Parameter::STRING:
-         {
-            parameter.setValue(stripQuotes(value).c_str());
-            break;
-         }
-
-         default:
-         {
-            break;
-         }
-      }
+      message->set(stripQuotes(paramName), stripQuotes(paramValue));
 
       isSuccess = true;
    }
@@ -204,51 +124,6 @@ bool JsonProtocol::parseParameter(
    }
 
    return (isSuccess);
-}
-
-Parameter::ParameterType JsonProtocol::getType(
-   const String& value)
-{
-   Parameter::ParameterType type = Parameter::STRING;
-
-   String lowerCase = value;
-   lowerCase.toLowerCase();
-
-   if ((value.charAt(0) == '\"') &&
-       (value.charAt(value.length() - 1) == '\"'))
-   {
-      type = Parameter::STRING;
-   }
-   else if (StringUtils::findFirstNotOf(value, "0123456789.-") == -1)
-   {
-      // TODO: Parse numeric types.
-      type = Parameter::INT;
-   }
-   else if ((lowerCase == "true") ||
-            (lowerCase == "false"))
-   {
-      type = Parameter::BOOL;
-   }
-   else
-   {
-      Logger::logDebugFinest(F("JsonProtocol::getType: Treating unquoted value [%s] as STRING."), value.c_str());
-   }
-
-   return (type);
-}
-
-bool JsonProtocol::validName(
-   const String& name)
-{
-   // TODO: More
-   return (name != "");
-}
-
-bool JsonProtocol::validValue(
-   const String& value)
-{
-   // TODO: More
-   return (value != "");
 }
 
 inline String JsonProtocol::stripQuotes(

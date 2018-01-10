@@ -1,8 +1,7 @@
 #pragma once
 
-
-#include "Component.hpp"
 #include "BehaviorListener.hpp"
+#include "Component.hpp"
 #include "Set.hpp"
 
 class Behavior : public Component
@@ -33,16 +32,16 @@ public:
 
    bool isEnabled() const;
 
-   bool addChild(
+   void addChild(
       Behavior* child);
 
-   bool removeChild(
+   void removeChild(
       Behavior* child);
 
-   bool addListener(
+   void addListener(
       BehaviorListener* child);
 
-   bool removeListener(
+   void removeListener(
       BehaviorListener* child);
 
 private:
@@ -51,9 +50,9 @@ private:
 
    int state;
 
-   Set<Behavior*, 5> children;
+   Set<Behavior*> children;
 
-   Set<BehaviorListener*, 5> listeners;
+   Set<BehaviorListener*> listeners;
 };
 
 inline Behavior::Behavior(
@@ -88,26 +87,26 @@ inline bool Behavior::isEnabled() const
    return (enabled);
 }
 
-inline bool Behavior::addChild(
+inline void Behavior::addChild(
    Behavior* child)
 {
-   return (children.add(child));
+   children.insert(child);
 }
 
-inline bool Behavior::removeChild(
+inline void Behavior::removeChild(
    Behavior* child)
 {
-   return (children.remove(child));
+   children.erase(child);
 }
 
-inline bool Behavior::addListener(
+inline void Behavior::addListener(
    BehaviorListener* listener)
 {
-   return (listeners.add(listener));
+   listeners.insert(listener);
 }
 
-inline bool Behavior::removeListener(
+inline void Behavior::removeListener(
    BehaviorListener* listener)
 {
-   return (listeners.remove(listener));
+   listeners.erase(listener);
 }

@@ -1,6 +1,7 @@
 #pragma once
 
-#include "ToastBot.h"
+#include "Messaging.h"
+#include "Webpage.hpp"
 
 class ConfigPage : public Webpage
 {
@@ -12,7 +13,7 @@ public:
   virtual bool handle(
       const HTTPMethod& requestMethod,
       const String& requestUri,
-      const Dictionary&, arguments,
+      MessagePtr message,
       String& responsePath);
 
 protected:

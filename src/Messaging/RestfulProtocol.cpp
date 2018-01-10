@@ -22,7 +22,7 @@ bool RestfulProtocol::parse(
 {
    bool success = false;
 
-   // /component/action?param=value;param=value ...
+   // /component/action?param=value&param=value ...
 
    String componentId = parseComponent(messageString);
    if (componentId.length() > 0)
@@ -37,14 +37,7 @@ bool RestfulProtocol::parse(
       success = true;  // TODO: More validation.
    }
 
-   Parameter parameters[MAX_PARAMETERS];
-   int parameterCount = 0;
-   parseParameters(messageString, parameters, parameterCount);
-
-   for (int i = 0; i < parameterCount; i++)
-   {
-      message->setParameter(parameters[i]);
-   }
+   parseParameters(messageString, message);
 
    return (success);
 }
@@ -55,7 +48,7 @@ bool RestfulProtocol::parse(
 {
    bool success = false;
 
-   // /component/action?param=value;param=value ...
+   // /component/action?param=value&param=value ...
 
    // component
    String componentId = parseComponent(server.uri());
@@ -76,10 +69,7 @@ bool RestfulProtocol::parse(
    int argCount = server.args();
    for (int i = 0; i < argCount; i++)
    {
-      String name = server.argName(i);
-      String value = server.arg(i);
-
-      message->setParameter(parseParameter(name, value));
+      message->set(server.argName(i), server.arg(i));
    }
 
    return (success);
@@ -93,7 +83,7 @@ String RestfulProtocol::serialize(
    // /component/action?param=value;param=value ...
 
    // component
-   if (message->isSet("destination") && (message->getDestination() != ""))
+   if (message->getDestination() != "")
    {
       serializedMessage += "/";
       serializedMessage += message->getDestination();
@@ -107,16 +97,12 @@ String RestfulProtocol::serialize(
    // parameters
    //
 
-   Parameter parameters[MAX_PARAMETERS];
-   int paramCount = 0;
-   message->getParameters(parameters, paramCount);
+   int paramIndex = 0;
 
-   for (int i = 0, paramIndex = 0; i < paramCount; i++)
+   for (Message::Iterator it = message->begin(); it != message->end(); it++)
    {
-      Parameter& parameter = parameters[i];
-
-      if ((strncmp(parameter.getName(), "messageId", sizeof(Parameter::ParameterName)) != 0) &&
-          (strncmp(parameter.getName(), "destination", sizeof(Parameter::ParameterName)) != 0))
+      if ((it->first != "messageId") &&
+          (it->first != "destination"))
       {
          if (paramIndex == 0)
          {
@@ -127,47 +113,9 @@ String RestfulProtocol::serialize(
             serializedMessage += "&";
          }
 
-         serializedMessage += String(parameter.getName());
+         serializedMessage += it->first;
          serializedMessage += "=";
-
-         switch (parameter.getType())
-         {
-            case Parameter::BOOL:
-            {
-               serializedMessage += String(parameter.getBoolValue());
-               break;
-            }
-
-            case Parameter::DOUBLE:
-            {
-               serializedMessage += String(parameter.getDoubleValue());
-               break;
-            }
-
-            case Parameter::FLOAT:
-            {
-               serializedMessage += String(parameter.getFloatValue());
-               break;
-            }
-
-            case Parameter::INT:
-            {
-               serializedMessage += String(parameter.getIntValue());
-               break;
-            }
-
-            case Parameter::STRING:
-            {
-               serializedMessage += parameter.getStringValue();
-               break;
-            }
-
-            case Parameter::UNKNOWN:
-            default:
-            {
-               // Invalid.
-            }
-         }
+         serializedMessage += it->second;
 
          paramIndex++;
       }
@@ -238,8 +186,7 @@ String RestfulProtocol::parseAction(
 
 void RestfulProtocol::parseParameters(
    const String& messageString,
-   Parameter parameters[MAX_PARAMETERS],
-   int& parameterCount)
+   MessagePtr message)
 {
    int startPos = StringUtils::findFirstOf(messageString, "?");
 
@@ -248,52 +195,17 @@ void RestfulProtocol::parseParameters(
    {
       String paramString = messageString.substring(startPos + 1);
 
-      int i = 0;
-      String keyValueString = StringUtils::tokenize(paramString, ";");
+      String keyValueString = StringUtils::tokenize(paramString, "&");
 
-      while ((keyValueString.length() > 0) &&
-             (i < MAX_PARAMETERS))
+      while (keyValueString.length() > 0)
       {
          String paramName = StringUtils::tokenize(keyValueString, "=");
-         String valueString = StringUtils::tokenize(keyValueString, "=");
+         String paramValue = StringUtils::tokenize(keyValueString, "=");
 
-         parameters[i] = parseParameter(paramName, valueString);
-         parameterCount++;
+         message->set(paramName, paramValue);
 
          // Next token.
-         i++;
          keyValueString = StringUtils::tokenize(paramString, "&");
       }
    }
-}
-
-Parameter RestfulProtocol::parseParameter(
-   const String& name,
-   const String& value)
-{
-   Parameter parameter;
-
-   String lowerCase = value;
-   lowerCase.toLowerCase();
-
-   parameter.setName(name.c_str());
-
-   if (StringUtils::findFirstNotOf(value, "0123456789.-") == -1)
-   {
-      // TODO: Parse numeric types.
-      // TODO: Fix trucation of longs.
-      long longValue = value.toInt();
-      parameter.setValue((int)longValue);
-   }
-   else if ((lowerCase == "true") ||
-            (lowerCase == "false"))
-   {
-      parameter.setValue(StringUtils::toBool(value));
-   }
-   else
-   {
-      parameter.setValue(value.c_str());
-   }
-
-   return (parameter);
 }

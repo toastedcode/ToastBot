@@ -126,7 +126,7 @@ MessagePtr WebSocketAdapter::getRemoteMessage()
             if (protocol->parse(serializedMessage, message) == false)
             {
                // Parse failed.  Set the message free.
-               message->setFree();
+               Messaging::freeMessage(message);
                message = 0;
             }
          }

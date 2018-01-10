@@ -2,10 +2,9 @@
 
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
-
-#include "../Webpage/Webpage.hpp"
 #include "Adapter.hpp"
 #include "List.hpp"
+#include "Webpage.hpp"
 
 class WebServerAdapter : public Adapter, RequestHandler
 {
@@ -47,13 +46,13 @@ public:
 
    // **************************************************************************
 
-   bool addPage(
+   void addPage(
       Webpage* webpage);
 
    Webpage* getPage(
       const String& uri);
 
-   bool removePage(
+   void removePage(
       const String& uri);
 
 protected:
@@ -98,7 +97,7 @@ private:
 
    ESP8266WebServer* server;
 
-   List<Webpage*, MAX_WEBPAGES> webpages;
+   List<Webpage*> webpages;
 
    PendingRequest pendingRequest;
 

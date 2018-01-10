@@ -40,14 +40,7 @@ bool CommandProtocol::parse(
       success = true;  // TODO: More validation.
    }
 
-   Parameter parameters[MAX_PARAMETERS];
-   int parameterCount = 0;
-   parseParameters(messageString, parameters, parameterCount);
-
-   for (int i = 0; i < parameterCount; i++)
-   {
-      message->setParameter(parameters[i]);
-   }
+   parseParameters(messageString, message);
 
    return (success);
 }
@@ -76,54 +69,14 @@ String CommandProtocol::serialize(
    serializedMessage += "(";
    int i = 0;
    String paramName = PARAM_PREFIX + String(i);
-   while ((message->isSet(paramName)) &&
-          (i < MAX_PARAMETERS))
+   while (message->isSet(paramName))
    {
       if (i > 0)
       {
          serializedMessage += ", ";
       }
 
-      Parameter parameter = message->getParameter(paramName);
-
-      switch (parameter.getType())
-      {
-         case Parameter::BOOL:
-         {
-            serializedMessage += String(parameter.getBoolValue());
-            break;
-         }
-
-         case Parameter::DOUBLE:
-         {
-            serializedMessage += String(parameter.getDoubleValue());
-            break;
-         }
-
-         case Parameter::FLOAT:
-         {
-            serializedMessage += String(parameter.getFloatValue());
-            break;
-         }
-
-         case Parameter::INT:
-         {
-            serializedMessage += String(parameter.getIntValue());
-            break;
-         }
-
-         case Parameter::STRING:
-         {
-            serializedMessage += parameter.getStringValue();
-            break;
-         }
-
-         case Parameter::UNKNOWN:
-         default:
-         {
-            // Invalid.
-         }
-      }
+      serializedMessage += message->getString(paramName);
 
       i++;
       paramName = PARAM_PREFIX + String(i);
@@ -190,8 +143,7 @@ String CommandProtocol::parseAction(
 
 void CommandProtocol::parseParameters(
    const String& messageString,
-   Parameter parameters[MAX_PARAMETERS],
-   int& parameterCount)
+   MessagePtr message)
 {
    int startPos = StringUtils::findFirstOf(messageString, "(") + 1;
    int endPos = StringUtils::findFirstOf(messageString, ")");
@@ -202,47 +154,18 @@ void CommandProtocol::parseParameters(
       String paramString = messageString.substring(startPos, endPos);
 
       int i = 0;
-      String valueString = StringUtils::tokenize(paramString, ",");
-      while ((valueString.length() > 0) &&
-             (i < MAX_PARAMETERS))
+      String paramValue = StringUtils::tokenize(paramString, ",");
+
+      while (paramValue.length() > 0)
       {
-         valueString.trim();
-
-         String lowerCase = valueString;
-         lowerCase.toLowerCase();
-
          String paramName = PARAM_PREFIX + String(i);
-         Parameter parameter(paramName.c_str());
+         paramValue.trim();
 
-         if ((valueString.charAt(0) == '\"') &&
-             (valueString.charAt(valueString.length() - 1) == '\"'))
-         {
-            valueString = valueString.substring(1, (valueString.length() - 1));
-            parameter.setValue(valueString.c_str());
-         }
-         else if (StringUtils::findFirstNotOf(valueString, "0123456789.-") == -1)
-         {
-            // TODO: Parse numeric types.
-            // TODO: Fix trucation of longs.
-            long longValue = valueString.toInt();
-            parameter.setValue((int)longValue);
-         }
-         else if ((lowerCase == "true") ||
-                  (lowerCase == "false"))
-         {
-            parameter.setValue(StringUtils::toBool(valueString));
-         }
-         else
-         {
-            Logger::logWarning(F("CommandProtocol::parseParameters: Bad parameter [\"%s\"]."), valueString.c_str());
-         }
-
-         parameters[i] = parameter;
-         parameterCount++;
+         message->set(paramName, paramValue);
 
          // Next token.
          i++;
-         valueString = StringUtils::tokenize(paramString, ",");
+         paramValue = StringUtils::tokenize(paramString, ",");
       }
    }
 }
