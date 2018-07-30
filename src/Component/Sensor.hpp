@@ -14,7 +14,7 @@
 #include "Timer.hpp"
 #include "TimerListener.hpp"
 
-class Sensor : public Component, TimerListener
+class Sensor : public Component, public TimerListener
 {
 
 public:
