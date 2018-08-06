@@ -14,8 +14,6 @@ public:
    static void setMode(
       const ConnectionMode mode);
 
-   static void setup();
-
    static WifiConfig getApConfig();
 
    static void setApConfig(
@@ -51,6 +49,10 @@ public:
       Led* statusLed);
 
 private:
+
+   static void setup();
+
+   static void breakdown();
 
    static void updateStatusLed();
 

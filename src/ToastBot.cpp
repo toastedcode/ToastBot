@@ -135,8 +135,6 @@ void ToastBot::setup(
    // Arduino library setup.
    Serial.begin(9600);
    SPIFFS.begin();
-
-   ESP.wdtDisable();  // To prevent WDT reset
 #endif
 
    // Logo.
@@ -144,16 +142,28 @@ void ToastBot::setup(
    Serial.print(FPSTR(ASCII_LOGO));
    Serial.print("\n");
 
+#ifdef ARDUINO
+   yield();
+#endif
+
    // Set the logger.
    Logger::setLogger(new SerialLogger());
 
    // Create the timer pool.
    Timer::setup(TIMER_POOL_SIZE);
 
+#ifdef ARDUINO
+   yield();
+#endif
+
    // Load properties.
    properties.load(PROPERTIES_FILE);
    Logger::logDebug(F("ToastBot::setup: Properties:"));
    properties.log();
+
+#ifdef ARDUINO
+   yield();
+#endif
 
    // Set log levels.
    if (properties.isSet("logLevel"))
@@ -167,6 +177,10 @@ void ToastBot::setup(
 
    //  Setup messaging.
    Messaging::setup(MESSAGE_POOL_SIZE);
+
+#ifdef ARDUINO
+   yield();
+#endif
 
    // Creating basic messaging adapters.
    Protocol* protocol = new JsonProtocol();
@@ -196,6 +210,10 @@ void ToastBot::setup(
 
    // Status LED.
    addComponent(new Led("statusLed", STATUS_LED_PIN));
+
+#ifdef ARDUINO
+   yield();
+#endif
 
    //
    // Create components found in properties.
@@ -228,11 +246,19 @@ void ToastBot::setup(
       Messaging::freeMessage(message);
    }
 
+#ifdef ARDUINO
+   yield();
+#endif
+
    // Setup registered components.
    for (Set<Component*>::Iterator it = components.begin(); it != components.end(); it++)
    {
       (*it)->setup();
    }
+
+#ifdef ARDUINO
+   yield();
+#endif
 
    // Configure the connection manager.
    configureConnections();
@@ -241,10 +267,6 @@ void ToastBot::setup(
    Logger::logDebug(F("ToastBot::setup: Free memory = %u bytes"), board->getFreeHeap());
 
    initialized = true;
-
-#ifdef ARDUINO
-   ESP.wdtEnable(1000);
-#endif
 }
 
 void ToastBot::loop()

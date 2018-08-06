@@ -18,6 +18,10 @@ Led* Connection::statusLed = 0;
 
 ClientAdapter* Connection::onlineAdapter = 0;
 
+// *****************************************************************************
+//                                   Public
+// *****************************************************************************
+
 ConnectionMode Connection::getMode()
 {
    return (mode);
@@ -34,97 +38,6 @@ void Connection::setMode(
 
       setup();
    }
-}
-
-void Connection::setup()
-{
-   WifiBoard* board = WifiBoard::getBoard();
-   if (board)
-   {
-      switch (getMode())
-      {
-         case OFFLINE:
-         {
-            board->stopAccessPoint();
-
-            if (board->isConnected())
-            {
-               board->disconnectWifi();
-            }
-
-            if (onlineAdapter)
-            {
-               onlineAdapter->disconnect();
-            }
-            break;
-         }
-         
-         case ACCESS_POINT:
-         {
-            board->stopAccessPoint();
-
-            if (board->isConnected())
-            {
-               board->disconnectWifi();
-            }
-            
-            if (onlineAdapter)
-            {
-               onlineAdapter->disconnect();
-            }
-
-            board->startAccessPoint(accessPointConfig.ssid, accessPointConfig.password);
-            break;
-         }
-         
-         case WIFI:
-         {
-            board->stopAccessPoint();
-
-            if (board->isConnected())
-            {
-               board->disconnectWifi();
-            }
-            
-            if (onlineAdapter)
-            {
-               onlineAdapter->disconnect();
-            }
-
-            if (board->connectWifi(wifiConfig.ssid, wifiConfig.password, WIFI_RETRY_TIME) == false)  // blocks
-            {
-               board->startAccessPoint(accessPointConfig.ssid, accessPointConfig.password);
-            }
-            break;
-         }
-         
-         case ONLINE:
-         {
-            board->stopAccessPoint();
-
-            if (board->isConnected())
-            {
-               board->disconnectWifi();
-            }
-
-            if (onlineAdapter)
-            {
-               onlineAdapter->disconnect();
-            }
-
-            if (board->connectWifi(wifiConfig.ssid, wifiConfig.password, WIFI_RETRY_TIME) == false)  // blocks
-            {
-               board->startAccessPoint(accessPointConfig.ssid, accessPointConfig.password);
-            }
-            else if (onlineAdapter)
-            {
-               onlineAdapter->connect();
-            }
-         }
-      }
-   }
-   
-   updateStatusLed();
 }
 
 WifiConfig Connection::getApConfig()
@@ -220,6 +133,79 @@ void Connection::setOnlineAdapter(
    Connection::onlineAdapter = onlineAdapter;
 }
 
+// *****************************************************************************
+//                                   Private
+// *****************************************************************************
+
+void Connection::setup()
+{
+   WifiBoard* board = WifiBoard::getBoard();
+   if (board)
+   {
+      breakdown();
+
+      switch (getMode())
+      {
+         case OFFLINE:
+         {
+            // Nothing else to do here.
+            break;
+         }
+
+         case ACCESS_POINT:
+         {
+            board->startAccessPoint(accessPointConfig.ssid, accessPointConfig.password);
+            break;
+         }
+
+         case WIFI:
+         {
+            board->startAccessPoint(accessPointConfig.ssid, accessPointConfig.password);
+
+            if (board->connectWifi(wifiConfig.ssid, wifiConfig.password, WIFI_RETRY_TIME) == false)  // blocks
+            {
+               Logger::logWarning(F("Connection::setup: Failed to connect WIFI."));
+            }
+            break;
+         }
+
+         case ONLINE:
+         {
+            board->startAccessPoint(accessPointConfig.ssid, accessPointConfig.password);
+
+            if (board->connectWifi(wifiConfig.ssid, wifiConfig.password, WIFI_RETRY_TIME) == false)  // blocks
+            {
+               Logger::logWarning(F("Connection::setup: Failed to connect WIFI."));
+            }
+            else if ((onlineAdapter) && (onlineAdapter->connect() == false))
+            {
+               Logger::logWarning(F("Connection::setup: Failed to make online connection."));
+            }
+         }
+      }
+   }
+
+   updateStatusLed();
+}
+
+void Connection::breakdown()
+{
+   WifiBoard* board = WifiBoard::getBoard();
+   if (board)
+   {
+      board->stopAccessPoint();
+
+      if (board->isConnected())
+      {
+         board->disconnectWifi();
+      }
+
+      if (onlineAdapter)
+      {
+         onlineAdapter->disconnect();
+      }
+   }
+}
 
 void Connection::updateStatusLed()
 {
