@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ComponentFactory.hpp"
 #include "Adapter.hpp"
+#include "ComponentFactory.hpp"
 
 class SerialAdapter : public Adapter
 {

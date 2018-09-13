@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Adapter.hpp"
+#include "ComponentFactory.hpp"
 #include "ESP8266WiFi.h"
 #include "WiFiUdp.h"
 
@@ -21,6 +22,9 @@ public:
       Protocol* protocol,
       const IPAddress& ipAddress,
       const int& port);
+
+   UdpAdapter(
+      MessagePtr parameters);
 
    virtual void setup();
 
@@ -56,3 +60,5 @@ private:
       IPAddress& ipAddress,
       int& port);
 };
+
+REGISTER(UdpAdapter, UdpAdapter)

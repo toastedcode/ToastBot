@@ -12,6 +12,16 @@
 #include "Messaging.h"
 #include "WebSocketAdapter.hpp"
 
+WebSocketAdapter::WebSocketAdapter(
+   MessagePtr parameters) :
+      Adapter(parameters),
+      port(parameters->getInt("port")),
+      server(parameters->getInt("port")),
+      isConnected(false),
+      isNegotiated(false)
+{
+}
+
 void WebSocketAdapter::setup()
 {
    Logger::logDebug(

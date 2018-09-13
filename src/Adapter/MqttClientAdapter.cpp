@@ -15,13 +15,13 @@
 
 MqttClientAdapter::MqttClientAdapter(
    const String& id,
-   Protocol* protocol) : ClientAdapter(id, protocol),
-                         port(0)
+   Protocol* protocol) :
+      ClientAdapter(id, protocol),
+      port(0)
 {
    mqttClient = new PubSubClient(client);
    mqttClient->setListener(this);
 }
-
 
 MqttClientAdapter::MqttClientAdapter(
    const String& id,
@@ -30,13 +30,33 @@ MqttClientAdapter::MqttClientAdapter(
    const int& port,
    const String& clientId,
    const String& userId,
-   const String& password) : ClientAdapter(id, protocol),
-                             host(host),
-                             port(port),
-                             clientId(clientId),
-                             userId(userId),
-                             password(password)
+   const String& password) :
+      ClientAdapter(id, protocol),
+      host(host),
+      port(port),
+      clientId(clientId),
+      userId(userId),
+      password(password)
 {
+   mqttClient = new PubSubClient(client);
+
+   mqttClient->setServer(host.c_str(), port);
+   mqttClient->setListener(this);
+}
+
+MqttClientAdapter::MqttClientAdapter(
+   MessagePtr parameters) :
+      ClientAdapter(parameters)
+{
+   mqttClient = new PubSubClient(client);
+   mqttClient->setListener(this);
+
+   host = parameters->getString("host");
+   port = parameters->getInt("port");
+   clientId = parameters->getString("clientId");
+   userId = parameters->getString("userId");
+   password = parameters->getString("password");
+
    mqttClient = new PubSubClient(client);
 
    mqttClient->setServer(host.c_str(), port);

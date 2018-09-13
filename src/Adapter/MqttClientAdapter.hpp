@@ -11,6 +11,7 @@
 #pragma once
 
 #include "ClientAdapter.hpp"
+#include "ComponentFactory.hpp"
 #include "ESP8266WiFi.h"
 #include "PubSubClient.h"
 #include "PubSubListener.h"
@@ -32,6 +33,9 @@ public:
       const String& clientId,
       const String& userId,
       const String& password);
+
+   MqttClientAdapter(
+      MessagePtr parameters);
 
    virtual ~MqttClientAdapter();
 
@@ -91,3 +95,5 @@ private:
 
    PubSubClient* mqttClient;
 };
+
+REGISTER(MqttClientAdapter, MqttClientAdapter)

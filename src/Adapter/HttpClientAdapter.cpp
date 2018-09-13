@@ -9,6 +9,12 @@ HttpClientAdapter::HttpClientAdapter(
 {
 }
 
+HttpClientAdapter::HttpClientAdapter(
+   MessagePtr parameters) :
+      Adapter(parameters)
+{
+}
+
 bool HttpClientAdapter::sendRemoteMessage(
    MessagePtr message)
 {
