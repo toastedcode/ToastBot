@@ -3,6 +3,7 @@
 #include <ESP8266WebServer.h>
 
 #include "Protocol.hpp"
+#include "ProtocolFactory.hpp"
 
 class RestfulProtocol : public Protocol
 {
@@ -36,3 +37,5 @@ private:
       const String& messageString,
       MessagePtr message);
 };
+
+REGISTER_PROTOCOL(RestfulProtocol, RestfulProtocol)

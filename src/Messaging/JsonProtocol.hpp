@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Protocol.hpp"
+#include "ProtocolFactory.hpp"
 
 class JsonProtocol : public Protocol
 {
@@ -44,3 +45,5 @@ inline String JsonProtocol::wrap(
 {
    return (String(c) + value + String(c));
 }
+
+REGISTER_PROTOCOL(JsonProtocol, JsonProtocol)

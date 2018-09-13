@@ -10,7 +10,7 @@ class HttpClientAdapter : public Adapter
 
 public:
 
-	HttpClientAdapter(
+   HttpClientAdapter(
       const String& id,
       Protocol* protocol);
 
