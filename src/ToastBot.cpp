@@ -337,6 +337,7 @@ void ToastBot::configureConnections()
       onlineAdapter->setClientId(serverConfig.clientId);
       onlineAdapter->setUser(serverConfig.userId, serverConfig.password);
       onlineAdapter->setTopic(topic);
+      onlineAdapter->setAutoReconnect(true);
 
       Connection::setOnlineAdapter(onlineAdapter);
    }

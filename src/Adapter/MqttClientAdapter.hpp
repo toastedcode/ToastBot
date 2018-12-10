@@ -69,9 +69,14 @@ public:
    void setTopic(
       const String& topic);
 
+   void setAutoReconnect(
+      const bool& autoReconnect);
+
 private:
 
    bool connectMqttClient();
+
+   void checkConnection();
 
    String host;
 
@@ -87,6 +92,8 @@ private:
 
    String subscribeTopic;
    
+   bool autoReconnect;
+
    WiFiClient client;
 
    PubSubClient* mqttClient;

@@ -55,6 +55,8 @@ void MqttClientAdapter::setup()
 
 void MqttClientAdapter::loop()
 {
+   checkConnection();
+
    // Allow the MQTT client to do its processing.
    mqttClient->loop();
 
@@ -175,8 +177,6 @@ void MqttClientAdapter::setServer(
    const String& host,
    const int& port)
 {
-   Logger::logDebug(F("MqttClientAdapter::setServer: host = %s, port = %d"), host.c_str(), port);  // REMOVE
-
    this->host = host;
    this->port = port;
 
@@ -186,8 +186,6 @@ void MqttClientAdapter::setServer(
 void MqttClientAdapter::setClientId(
    const String& clientId)
 {
-   Logger::logDebug(F("MqttClientAdapter::setClientId: clientId = %s"), clientId.c_str());  // REMOVE
-
    this->clientId = clientId;
 }
 
@@ -195,8 +193,6 @@ void MqttClientAdapter::setUser(
    const String& userId,
    const String& password)
 {
-   Logger::logDebug(F("MqttClientAdapter::setUser: userId = %s, password = %s"), userId.c_str(), password.c_str());  // REMOVE
-
    this->userId = userId;
    this->password = password;
 }
@@ -204,10 +200,14 @@ void MqttClientAdapter::setUser(
 void MqttClientAdapter::setTopic(
    const String& topic)
 {
-   Logger::logDebug(F("MqttClientAdapter::setTopic: topic = %s"), topic.c_str());  // REMOVE
-
    this->subscribeTopic = topic + "/to";
    this->publishTopic = topic + "/from";
+}
+
+void MqttClientAdapter::setAutoReconnect(
+   const bool& autoReconnect)
+{
+   this->autoReconnect = autoReconnect;
 }
 
 bool MqttClientAdapter::connectMqttClient()
@@ -260,4 +260,27 @@ bool MqttClientAdapter::connectMqttClient()
    }
 
    return  (success);
+}
+
+void MqttClientAdapter::checkConnection()
+{
+   static bool wasConnected = false;
+
+   bool isClientConnected = isConnected();
+
+   if (wasConnected && !isClientConnected)
+   {
+      Logger::logDebug(
+         F("MqttClientAdapter::checkConnection: MQTT adapter [%s] disconnected from host [%s:%d]."),
+         getId().c_str(),
+         host.c_str(),
+         port);
+
+      if (autoReconnect)
+      {
+         connectMqttClient();
+      }
+   }
+
+   wasConnected = isClientConnected;
 }
