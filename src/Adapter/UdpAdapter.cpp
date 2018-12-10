@@ -26,6 +26,25 @@ UdpAdapter::UdpAdapter(
 {
 }
 
+UdpAdapter::UdpAdapter(
+   MessagePtr parameters) :
+      Adapter(parameters)
+{
+   if (parameters->isSet("ipAddress"))
+   {
+      // Send adapter
+      listenPort = 0;
+      sendPort = parameters->getInt("port");
+      sendIpAddress.fromString(parameters->getString("ipAddress"));
+   }
+   else
+   {
+      // Listen adapter
+      sendPort = 0;
+      listenPort = parameters->getInt("port");
+   }
+}
+
 void UdpAdapter::setup()
 {
    if (listenPort != 0)

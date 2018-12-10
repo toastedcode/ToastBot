@@ -2,7 +2,9 @@
 
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
+
 #include "Adapter.hpp"
+#include "ComponentFactory.hpp"
 #include "List.hpp"
 #include "Webpage.hpp"
 
@@ -14,6 +16,9 @@ public:
    WebServerAdapter(
       const String& id,
       const int& port);
+
+   WebServerAdapter(
+      MessagePtr parameters);
 
    virtual ~WebServerAdapter();
 
@@ -103,3 +108,5 @@ private:
 
    long responseTime;
 };
+
+REGISTER(WebServerAdapter, WebServerAdapter)

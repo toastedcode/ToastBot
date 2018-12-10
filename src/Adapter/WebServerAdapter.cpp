@@ -22,6 +22,15 @@ WebServerAdapter::WebServerAdapter(
    // Nothing to do here.
 }
 
+WebServerAdapter::WebServerAdapter(
+   MessagePtr parameters) :
+      Adapter(parameters),
+      server(0),
+      responseTime(0)
+{
+   port = parameters->getInt("port");
+}
+
 WebServerAdapter::~WebServerAdapter()
 {
    // Nothing to do here.

@@ -16,6 +16,9 @@ public:
       const int& port,
       const int& retryDelay);
 
+   TcpClientAdapter(
+      MessagePtr parameters);
+
    // **************************************************************************
    //                            Component interface
 
@@ -60,3 +63,6 @@ private:
 
    int readIndex = 0;
 };
+
+REGISTER(TcpClientAdapter, TcpClientAdapter)
+

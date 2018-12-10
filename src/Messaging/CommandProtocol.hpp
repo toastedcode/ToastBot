@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Protocol.hpp"
+#include "ProtocolFactory.hpp"
 
 class CommandProtocol : public Protocol
 {
@@ -30,3 +31,5 @@ private:
       const String& messageString,
       MessagePtr message);
 };
+
+REGISTER_PROTOCOL(CommandProtocol, CommandProtocol)

@@ -18,6 +18,17 @@ TcpClientAdapter::TcpClientAdapter(
 {
 }
 
+TcpClientAdapter::TcpClientAdapter(
+   MessagePtr parameters) :
+      ClientAdapter(parameters),
+      readIndex(0)
+{
+   host = parameters->getString("host");
+   port = parameters->getInt("port");
+   retryTime = parameters->getInt("clientId");
+   retryDelay = parameters->getInt("userId");
+}
+
 void TcpClientAdapter::setup()
 {
    connect();

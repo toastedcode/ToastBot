@@ -9,6 +9,7 @@
 // *****************************************************************************
 
 #include "Adapter.hpp"
+#include "ComponentFactory.hpp"
 #include "ESP8266WiFi.h"
 #include "../Messaging/JsonProtocol.hpp"
 #include "WebSocketServer.h"
@@ -22,6 +23,9 @@ public:
       const String& id,
       Protocol* protocol,
       const int& port);
+
+   WebSocketAdapter(
+      MessagePtr parameters);
 
    virtual void setup();
 
@@ -57,3 +61,5 @@ inline WebSocketAdapter::WebSocketAdapter(
                       isNegotiated(false)
 {
 }
+
+REGISTER(WebSocketAdapter, WebSocketAdapter)

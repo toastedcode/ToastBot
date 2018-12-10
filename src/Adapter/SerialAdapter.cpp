@@ -9,6 +9,12 @@ SerialAdapter::SerialAdapter(
 {
 }
 
+SerialAdapter::SerialAdapter(
+   MessagePtr parameters) :
+      Adapter(parameters)
+{
+}
+
 bool SerialAdapter::sendRemoteMessage(
    MessagePtr message)
 {

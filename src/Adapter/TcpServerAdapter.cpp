@@ -15,6 +15,15 @@ TcpServerAdapter::TcpServerAdapter(
 {
 }
 
+TcpServerAdapter::TcpServerAdapter(
+   MessagePtr parameters) :
+      Adapter(parameters),
+      port(parameters->getInt("port")),
+      server(parameters->getInt("port")),
+      isConnected(false)
+{
+}
+
 void TcpServerAdapter::setup()
 {
    Logger::logDebug(

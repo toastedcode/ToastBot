@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Adapter.hpp"
+#include "ComponentFactory.hpp"
 #include "ESP8266WiFi.h"
 
 class TcpServerAdapter : public Adapter
@@ -12,6 +13,9 @@ public:
       const String& id,
       Protocol* protocol,
       const int& port);
+
+   TcpServerAdapter(
+      MessagePtr parameters);
 
    virtual void setup();
 
@@ -36,3 +40,5 @@ protected:
 
    int readIndex = 0;
 };
+
+REGISTER(TcpServerAdapter, TcpServerAdapter)
