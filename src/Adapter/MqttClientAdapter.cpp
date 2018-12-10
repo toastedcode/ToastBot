@@ -84,6 +84,25 @@ void MqttClientAdapter::loop()
    Adapter::loop();
 }
 
+bool MqttClientAdapter::subscribe(
+   const String& topic)
+{
+   return (mqttClient && mqttClient->subscribe(topic.c_str()));
+}
+
+bool MqttClientAdapter::subscribe(
+   const String& topic,
+   const unsigned int qos)
+{
+   return (mqttClient && mqttClient->subscribe(topic.c_str(), qos));
+}
+
+bool MqttClientAdapter::unsubscribe(
+   const String& topic)
+{
+   return (mqttClient && mqttClient->unsubscribe(topic.c_str()));
+}
+
 bool MqttClientAdapter::sendRemoteMessage(
    MessagePtr message)
 {

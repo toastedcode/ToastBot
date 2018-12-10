@@ -43,6 +43,16 @@ public:
 
    virtual void loop();
 
+   bool subscribe(
+      const String& topic);
+
+   bool subscribe(
+      const String& topic,
+      const unsigned int qos);
+
+   bool unsubscribe(
+      const String& topic);
+
    virtual bool sendRemoteMessage(
       MessagePtr message);
 

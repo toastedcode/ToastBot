@@ -182,33 +182,11 @@ void ToastBot::setup(
    yield();
 #endif
 
-   /*
-   // Creating basic messaging adapters.
-   Protocol* protocol = new JsonProtocol();
-   addComponent(new SerialAdapter("serial", protocol));
-   if (properties.isSet("discoverPort"))
-   {
-      addComponent(new UdpAdapter("discover", protocol, properties.getInt("discoverPort")));
-   }
-   if (properties.isSet("controlPort"))
-   {
-      addComponent(new TcpServerAdapter("control", protocol, properties.getInt("controlPort")));
-   }
-   if (properties.isSet("debugPort"))
-   {
-      addComponent(new TcpServerAdapter("debug", protocol, properties.getInt("debugPort")));
-   }
-   if (properties.isSet("server.host") && properties.isSet("server.port"))
-   {
-      addComponent(new MqttClientAdapter("online", protocol));
-   }
-   */
-
    // Factory reset button.
    // TODO: Flash button conflicts with motor1 pin.
    /*
    Button* flashButton = new FactoryResetButton("flashButton", 0);
-   //flashButton->setLongPress(5000);
+   flashButton->setLongPress(5000);
    addComponent(flashButton);
    */
 
