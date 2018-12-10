@@ -182,6 +182,7 @@ void ToastBot::setup(
    yield();
 #endif
 
+   /*
    // Creating basic messaging adapters.
    Protocol* protocol = new JsonProtocol();
    addComponent(new SerialAdapter("serial", protocol));
@@ -201,12 +202,15 @@ void ToastBot::setup(
    {
       addComponent(new MqttClientAdapter("online", protocol));
    }
+   */
 
    // Factory reset button.
    // TODO: Flash button conflicts with motor1 pin.
+   /*
    Button* flashButton = new FactoryResetButton("flashButton", 0);
    //flashButton->setLongPress(5000);
    addComponent(flashButton);
+   */
 
    // Status LED.
    addComponent(new Led("statusLed", STATUS_LED_PIN));
@@ -219,6 +223,9 @@ void ToastBot::setup(
    // Create components found in properties.
    //
 
+   // Component definitions are stored in JSON format in the properties file.
+   JsonProtocol protocol;
+
    Message* message = Messaging::newMessage();
    if (message)
    {
@@ -229,7 +236,7 @@ void ToastBot::setup(
       {
          String componentDescription = ToastBot::getProperties().getString(*it);
 
-         if (protocol->parse(componentDescription, message))
+         if (protocol.parse(componentDescription, message))
          {
            Logger::logDebug(F("ToastBot::setup: Creating %s component [%s]"),
                             message->getString("class").c_str(),

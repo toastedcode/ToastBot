@@ -18,7 +18,7 @@ void setup()
    ToastBot::addComponent(new Robox(), true);  // <-- default handler
 
    webServer.setup();
-   webServer.addPage(new PropertiesPage());
+   //webServer.addPage(new PropertiesPage());
 }
 
 void loop()
