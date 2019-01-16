@@ -103,17 +103,22 @@ void MotorPair::handleMessage(
    if ((message->getMessageId() == "motorPair") ||
        (message->getMessageId() == "drive"))
    {
-      Logger::logDebug(F("MotorPair::handleMessage: drive()"));
+      int speed = message->getInt("speed");
+      int yaw = message->getInt("yaw");
 
-      drive(message->getInt("speed"), message->getInt("yaw"));
+      Logger::logDebug(F("MotorPair::handleMessage: drive(%d, %d)"), speed, yaw);
+
+      drive(speed, yaw);
 
       Messaging::freeMessage(message);
    }
    else if (message->getMessageId() == "rotate")
    {
-      Logger::logDebug(F("MotorPair::handleMessage: rotate()\n"));
+      int speed = message->getInt("speed");
 
-      rotate(message->getInt("speed"));
+      Logger::logDebug(F("MotorPair::handleMessage: rotate(%d)"), speed);
+
+      rotate(speed);
 
       Messaging::freeMessage(message);
    }

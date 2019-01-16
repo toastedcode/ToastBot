@@ -25,7 +25,7 @@ WebSocketAdapter::WebSocketAdapter(
 void WebSocketAdapter::setup()
 {
    Logger::logDebug(
-      F("WebSocketAdapter::setup: Web Socket Adapter [%s] is listening on port %d.\n"),
+      F("WebSocketAdapter::setup: Web Socket Adapter [%s] is listening on port %d."),
       getId().c_str(),
       port);
 
@@ -52,13 +52,13 @@ void WebSocketAdapter::loop()
    if (!wasConnected && isConnected)
    {
       Logger::logDebug(
-         F("WebSocketAdapter::loop: Web Socket Server Adapter [%s] connected.\n"),
+         F("WebSocketAdapter::loop: Web Socket Server Adapter [%s] connected."),
          getId().c_str());
    }
    else if (wasConnected && !isConnected)
    {
       Logger::logDebug(
-         F("WebSocketAdapter::loop: Web Socket Server Adapter [%s] disconnected.\n"),
+         F("WebSocketAdapter::loop: Web Socket Server Adapter [%s] disconnected."),
          getId().c_str());
 
       isNegotiated = false;
@@ -77,13 +77,13 @@ void WebSocketAdapter::loop()
       if (!wasNegotiated && isNegotiated)
       {
          Logger::logDebug(
-            F("WebSocketAdapter::loop: Web Socket Server Adapter [%s] negotiated.\n"),
+            F("WebSocketAdapter::loop: Web Socket Server Adapter [%s] negotiated."),
             getId().c_str());
       }
       else
       {
          Logger::logDebug(
-            F("WebSocketAdapter::loop: Web Socket Server Adapter [%s] failed negotiation.\n"),
+            F("WebSocketAdapter::loop: Web Socket Server Adapter [%s] failed negotiation."),
             getId().c_str());
       }
    }
@@ -110,7 +110,7 @@ bool WebSocketAdapter::sendRemoteMessage(
    else
    {
       Logger::logWarning(
-         F("IpServerAdapter::sendRemoteMessage: Failed to send message [%s] to remote host.\n"),
+         F("IpServerAdapter::sendRemoteMessage: Failed to send message [%s] to remote host."),
          message->getMessageId().c_str());
    }
 

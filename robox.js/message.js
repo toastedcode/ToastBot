@@ -4,5 +4,4 @@ function Message()
    this.source = "";
    this.destination = "";
    this.topic = "";
-   this.payload = null;
 }
