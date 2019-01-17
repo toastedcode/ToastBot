@@ -33,15 +33,19 @@
          console.log("Error!");
       }
       
-      var ipAddress = "10.1.50.26";
+      var ipAddress = "192.168.0.112";
       var port = 1975;
 
    </script>
    
    <button onclick="myRobox.connect(ipAddress, port)">Connect</button>
    <button onclick="myRobox.disconnect()">Disconnect</button>
-   <button onclick="myRobox.motor('motor1', 55)">Motor</button>
-   <button onclick="myRobox.motorPair(55, 0)">Motor Pair</button>
+   <button onmousedown="myRobox.motor('motor1', 100)" onmouseup="myRobox.motor('motor1', 0)">Motor</button>
+   <button onmousedown="myRobox.motorPair(100, 0)" onmouseup="myRobox.motorPair(0, 0)">Motor Pair</button>
    <button onclick="myRobox.ping()">Ping</button>
+   
+   <div>
+      <iframe id="video-iframe" src="http://192.168.0.119:8080/browserfs.html" width="580px" height="700px"></iframe>
+   </div>
 </body>
 </html>
