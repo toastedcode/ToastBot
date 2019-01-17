@@ -11,8 +11,10 @@
 #include "Arduino.h"
 #include "FS.h"
 
+#include "BoardFactory.hpp"
 #include "Connection/Connection.hpp"
 #include "Component/FactoryResetButton.hpp"
+#include "Esp8266Board.hpp"
 #include "Logger.hpp"
 #include "Messaging.hpp"
 #include "SerialLogger.hpp"
@@ -28,6 +30,8 @@ Set<Component*> ToastBot::components;
 
 const String PROPERTIES_FILE = "/robox.properties";
 const String DEFAULT_PROPERTIES_FILE = "/default.properties";
+
+const String DEFAULT_BOARD = "Esp8266Board";
 
 const char PROGMEM ASCII_LOGO[] =
 "............................................................\n"
@@ -128,8 +132,7 @@ Properties& ToastBot::getProperties()
    return (properties);
 }
 
-void ToastBot::setup(
-   Board* board)
+void ToastBot::setup()
 {
 #ifdef ARDUINO
    // Arduino library setup.
@@ -172,8 +175,13 @@ void ToastBot::setup(
    }
 
    // Setup the board.
-   // TODO: Read board from properties file and create dynamically.
-   Board::setBoard(board);
+   String boardClass = DEFAULT_BOARD;
+   if (properties.isSet("board"))
+   {
+      boardClass = properties.getString("board");
+   }
+
+   Board::setBoard(BoardFactory::create(boardClass));
 
    //  Setup messaging.
    Messaging::setup(MESSAGE_POOL_SIZE);
@@ -249,7 +257,7 @@ void ToastBot::setup(
    configureConnections();
 
    // Log free memory.
-   Logger::logDebug(F("ToastBot::setup: Free memory = %u bytes"), board->getFreeHeap());
+   Logger::logDebug(F("ToastBot::setup: Free memory = %u bytes"), Board::getBoard()->getFreeHeap());
 
    initialized = true;
 }
