@@ -1,7 +1,5 @@
 function WebSocketAdapter()
 {
-   this.handler = null;
-
    this.protocol = null;
 
    this.webSocket = null;
@@ -10,7 +8,7 @@ function WebSocketAdapter()
 
    this.port = null;
 
-   // Function to be implemented by client.
+   // Callback functions to be implemented by client.
    this.onConnected = null;
    this.onDisconnected = null;
    this.onError = null;

@@ -4,7 +4,10 @@
 <head>
    <title>robox.js</title>
 
+   <script src="../thirdparty/mqttws31.js"></script>
+   <script src="../thirdparty/mqtt-client.js"></script>
    <script src="../communication/message.js"></script>
+   <script src="../communication/mqttAdapter.js"></script>
    <script src="../communication/jsonProtocol.js"></script>
    <script src="../communication/webSocketAdapter.js"></script>
    <script src="../component/led.js"></script>
@@ -18,12 +21,12 @@
 
    <script>
       var myRobox = new Robox();
-      
+
       myRobox.onConnected = function()
       {
          console.log("Robox connected.");
       }
-      
+
       myRobox.onDisconnected = function()
       {
          console.log("Robox disconnected.");
@@ -42,7 +45,7 @@
 
          myRobox.sendMessage(message);
       }
-      
+
       function blink(on)
       {
          if (on)
@@ -67,6 +70,7 @@
    <div>Camera address: <input type="text" id="camAddress"></div>
 
    <button onclick="myRobox.connect(getRoboxAddress(), 1975)">Connect</button>
+   <button onclick="myRobox.connect('test.mosquitto.org', 8080, 'robox/jasontost@gmail.com/robo1')">MQTT Connect</button>
    <button onclick="myRobox.disconnect()">Disconnect</button>
    <!--button onclick="myRobox.ping()">Ping</button-->
 
@@ -81,7 +85,7 @@
    <button onmousedown="myRobox.components['servo2'].rotate(170)" onmouseup="myRobox.components['servo2'].rotate(10)">Servo 2</button>
 
    <button onmousedown="scout()">Scout</button>
-   
+
    <button onmousedown="blink(true)" onmouseup="blink(false)">Led</button>
 
    <br><br>
@@ -102,7 +106,7 @@
          <td></td>
       </tr>
    </table>
-   
+
    <input name="code" type="text" />
    <button onclick="eval(document.getElementsByName('code')[0].value)">Evaluate</button>
 
