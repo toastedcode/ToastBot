@@ -22,7 +22,8 @@ EscapeBehavior::EscapeBehavior(
       distanceSensor(distanceSensor),
 	  servo(servo)
 {
-   fleeBehavior = new ScoutBehavior(id + ".flee", motorPair, distanceSensor, servo);
+   // TODO: Fix.
+   //fleeBehavior = new ScoutBehavior(id + ".flee", motorPair, distanceSensor, servo);
    addChild(fleeBehavior);
    fleeBehavior->disable();
 

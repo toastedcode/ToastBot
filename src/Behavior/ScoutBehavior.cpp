@@ -1,5 +1,9 @@
 #include "Logger.hpp"
 #include "ScoutBehavior.hpp"
+#include "ToastBot.hpp"
+#include "../Component/DistanceSensor.hpp"
+#include "../Component/MotorPair.hpp"
+#include "../Component/ServoComponent.hpp"
 
 // *****************************************************************************
 
@@ -22,7 +26,7 @@ public:
       const String& id,
       MotorPair* motorPair,
       DistanceSensor* distanceSensor,
-	  ServoComponent* servo) :
+	   ServoComponent* servo) :
          Behavior(id)
    {
       this->motorPair = motorPair;
@@ -264,28 +268,25 @@ private:
 
 ScoutBehavior::ScoutBehavior(
    const String& id,
-   MotorPair* motorPair,
-   DistanceSensor* distanceSensor,
-   ServoComponent* servo) :
-      Behavior(id)
+   const String& motorPairId,
+   const String& distanceSensorId,
+   const String& servoId) :
+      Behavior(id),
+      motorPairId(motorPairId),
+      distanceSensorId(distanceSensorId),
+      servoId(servoId),
+      initialized(false)
 {
-   forwardBehavior = new ForwardBehavior(id + ".forward", motorPair, distanceSensor, servo);
-   reverseBehavior = new ReverseBehavior(id + ".reverse", motorPair);
-   rotateBehavior = new RotateBehavior(id + ".rotate", motorPair);
+}
 
-   forwardBehavior->addListener(this);
-   reverseBehavior->addListener(this);
-   rotateBehavior->addListener(this);
-
-   addChild(forwardBehavior);
-   addChild(reverseBehavior);
-   addChild(rotateBehavior);
-
-   forwardBehavior->enable();
-   reverseBehavior->enable();
-   rotateBehavior->enable();
-
-   disable();
+ScoutBehavior::ScoutBehavior(
+   MessagePtr message) :
+      Behavior(message->getString("id")),
+      motorPairId(message->getString("motorPair")),
+      distanceSensorId(message->getString("distanceSensor")),
+      servoId(message->getString("servo")),
+      initialized(false)
+{
 }
 
 ScoutBehavior::~ScoutBehavior()
@@ -295,16 +296,56 @@ ScoutBehavior::~ScoutBehavior()
    delete (rotateBehavior);
 }
 
+void ScoutBehavior::setup()
+{
+   MotorPair* motorPair = static_cast<MotorPair*>(ToastBot::getComponent(motorPairId));
+   DistanceSensor* distanceSensor = static_cast<DistanceSensor*>(ToastBot::getComponent(distanceSensorId));
+   ServoComponent* servo = static_cast<ServoComponent*>(ToastBot::getComponent(servoId));
+
+   if (motorPair && distanceSensor && servo)
+   {
+      initialized = true;
+
+      forwardBehavior = new ForwardBehavior(getId() + ".forward", motorPair, distanceSensor, servo);
+      reverseBehavior = new ReverseBehavior(getId() + ".reverse", motorPair);
+      rotateBehavior = new RotateBehavior(getId() + ".rotate", motorPair);
+
+      forwardBehavior->addListener(this);
+      reverseBehavior->addListener(this);
+      rotateBehavior->addListener(this);
+
+      addChild(forwardBehavior);
+      addChild(reverseBehavior);
+      addChild(rotateBehavior);
+
+      forwardBehavior->enable();
+      reverseBehavior->enable();
+      rotateBehavior->enable();
+
+      disable();
+   }
+   else
+   {
+      Logger::logWarning(F("ScoutBehavior::setup: Failed to initialize all sub-components for ScoutBehavior [%s]"), getId().c_str());
+   }
+}
+
 void ScoutBehavior::enable()
 {
-   setState(FORWARD);
-   Behavior::enable();
+   if (initialized)
+   {
+      setState(FORWARD);
+      Behavior::enable();
+   }
 }
 
 void ScoutBehavior::disable()
 {
-   setState(INIT);
-   Behavior::disable();
+   if (initialized)
+   {
+      setState(INIT);
+      Behavior::disable();
+   }
 }
 
 void ScoutBehavior::onStateChange(
@@ -312,7 +353,7 @@ void ScoutBehavior::onStateChange(
    const int& previousState,
    const int& newState)
 {
-   if (isEnabled())
+   if (initialized && isEnabled())
    {
       if ((getState() == FORWARD) &&
           (behavior->getId() == (getId() + ".forward")) &&
@@ -338,37 +379,39 @@ void ScoutBehavior::onStateChange(
 void ScoutBehavior::setState(
    const int& state)
 {
-
    Logger::logDebug(F("ScoutBehavior::setState: %s -> %d"), getId().c_str(), state);
 
-   switch (state)
+   if (initialized)
    {
-      case INIT:
+      switch (state)
       {
-         forwardBehavior->setState(ForwardBehavior::INIT);
-         reverseBehavior->setState(ReverseBehavior::INIT);
-         rotateBehavior->setState(RotateBehavior::INIT);
-         break;
+         case INIT:
+         {
+            forwardBehavior->setState(ForwardBehavior::INIT);
+            reverseBehavior->setState(ReverseBehavior::INIT);
+            rotateBehavior->setState(RotateBehavior::INIT);
+            break;
+         }
+
+         case FORWARD:
+         {
+            forwardBehavior->setState(ForwardBehavior::MOVING);
+            break;
+         }
+
+         case REVERSE:
+         {
+            reverseBehavior->setState(ReverseBehavior::MOVING);
+            break;
+         }
+
+         case ROTATE:
+         {
+            rotateBehavior->setState(RotateBehavior::ROTATING);
+            break;
+         }
       }
 
-      case FORWARD:
-      {
-         forwardBehavior->setState(ForwardBehavior::MOVING);
-         break;
-      }
-
-      case REVERSE:
-      {
-         reverseBehavior->setState(ReverseBehavior::MOVING);
-         break;
-      }
-
-      case ROTATE:
-      {
-         rotateBehavior->setState(RotateBehavior::ROTATING);
-         break;
-      }
+      Behavior::setState(state);
    }
-
-   Behavior::setState(state);
 }

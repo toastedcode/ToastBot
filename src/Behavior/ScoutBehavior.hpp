@@ -1,9 +1,7 @@
 #pragma once
 
 #include "Behavior.hpp"
-#include "../Component/DistanceSensor.hpp"
-#include "../Component/MotorPair.hpp"
-#include "../Component/ServoComponent.hpp"
+#include "ComponentFactory.hpp"
 
 class ScoutBehavior : public Behavior, BehaviorListener
 {
@@ -20,11 +18,16 @@ public:
 
    ScoutBehavior(
       const String& id,
-      MotorPair* motorPair,
-      DistanceSensor* distanceSensor,
-	  ServoComponent* servo);
+      const String& motorPairId,
+      const String& distanceSensorId,
+	   const String& servoId);
+
+   ScoutBehavior(
+      MessagePtr message);
 
    virtual ~ScoutBehavior();
+
+   virtual void setup();
 
    virtual void enable();
 
@@ -40,9 +43,19 @@ public:
 
 private:
 
+   String motorPairId;
+
+   String distanceSensorId;
+
+   String servoId;
+
+   bool initialized;
+
    Behavior* forwardBehavior;
 
    Behavior* reverseBehavior;
 
    Behavior* rotateBehavior;
 };
+
+REGISTER(ScoutBehavior, ScoutBehavior)

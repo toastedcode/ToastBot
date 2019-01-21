@@ -14,7 +14,7 @@ public:
 
    virtual ~Behavior();
 
-   void handleMessage(
+   virtual void handleMessage(
       MessagePtr message);
 
    virtual void setup();
