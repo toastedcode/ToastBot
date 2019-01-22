@@ -13,7 +13,8 @@ public:
 
    HttpClientAdapter(
       const String& id,
-      Protocol* protocol);
+      Protocol* protocol,
+      const String& defaultUrl = "");
 
    HttpClientAdapter(
       MessagePtr parameters);
@@ -28,6 +29,8 @@ private:
    HTTPClient http;
 
    RestfulProtocol sendProtocol;
+
+   String defaultUrl;
 };
 
 REGISTER(HttpClientAdapter, HttpClientAdapter)

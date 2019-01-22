@@ -90,8 +90,11 @@ String RestfulProtocol::serialize(
    }
 
    // action
-   serializedMessage += "/";
-   serializedMessage += message->getMessageId();
+   if (message->getMessageId() != "")
+   {
+      serializedMessage += "/";
+      serializedMessage += message->getMessageId();
+   }
 
    //
    // parameters
