@@ -34,7 +34,6 @@ void Registrar::setup()
    timer->start();
 }
 
-
 void Registrar::timeout(
    Timer* timer)
 {
@@ -70,7 +69,8 @@ void Registrar::pingRegistry()
          }
 
          message->set("chipId", chipId);
-         message->set("roboxId", ToastBot::getId());
+         message->set("roboxName", ToastBot::getId());
+         message->set("userId", ToastBot::getProperties().getString("userId"));
          message->set("ipAddress", WifiBoard::getBoard()->getIpAddress());
          message->set("macAddress", macAddress);
 

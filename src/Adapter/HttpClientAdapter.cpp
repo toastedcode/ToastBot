@@ -16,7 +16,6 @@ HttpClientAdapter::HttpClientAdapter(
       Adapter(parameters)
 {
    defaultUrl = parameters->getString("defaultUrl");
-   Logger::logDebug("HttpClientAdapter::HttpClientAdapter: %s", defaultUrl.c_str());
 }
 
 bool HttpClientAdapter::sendRemoteMessage(
@@ -49,12 +48,10 @@ bool HttpClientAdapter::sendRemoteMessage(
 
      if (httpCode > 0)
      {
-        // TODO: Parse response.
-        //httpResponse = http.getString(); // TODO: Can fragment heap!
+        Logger::logDebugFinest(F("HttpClientAdapter::sendRemoteMessage: Response code [%d]."), httpCode);
 
-        Logger::logDebug(F("HttpClientAdapter::sendRemoteMessage: Request: %s"), httpRequest.c_str());
-
-        Logger::logDebug(F("HttpClientAdapter::sendRemoteMessage: Response code [%d]."), httpCode);
+        httpResponse = http.getString();
+        Logger::logDebugFinest(F("HttpClientAdapter::sendRemoteMessage: Response: %s"), httpResponse.c_str());
      }
      else
      {

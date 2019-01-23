@@ -94,6 +94,7 @@ String RestfulProtocol::serialize(
    {
       serializedMessage += "/";
       serializedMessage += message->getMessageId();
+      serializedMessage += "/";
    }
 
    //
