@@ -28,7 +28,7 @@ Button::Button(
 {
    pin = message->isSet("pin") ? message->getInt("pin") : 0;
    inputPullup = message->isSet("inputPullup") ? message->getBool("inputPullup") : false;
-   longPressTime = message->isSet("longpress") ? message->getInt("longpress") : 0;
+   longPressTime = message->isSet("longPress") ? message->getInt("longPress") : 0;
 }
 
 Button::~Button()

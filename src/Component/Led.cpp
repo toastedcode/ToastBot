@@ -207,7 +207,6 @@ Led::Led(
       Component(message),
       brightness(0)
 {
-   id = message->isSet("id") ? message->getString("id") : "led";
    pin = message->isSet("pin") ? message->getInt("pin") : 0;
 
    ledPattern = new LedPattern(this, "");

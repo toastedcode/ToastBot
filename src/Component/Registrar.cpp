@@ -37,7 +37,10 @@ void Registrar::setup()
 void Registrar::timeout(
    Timer* timer)
 {
-   pingRegistry();
+   if (WifiBoard::getBoard()->isConnected())
+   {
+      pingRegistry();
+   }
 }
 
 void Registrar::pingRegistry()

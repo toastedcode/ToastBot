@@ -85,4 +85,4 @@ private:
    unsigned long downTime;
 };
 
-REGISTER(Button, button)
+REGISTER(Button, Button)
