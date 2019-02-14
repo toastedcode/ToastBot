@@ -67,7 +67,6 @@ function Robox()
       this.adapter.connect(ipAddress, port);
    }
    
-   /*
    Robox.prototype.connect = function(host, port, topic)
    {
       if (this.adapter)
@@ -80,7 +79,6 @@ function Robox()
       this.adapter.setProtocol(new JsonProtocol());
       this.adapter.connect(host, port, topic);
    }
-   */
 
    Robox.prototype.disconnect = function()
    {
@@ -94,7 +92,7 @@ function Robox()
 
    Robox.prototype.isConnected = function()
    {
-      return (this.adapter && adapter.isConnected());
+      return (this.adapter && this.adapter.isConnected());
    }
 
    // **************************************************************************
