@@ -116,12 +116,12 @@ void PropertiesPage::getPropertyDiv(
    String& content)
 {
    String divTemplate = 
-      "<div class=\"flex-row card property-card\">"
-      "<input type=\"text\" value=\"%propertyName\" disabled></input>"
-      "<input id=\"%propertyName\" type=\"text\" name=\"%propertyName\"value=\"%propertyValue\"></input>"
-      "<div class=\"update-button\" onclick=\"updateProperty('%propertyName')\"><img class=\"action-icon\" src=\"check.png\"/></div>"
-      "<div class=\"delete-button\" onclick=\"deleteProperty('%propertyName')\"><img class=\"action-icon\" src=\"close.png\"/></div>"
-      "</div>";
+      F("<div class=\"flex-row card property-card\">"
+        "<input type=\"text\" value=\"%propertyName\" disabled></input>"
+        "<input id=\"%propertyName\" type=\"text\" name=\"%propertyName\"value=\"%propertyValue\"></input>"
+        "<div class=\"update-button\" onclick=\"updateProperty('%propertyName')\"><img class=\"action-icon\" src=\"check.png\"/></div>"
+        "<div class=\"delete-button\" onclick=\"deleteProperty('%propertyName')\"><img class=\"action-icon\" src=\"close.png\"/></div>"
+        "</div>");
 
    divTemplate.replace("%propertyName", propertyName);
    divTemplate.replace("%propertyValue", propertyValue);
