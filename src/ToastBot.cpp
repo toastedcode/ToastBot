@@ -20,6 +20,7 @@
 #include "SerialLogger.hpp"
 #include "Timer.hpp"
 #include "ToastBot.hpp"
+#include "ToastBotMessageHandler.hpp"
 #include "WifiBoard.hpp"
 
 Properties ToastBot::properties;
@@ -206,6 +207,12 @@ void ToastBot::setup()
 #endif
 
    //
+   // Default message handler.
+   //
+
+   addComponent(new ToastBotMessageHandler(), true);
+
+   //
    // Create components found in properties.
    //
 
@@ -231,7 +238,7 @@ void ToastBot::setup()
            Component* component = ComponentFactory::create(message->getString("class"), message);
            if (component)
            {
-             ToastBot::addComponent(component);
+             addComponent(component);
            }
          }
       }

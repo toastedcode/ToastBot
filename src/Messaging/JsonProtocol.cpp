@@ -59,7 +59,31 @@ String JsonProtocol::serializeParameters(
       String lowerCase = paramValue;
       lowerCase.toLowerCase();
 
-      if (StringUtils::findFirstNotOf(paramValue, "0123456789.-") == -1)
+      // Determine if the string is numeric.
+      bool isNumeric = true;
+      int periodCount = 0;
+      int dashCount = 0;
+      for (int i = 0; i < paramValue.length(); i++)
+      {
+         char c = paramValue.charAt(i);
+
+         if (c == '.')
+         {
+            periodCount++;
+         }
+         else if (c == '-')
+         {
+            dashCount++;
+            isNumeric &= (i == 0);
+         }
+         else
+         {
+            isNumeric &= isDigit(c);
+         }
+      }
+      isNumeric &= ((periodCount <= 1) && (dashCount <= 1));
+
+      if (isNumeric)
       {
          // Numeric type.  No extra processing.
       }

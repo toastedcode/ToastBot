@@ -1,11 +1,13 @@
+#include "HttpClientAdapter.hpp"
 #include "Logger.hpp"
 #include "Messaging.hpp"
-#include "HttpClientAdapter.hpp"
 
 HttpClientAdapter::HttpClientAdapter(
    const String& id,
-   Protocol* protocol) :
-   Adapter(id, protocol)
+   Protocol* protocol,
+   const String& defaultUrl) :
+      Adapter(id, protocol),
+      defaultUrl(defaultUrl)
 {
 }
 
@@ -13,6 +15,7 @@ HttpClientAdapter::HttpClientAdapter(
    MessagePtr parameters) :
       Adapter(parameters)
 {
+   defaultUrl = parameters->getString("defaultUrl");
 }
 
 bool HttpClientAdapter::sendRemoteMessage(
@@ -24,6 +27,10 @@ bool HttpClientAdapter::sendRemoteMessage(
    static String httpResponse = "";
 
    url = message->getString("url");
+   if (url.length() == 0)
+   {
+      url = defaultUrl;
+   }
 
    if (url != "")
    {
@@ -41,14 +48,14 @@ bool HttpClientAdapter::sendRemoteMessage(
 
      if (httpCode > 0)
      {
-        // TODO: Parse response.
-        //httpResponse = http.getString(); // TODO: Can fragment heap!
+        Logger::logDebugFinest(F("HttpClientAdapter::sendRemoteMessage: Response code [%d]."), httpCode);
 
-        Logger::logDebug(F("HttpClientAdapter::sendRemoteMessage: Response code [%d]."), httpCode);
+        httpResponse = http.getString();
+        Logger::logDebugFinest(F("HttpClientAdapter::sendRemoteMessage: Response: %s"), httpResponse.c_str());
      }
      else
      {
-        Logger::logWarning(F("No response from request: %s."), httpRequest.c_str());
+        Logger::logWarning(F("No response from request: %s"), httpRequest.c_str());
      }
 
      http.end();
