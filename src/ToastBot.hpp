@@ -43,8 +43,7 @@ public:
       properties.save();
    }
 
-   static void setup(
-      Board* board);
+   static void setup();
 
    static void loop();
 
