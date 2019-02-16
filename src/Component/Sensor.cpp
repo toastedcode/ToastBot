@@ -28,14 +28,60 @@ Sensor::~Sensor()
 {
 }
 
+// **************************************************************************
+//                         MessageHandler interface
+
+void Sensor::handleMessage(
+   MessagePtr message)
+{
+   // read
+   if (message->getMessageId() == "read")
+   {
+      Logger::logDebug(F("Motor::handleMessage: read()"));
+
+      sendReading(message->getSource());
+   }
+   // poll
+   if (message->getMessageId() == "poll")
+   {
+      int period = message->getInt("period");
+
+      Logger::logDebug(F("Motor::handleMessage: poll(%d)"), period);
+
+      poll(period);
+   }
+   // killSwitch
+   else if (message->getMessageId() == "killSwitch")
+   {
+      Logger::logDebug(F("Motor::handleMessage: killSwitch"));
+
+      poll(0);
+   }
+   else
+   {
+      Component::handleMessage(message);
+   }
+
+   Messaging::freeMessage(message);
+}
+
+// **************************************************************************
+//                         TimerListner interface
+
 void Sensor::timeout(
    Timer* timer)
 {
    onPoll();
 }
 
+// **************************************************************************
+
+void Sensor::onPoll()
+{
+   broadcastReading();
+}
+
 void Sensor::poll(
-   // The rate at which updates should be sent, in milliseconds.
    const int& period)
 {
    if (pollTimer)
@@ -51,5 +97,35 @@ void Sensor::poll(
       {
          pollTimer->start();
       }
+   }
+}
+
+void Sensor::sendReading(
+      const String& destination)
+{
+   MessagePtr message = Messaging::newMessage();
+
+   if (message)
+   {
+      message->setMessageId("sensorReading");
+      message->setSource(getId());
+      message->set("value", read());
+
+      Messaging::send(message);
+   }
+}
+
+void Sensor::broadcastReading()
+{
+   MessagePtr message = Messaging::newMessage();
+
+   if (message)
+   {
+      message->setTopic(getId());
+      message->setMessageId("sensorReading");
+      message->setSource(getId());
+      message->set("value", read());
+
+      Messaging::publish(message);
    }
 }

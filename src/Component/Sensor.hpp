@@ -32,8 +32,21 @@ public:
    // Destructor.
    virtual ~Sensor();
 
+   // **************************************************************************
+   //                         MessageHandler interface
+
+   // This operation handles a message directed to this component.
+   virtual void handleMessage(
+      // The message to handle.
+      MessagePtr message);
+
+   // **************************************************************************
+   //                         TimerListner interface
+
    virtual void timeout(
       Timer* timer);
+
+   // **************************************************************************
 
    virtual int read() = 0;
 
@@ -44,7 +57,12 @@ public:
 
 protected:
 
-   virtual void onPoll() = 0;
+   virtual void onPoll();
+
+   virtual void sendReading(
+         const String& destination);
+
+   virtual void broadcastReading();
 
 private:
 

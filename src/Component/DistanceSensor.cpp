@@ -58,18 +58,6 @@ int DistanceSensor::readMedian(
    return (sensorValue);
 }
 
-void DistanceSensor::onPoll()
-{
-   MessagePtr message = Messaging::newMessage();
-   if (message)
-   {
-      message->setTopic("sensorPoll");
-      message->setSource(getId());
-      message->set("value", sensorValue);
-      Messaging::publish(message);
-   }
-}
-
 int DistanceSensor::toCentimeters(
    const int& microseconds)
 {

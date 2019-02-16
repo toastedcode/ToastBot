@@ -67,6 +67,7 @@ function Robox()
       this.adapter.connect(ipAddress, port);
    }
    
+   /*
    Robox.prototype.connect = function(host, port, topic)
    {
       if (this.adapter)
@@ -79,6 +80,7 @@ function Robox()
       this.adapter.setProtocol(new JsonProtocol());
       this.adapter.connect(host, port, topic);
    }
+   */
 
    Robox.prototype.disconnect = function()
    {
@@ -236,6 +238,7 @@ function Robox()
    this.addComponent(new Motor("motor1"));
    this.addComponent(new Motor("motor2"));
    this.addComponent(new MotorPair("motorPair"));
+   this.addComponent(new Sensor("distanceSensor"));
    this.addComponent(new Servo("servo1"));
    this.addComponent(new Servo("servo2"));
    this.addComponent(new Led("statusLed"));

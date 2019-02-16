@@ -55,10 +55,6 @@ public:
    static int toInches(
       const int& microseconds);
 
-protected:
-
-   virtual void onPoll();
-
 private:
 
    NewPing* sensor;

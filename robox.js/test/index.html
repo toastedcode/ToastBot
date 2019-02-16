@@ -13,6 +13,7 @@
    <script src="../component/led.js"></script>
    <script src="../component/motor.js"></script>
    <script src="../component/motorPair.js"></script>
+   <script src="../component/sensor.js"></script>
    <script src="../component/servo.js"></script>
    <script src="../robox.js"></script>
 </head>
@@ -25,6 +26,8 @@
       myRobox.onConnected = function()
       {
          console.log("Robox connected.");
+         
+         myRobox.subscribe("distanceSensor");
       }
 
       myRobox.onDisconnected = function()
@@ -35,6 +38,12 @@
       myRobox.handleMessage = function(message)
       {
          console.log(message.messageId);
+         
+         if ((message.messageId == "sensorReading") &&
+             (message.source == "distanceSensor"))
+         {
+            document.getElementById("distance-sensor-value").value = message.value;
+         }
       }
 
       function scout()
@@ -106,6 +115,11 @@
          <td></td>
       </tr>
    </table>
+   
+   Ping <input id="distance-sensor-value" type="number">
+   <button onclick="myRobox.components['distanceSensor'].poll(2000)">On</button><button onclick="myRobox.components['distanceSensor'].poll(0)">Off</button>
+   
+   <br><br>
 
    <input name="code" type="text" />
    <button onclick="eval(document.getElementsByName('code')[0].value)">Evaluate</button>
