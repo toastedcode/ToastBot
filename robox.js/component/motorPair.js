@@ -44,4 +44,14 @@ function MotorPair(id)
       
       this.parent.sendMessage(message);
    }
+   
+   MotorPair.prototype.reverse = function(isReversed)
+   {
+      var message = new Message();
+      message.messageId = "reverse";
+      message.destination = this.id;
+      message.isReversed = isReversed;
+      
+      this.parent.sendMessage(message);
+   }
 }

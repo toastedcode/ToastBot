@@ -76,11 +76,11 @@ void ServoComponent::stop()
 }
 
 void ServoComponent::limit(
-   const int& minAngle,
-   const int& maxAngle)
+   const int& limitMin,
+   const int& limitMax)
 {
-   this->limitMin = minAngle;
-   this->limitMax = maxAngle;
+   this->limitMin = limitMin;
+   this->limitMax = limitMax;
 }
 
 void ServoComponent::reverse(
@@ -116,18 +116,14 @@ void ServoComponent::handleMessage(
 {
    bool handled = false;
 
-   // servo
    // rotate
-   if ((message->getMessageId() == "servo") ||
-       (message->getMessageId() == "rotate"))
+   if (message->getMessageId() == "rotate")
    {
       int angle = message->getInt("angle");
 
       Logger::logDebug(F("ServoComponent::handleMessage: rotate(%d)"), angle);
 
       rotate(angle);
-
-      Messaging::freeMessage(message);
    }
    // panTo
    // stop
@@ -173,13 +169,13 @@ void ServoComponent::handleMessage(
       Logger::logDebug(F("ServoComponent::handleMessage: killSwitch"));
 
       rotate(MIN_ANGLE);
-
-      Messaging::freeMessage(message);
    }
    else
    {
       Component::handleMessage(message);
    }
+
+   Messaging::freeMessage(message);
 }
 
 

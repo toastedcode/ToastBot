@@ -64,6 +64,9 @@ public:
    // Stops both motors in the pair by setting their speed to zero.
    void stop();
 
+   void reverse(
+      const bool& isReversed);
+
    // Retrieves the speed of the motor pair.
    int getSpeed() const;
 

@@ -32,4 +32,25 @@ function Motor(id)
       
       this.parent.sendMessage(message);
    }
+   
+   Motor.prototype.limit = function(limitMin, limitMax)
+   {
+      var message = new Message();
+      message.messageId = "limit";
+      message.destination = this.id;
+      message.limitMin = limitMin;
+      message.limitMax = limitMax;
+      
+      this.parent.sendMessage(message);
+   }
+   
+   Motor.prototype.reverse = function(isReversed)
+   {
+      var message = new Message();
+      message.messageId = "reverse";
+      message.destination = this.id;
+      message.isReversed = isReversed;
+      
+      this.parent.sendMessage(message);
+   }
 }

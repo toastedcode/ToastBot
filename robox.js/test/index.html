@@ -62,6 +62,36 @@
       {
          return (document.getElementById("roboxAddress").value);
       }
+      
+      function limit()
+      {
+         var limitMin = document.getElementById("limit-min").value;
+         var limitMax = document.getElementById("limit-max").value;
+         
+         myRobox.components["servo1"].limit(limitMin, limitMax);
+      }
+      
+      function reverse()
+      {
+         var isReversed = document.getElementById("is-reversed").checked;
+         
+         myRobox.components["servo1"].reverse(isReversed);
+      }
+      
+      function limitMotor()
+      {
+         var limitMin = document.getElementById("motor-limit-min").value;
+         var limitMax = document.getElementById("motor-limit-max").value;
+         
+         myRobox.components["motor1"].limit(limitMin, limitMax);
+      }
+      
+      function reverseMotor()
+      {
+         var isReversed = document.getElementById("motor-is-reversed").checked;
+         
+         myRobox.components["motor1"].reverse(isReversed);
+      }
    </script>
 
    <h1>Robot Controller</h1>
@@ -77,12 +107,26 @@
    <br><br>
 
    <button onmousedown="myRobox.components['motor1'].drive(100)" onmouseup="myRobox.components['motor1'].stop()">Motor 1</button>
+   <input id="motor-limit-min" type="number" value="0" onchange="limitMotor();">Min</input>
+   <input id="motor-limit-max" type="number" value="100" onchange="limitMotor();">Max</input>
+   <input id="motor-is-reversed" type="checkbox" name="isReversed" value="true" onchange="reverseMotor();">isReversed</input>
+   
+   <br><br>
+      
    <button onmousedown="myRobox.components['motor2'].drive(100)" onmouseup="myRobox.components['motor2'].stop()">Motor 2</button>
 
    <br><br>
 
-   <button onmousedown="myRobox.components['servo1'].rotate(10)" onmouseup="myRobox.components['servo1'].rotate(170)">Servo 1</button>
+   <button onmousedown="myRobox.components['servo1'].rotate(180)" onmouseup="myRobox.components['servo1'].rotate(0)">Servo 1</button>
+   <input id="limit-min" type="number" value="0" onchange="limit();">Min</input>
+   <input id="limit-max" type="number" value="180" onchange="limit();">Max</input>
+   <input id="is-reversed" type="checkbox" name="isReversed" value="true" onchange="reverse();">isReversed</input>
+   
+   <br><br>
+   
    <button onmousedown="myRobox.components['servo2'].rotate(170)" onmouseup="myRobox.components['servo2'].rotate(10)">Servo 2</button>
+   
+   <br><br>
 
    <button onmousedown="scout()">Scout</button>
 

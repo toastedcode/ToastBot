@@ -90,6 +90,12 @@ void MotorPair::rotate(
    }
 }
 
+void MotorPair::reverse(
+   const bool& isReversed)
+{
+   this->isReversed = isReversed;
+}
+
 void MotorPair::setup()
 {
    Messaging::subscribe(this, "killSwitch");
@@ -103,10 +109,8 @@ void MotorPair::run()
 void MotorPair::handleMessage(
    MessagePtr message)
 {
-   // motorPair
    // drive
-   if ((message->getMessageId() == "motorPair") ||
-       (message->getMessageId() == "drive"))
+   if (message->getMessageId() == "drive")
    {
       int speed = message->getInt("speed");
       int yaw = message->getInt("yaw");
@@ -114,8 +118,6 @@ void MotorPair::handleMessage(
       Logger::logDebug(F("MotorPair::handleMessage: drive(%d, %d)"), speed, yaw);
 
       drive(speed, yaw);
-
-      Messaging::freeMessage(message);
    }
    else if (message->getMessageId() == "rotate")
    {
@@ -124,8 +126,15 @@ void MotorPair::handleMessage(
       Logger::logDebug(F("MotorPair::handleMessage: rotate(%d)"), speed);
 
       rotate(speed);
+   }
+   // reverse
+   else if (message->getMessageId() == "reverse")
+   {
+      bool newIsReversed = message->getBool("isReversed");
 
-      Messaging::freeMessage(message);
+      Logger::logDebug(F("MotorPair::handleMessage: reverse(%s)"), (newIsReversed ? "true" : "false"));
+
+      reverse(newIsReversed);
    }
    // killSwitch
    else if (message->getMessageId() == "killSwitch")
@@ -133,42 +142,13 @@ void MotorPair::handleMessage(
       Logger::logDebug(F("MotorPair::handleMessage: killSwitch"));
 
       drive(0, 0);
-
-      Messaging::freeMessage(message);
-   }
-   else if (message->getMessageId() == "instruction")
-   {
-      String action = message->getString("action");
-
-      if (action == "drive")
-      {
-         int speed = message->getInt("param_0");
-
-         Logger::logDebug(F("MotorPair::handleMessage: instruction:drive(%d)"), speed);
-
-         drive(speed, 0);
-      }
-      else if (action == "rotate")
-      {
-         int angle = message->getInt("param_0");
-
-         Logger::logDebug(F("MotorPair::handleMessage: instruction:rotate(%d)"), angle);
-
-         rotate(angle);
-      }
-      else
-      {
-         Logger::logWarning(F("MotorPair::handleMessage: Illegal instruction [%s] for %s."),
-                            message->getString("action").c_str(),
-                            getId().c_str());
-      }
-
-      Messaging::freeMessage(message);
    }
    else
    {
       Component::handleMessage(message);
    }
+
+   Messaging::freeMessage(message);
 }
 
 void MotorPair::updateMotors()
@@ -195,9 +175,9 @@ void MotorPair::updateMotors()
 int MotorPair::transformYaw(
    const int& yaw)
 {
-   const int sDIRECTION = (yaw / abs(yaw));
+   const int sDIRECTION = (yaw == 0) ? 1 : (yaw / abs(yaw));
 
-   int transformedYaw = (constrain(abs(transformedYaw), MIN_YAW, MAX_YAW) * sDIRECTION);
+   int transformedYaw = (constrain(abs(yaw), MIN_YAW, MAX_YAW) * sDIRECTION);
 
    if (isReversed)
    {

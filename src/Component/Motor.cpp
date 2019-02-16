@@ -95,8 +95,6 @@ void Motor::handleMessage(
       Logger::logDebug(F("Motor::handleMessage: setSpeed(%d)"), newSpeed);
 
       setSpeed(newSpeed);
-
-      Messaging::freeMessage(message);
    }
    // limit
    else if (message->getMessageId() == "limit")
@@ -125,13 +123,13 @@ void Motor::handleMessage(
       Logger::logDebug(F("Motor::handleMessage: killSwitch"));
 
       setSpeed(NO_SPEED);
-
-      Messaging::freeMessage(message);
    }
    else
    {
       Component::handleMessage(message);
    }
+
+   Messaging::freeMessage(message);
 }
 
 void Motor::updatePins()
@@ -159,14 +157,16 @@ void Motor::updatePins()
 int Motor::transformSpeed(
    const int& speed)
 {
-   const int sDIRECTION = (speed / abs(speed));
+   const int sDIRECTION = (speed == 0) ? 1 : (speed / abs(speed));
 
-   int transformedSpeed = (constrain(abs(transformedSpeed), limitMin, limitMax) * sDIRECTION);
+   int transformedSpeed = (constrain(abs(speed), limitMin, limitMax) * sDIRECTION);
 
    if (isReversed)
    {
       transformedSpeed = (transformedSpeed * -1);
    }
+
+   Logger::logDebug(F("Motor::transformSpeed: speed = %d, transformedSpeed = %d"), speed, transformedSpeed);
 
    return (transformedSpeed);
 }
