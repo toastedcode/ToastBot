@@ -27,7 +27,8 @@ MotorPair::MotorPair(
    Motor* rightMotor) :
       Component(id),
       speed(0),
-      yaw(0)
+      yaw(0),
+      isReversed(false)
 {
    this->leftMotor = leftMotor;
    this->rightMotor = rightMotor;
@@ -50,6 +51,8 @@ MotorPair::MotorPair(
    {
       rightMotor = (Motor*)ToastBot::getComponent(message->getString("rightMotor"));
    }
+
+   isReversed = message->isSet("isReversed") ? message->getBool("isReversed") : false;
 }
 
 void MotorPair::drive(
@@ -57,7 +60,7 @@ void MotorPair::drive(
    int yaw)
 {
    this->speed = constrain(speed, MIN_SPEED, MAX_SPEED);
-   this->yaw = constrain(yaw, MIN_YAW, MAX_YAW);
+   this->yaw = transformYaw(yaw);
 
    updateMotors();
 }
@@ -65,15 +68,17 @@ void MotorPair::drive(
 void MotorPair::rotate(
    int speed)
 {
-   this->speed = abs(speed);
+   int transformedSpeed = transformRotateSpeed(speed);
+
+   this->speed = abs(transformedSpeed);
    this->yaw = 0;
 
-   if (speed == 0)
+   if (transformedSpeed == 0)
    {
       leftMotor->setSpeed(this->speed);
       rightMotor->setSpeed(this->speed);
    }
-   else if (speed < 0)
+   else if (transformedSpeed < 0)
    {
       leftMotor->setSpeed(this->speed * -1);
       rightMotor->setSpeed(this->speed);
@@ -184,4 +189,33 @@ void MotorPair::updateMotors()
 
    leftMotor->setSpeed(leftMotorSpeed);
    rightMotor->setSpeed(rightMotorSpeed);
+}
+
+
+int MotorPair::transformYaw(
+   const int& yaw)
+{
+   const int sDIRECTION = (yaw / abs(yaw));
+
+   int transformedYaw = (constrain(abs(transformedYaw), MIN_YAW, MAX_YAW) * sDIRECTION);
+
+   if (isReversed)
+   {
+      transformedYaw = (transformedYaw * -1);
+   }
+
+   return (transformedYaw);
+}
+
+int MotorPair::transformRotateSpeed(
+   const int& speed)
+{
+   int transformedSpeed = constrain(speed, MIN_SPEED, MAX_SPEED);
+
+   if (isReversed)
+   {
+      transformedSpeed = (transformedSpeed * -1);
+   }
+
+   return (transformedSpeed);
 }

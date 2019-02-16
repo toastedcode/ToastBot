@@ -25,7 +25,10 @@ ServoComponent::ServoComponent(
    const String& id,
    const int& pin) :
       Component(id),
-      pin(pin)
+      pin(pin),
+      limitMin(MIN_ANGLE),
+      limitMax(MAX_ANGLE),
+      isReversed(false)
 {
    servoPanBehavior = new ServoPanBehavior(getId() + ".pan", this);
 }
@@ -40,20 +43,23 @@ ServoComponent::ServoComponent(
       Component(message)
 {
    pin = message->isSet("pin") ? message->getInt("pin") : 0;
+   limitMin = message->isSet("limitMin") ? message->getInt("limitMin") : MIN_ANGLE;
+   limitMax = message->isSet("limitMax") ? message->getInt("limitMax") : MAX_ANGLE;
+   isReversed = message->isSet("isReversed") ? message->getBool("isReversed") : false;
    servoPanBehavior = new ServoPanBehavior(getId() + ".pan", this);
 }
 
 void ServoComponent::rotate(
    int angle)
 {
-   servo.write(constrain(angle, MIN_ANGLE, MAX_ANGLE));
+   servo.write(transformAngle(angle));
 }
 
 void ServoComponent::panTo(
    const int& angle,
    const int& seconds)
 {
-	servoPanBehavior->panTo(angle, seconds);
+   servoPanBehavior->panTo(transformAngle(angle), seconds);
 }
 
 void ServoComponent::oscillate(
@@ -61,12 +67,26 @@ void ServoComponent::oscillate(
    const int& endAngle,
    const int& seconds)
 {
-	servoPanBehavior->oscillate(startAngle, endAngle, seconds);
+   servoPanBehavior->oscillate(transformAngle(startAngle), transformAngle(endAngle), seconds);
 }
 
 void ServoComponent::stop()
 {
-	servoPanBehavior->stop();
+   servoPanBehavior->stop();
+}
+
+void ServoComponent::limit(
+   const int& minAngle,
+   const int& maxAngle)
+{
+   this->limitMin = minAngle;
+   this->limitMax = maxAngle;
+}
+
+void ServoComponent::reverse(
+   const bool& isReversed)
+{
+   this->isReversed = isReversed;
 }
 
 void ServoComponent::setPwm(
@@ -117,6 +137,27 @@ void ServoComponent::handleMessage(
    {
       servoPanBehavior->handleMessage(message);
    }
+   // limit
+   else if (message->getMessageId() == "limit")
+   {
+      int newLimitMin = message->getInt("limitMin");
+      int newLimitMax = message->getInt("limitMax");
+
+      Logger::logDebug(F("ServoComponent::handleMessage: limit(%d, %d)"), newLimitMin, newLimitMax);
+
+      limit(
+         constrain(newLimitMin, MIN_ANGLE, MAX_ANGLE),
+         constrain(newLimitMax, MIN_ANGLE, MAX_ANGLE));
+   }
+   // reverse
+   else if (message->getMessageId() == "reverse")
+   {
+      bool newIsReversed = message->getBool("isReversed");
+
+      Logger::logDebug(F("ServoComponent::handleMessage: reverse(%s)"), (newIsReversed ? "true" : "false"));
+
+      reverse(newIsReversed);
+   }
    // setPwm
    else if (message->getMessageId() == "setPwm")
    {
@@ -135,54 +176,27 @@ void ServoComponent::handleMessage(
 
       Messaging::freeMessage(message);
    }
-   else if (message->getMessageId() == "instruction")
-   {
-      String action = message->getString("action");
-
-      if (action == "rotate")
-      {
-         int angle = message->getInt("param_0");
-
-         Logger::logDebug(F("ServoComponent::handleMessage: instruction:rotate(%d)"), angle);
-
-         rotate(angle);
-      }
-      else if (action == "panTo")
-      {
-         int angle = message->getInt("param_0");
-         int seconds = message->getInt("param_1");
-
-         Logger::logDebug(F("ServoComponent::handleMessage: instruction:panTo(%d, %d)"), angle, seconds);
-
-         panTo(angle, seconds);
-      }
-      else if (action == "oscillate")
-      {
-         int startAngle = message->getInt("param_0");
-         int endAngle = message->getInt("param_1");
-         int seconds = message->getInt("param_1");
-
-         Logger::logDebug(F("ServoComponent::handleMessage: instruction:oscillate(%d, %d, %d)"), startAngle, endAngle, seconds);
-
-         oscillate(startAngle, endAngle, seconds);
-      }
-      else if (action == "stop")
-      {
-         Logger::logDebug(F("ServoComponent::handleMessage: instruction:stop()"));
-
-         stop();
-      }
-      else
-      {
-         Logger::logWarning(F("ServoComponent::handleMessage: Illegal instruction [%s] for %s."),
-                            message->getString("action").c_str(),
-                            getId().c_str());
-      }
-
-      Messaging::freeMessage(message);
-   }
    else
    {
       Component::handleMessage(message);
    }
+}
+
+
+int ServoComponent::transformAngle(
+   const int& angle)
+{
+  int transformedAngle = angle;
+
+  if (isReversed)
+  {
+     transformedAngle = (MAX_ANGLE - angle);
+     constrain(transformedAngle, (MAX_ANGLE - limitMax), (MAX_ANGLE - limitMin));
+  }
+  else
+  {
+     transformedAngle = constrain(transformedAngle, limitMin, limitMax);
+  }
+
+  return (transformedAngle);
 }

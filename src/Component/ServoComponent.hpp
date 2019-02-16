@@ -57,6 +57,13 @@ public:
 
    void stop();
 
+   void limit(
+      const int& minAngle,
+      const int& maxAngle);
+
+   void reverse(
+      const bool& isReversed);
+
    // Retrieves the current angle of the servo.
    // Note: Non-const because it calls read() on the Servo object.
    int getAngle();
@@ -86,11 +93,25 @@ public:
 
 private:
 
+   // Transforms the angle based on the limitMin, limitMax, and isReversed params.
+   int transformAngle(
+      // The angle to transform.
+      const int& angle);
+
    // The GPIO pin used for controlling the angle of the servo.
    int pin;
 
    // A servo object from the Arduino library.
    Servo servo;
+
+   // A value limiting the minimum angle of the servo.
+   int limitMin;
+
+   // A value limiting the maximum angle of the servo.
+   int limitMax;
+
+   // A flag indicating that all angle parameters should be flipped (i.e. 0 = 180 and 180 = 0).
+   bool isReversed;
 
    ServoPanBehavior* servoPanBehavior;
 };

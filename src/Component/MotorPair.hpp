@@ -85,7 +85,7 @@ public:
 
    static const int MAX_SPEED = 1023;
 
-   static const int MIN_YAW = -100;
+   static const int MIN_YAW = 0;
 
    static const int MAX_YAW = 100;
 
@@ -93,6 +93,16 @@ private:
 
    // Updates the two motors to reflect the current speed.
    void updateMotors();
+
+   // Transforms the speed based on the param.
+   int transformYaw(
+      // The yaw to transform.
+      const int& yaw);
+
+   // Transforms the speed based on the param.
+   int transformRotateSpeed(
+      // The speed to transform.
+      const int& speed);
 
    // The left motor in a motor pair.
    Motor* leftMotor;
@@ -107,6 +117,9 @@ private:
    // The speed ratio between the left and right motors.
    // Positive values indicate the motor pair will be turning to the right; negative values left.
    int yaw;
+
+   // A flag indicating that all yaw/rotate parameters should be flipped.
+   bool isReversed;
 };
 
 REGISTER(MotorPair, motorpair)
