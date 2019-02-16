@@ -1,3 +1,4 @@
+#include "Address.hpp"
 #include "Connection/Connection.hpp"
 #include "Messaging/JsonProtocol.hpp"
 #include "Logger/RemoteLogger.hpp"
@@ -214,7 +215,9 @@ void ToastBotMessageHandler::handleMessage(
    }
    else if (message->getMessageId() == "subscribe")
    {
-      String source = message->getSource();
+      Address sourceAddress(message->getSource());
+
+      String source = sourceAddress.getTop();
       String topic = message->getString("toTopic");
 
       Logger::logDebug("ToastBot::handleMessage: subscribe(%s, %s)", source.c_str(), topic.c_str());
