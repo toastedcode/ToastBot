@@ -18,7 +18,8 @@ DistanceSensor::DistanceSensor(
    const int& echoPin,
    const int& maxCmDistance) :
       Sensor(id),
-      sensorValue(0)
+      sensorValue(0),
+      pollUnits(MICROSECONDS)
 {
    sensor = new NewPing(triggerPin, echoPin, maxCmDistance);
 }
@@ -26,7 +27,8 @@ DistanceSensor::DistanceSensor(
 DistanceSensor::DistanceSensor(
    MessagePtr message) :
       Sensor(message),
-      sensorValue(0)
+      sensorValue(0),
+      pollUnits(MICROSECONDS)
 {
    sensor = new NewPing(message->getInt("triggerPin"),
                         message->getInt("echoPin"),
@@ -46,6 +48,35 @@ void DistanceSensor::loop()
 int DistanceSensor::read()
 {
    sensorValue = sensor->ping();
+
+   return (sensorValue);
+}
+
+int DistanceSensor::read(
+   const DistanceUnits& units)
+{
+   int sensorValue = read();
+
+   switch (units)
+   {
+      case CENTIMETERS:
+      {
+         sensorValue = toCentimeters(sensorValue);
+         break;
+      }
+
+      case INCHES:
+      {
+         sensorValue = toInches(sensorValue);
+         break;
+      }
+
+      case MICROSECONDS:
+      default:
+      {
+         break;
+      }
+   }
 
    return (sensorValue);
 }
