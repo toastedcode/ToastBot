@@ -51,7 +51,7 @@ public:
    virtual int read() = 0;
 
    // This operation sets up automatic polling on the sensor.
-   void poll(
+   virtual void poll(
       // The rate at which updates should be sent, in milliseconds.
       const int& period);
 

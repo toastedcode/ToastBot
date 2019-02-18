@@ -19,7 +19,7 @@ DistanceSensor::DistanceSensor(
    const int& maxCmDistance) :
       Sensor(id),
       sensorValue(0),
-      pollUnits(MICROSECONDS)
+      units(MICROSECONDS)
 {
    sensor = new NewPing(triggerPin, echoPin, maxCmDistance);
 }
@@ -28,7 +28,7 @@ DistanceSensor::DistanceSensor(
    MessagePtr message) :
       Sensor(message),
       sensorValue(0),
-      pollUnits(MICROSECONDS)
+      units(MICROSECONDS)
 {
    sensor = new NewPing(message->getInt("triggerPin"),
                         message->getInt("echoPin"),
@@ -40,45 +40,53 @@ DistanceSensor::~DistanceSensor()
    delete (sensor);
 }
 
+// **************************************************************************
+//                         Component interface
+
 void DistanceSensor::loop()
 {
    Sensor::loop();
 }
 
+// **************************************************************************
+//                        MessageHandler interface
+
+void DistanceSensor::handleMessage(
+   MessagePtr message)
+{
+   // setUnits
+   if (message->getMessageId() == "setUnits")
+   {
+      DistanceUnits newUnits = parseDistanceUnits(message->getString("units"));
+
+      Logger::logDebug(F("Motor::handleMessage: setUnits(%s)"), newUnits);
+
+      setUnits(newUnits);
+
+      Messaging::freeMessage(message);
+   }
+   else
+   {
+      Sensor::handleMessage(message);
+   }
+}
+
+// **************************************************************************
+//                           Sensor interface
+
 int DistanceSensor::read()
 {
    sensorValue = sensor->ping();
 
-   return (sensorValue);
+   return (convertUnits(sensorValue, units));
 }
 
-int DistanceSensor::read(
+// **************************************************************************
+
+inline void DistanceSensor::setUnits(
    const DistanceUnits& units)
 {
-   int sensorValue = read();
-
-   switch (units)
-   {
-      case CENTIMETERS:
-      {
-         sensorValue = toCentimeters(sensorValue);
-         break;
-      }
-
-      case INCHES:
-      {
-         sensorValue = toInches(sensorValue);
-         break;
-      }
-
-      case MICROSECONDS:
-      default:
-      {
-         break;
-      }
-   }
-
-   return (sensorValue);
+   this->units = units;
 }
 
 int DistanceSensor::readMedian(
@@ -86,7 +94,7 @@ int DistanceSensor::readMedian(
 {
    sensorValue = sensor->ping_median(iterations);
 
-   return (sensorValue);
+   return (convertUnits(sensorValue, units));
 }
 
 int DistanceSensor::toCentimeters(
@@ -99,4 +107,34 @@ int DistanceSensor::toInches(
    const int& microseconds)
 {
    return (NewPing::convert_in(microseconds));
+}
+
+int DistanceSensor::convertUnits(
+   const int& microSeconds,
+   const DistanceUnits& units)
+{
+   int convertedValue = microSeconds;
+
+   switch (units)
+   {
+      case CENTIMETERS:
+      {
+         convertedValue = toCentimeters(microSeconds);
+         break;
+      }
+
+      case INCHES:
+      {
+         convertedValue = toInches(microSeconds);
+         break;
+      }
+
+      case MICROSECONDS:
+      default:
+      {
+         break;
+      }
+   }
+
+   return (convertedValue);
 }
