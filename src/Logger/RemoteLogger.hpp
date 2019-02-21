@@ -19,26 +19,26 @@ class RemoteLogger : public Logger
 public:
 
    RemoteLogger(
-      const String& adapterId);
+      const String& target);
 
    virtual ~RemoteLogger();
 
-   void setAdapter(
-      const String& adapterId);
+   void setTarget(
+      const String& target);
 
    virtual void log(
       const LogLevel& logLevel,
-      const String& string);
+      const String& logMessage);
 
 protected:
 
-   String adapterId;
+   String target;
 };
 
 inline RemoteLogger::RemoteLogger(
-   const String& adapterId) :
+   const String& target) :
       Logger(),
-      adapterId(adapterId)
+      target(target)
 {
 }
 
@@ -46,8 +46,8 @@ inline RemoteLogger::~RemoteLogger()
 {
 }
 
-inline void RemoteLogger::setAdapter(
+inline void RemoteLogger::setTarget(
    const String& adapterId)
 {
-   this->adapterId = adapterId;
+   this->target = target;
 }

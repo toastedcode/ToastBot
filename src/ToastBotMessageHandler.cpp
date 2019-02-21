@@ -46,16 +46,12 @@ void ToastBotMessageHandler::handleMessage(
          }
 
          Messaging::send(reply);
-
-         Messaging::freeMessage(message);
       }
    }
    else if (message->getMessageId() == "reset")
    {
       Logger::logDebug(F("ToastBot::handleMessage: reset()"));
       Board::getBoard()->reset();
-
-      Messaging::freeMessage(message);
    }
    else if (message->getMessageId() == "setProperty")
    {
@@ -81,8 +77,6 @@ void ToastBotMessageHandler::handleMessage(
 
          properties.save();
       }
-
-      Messaging::freeMessage(message);
    }
    else if (message->getMessageId() == "digitalRead")
    {
@@ -103,11 +97,7 @@ void ToastBotMessageHandler::handleMessage(
          reply->set("value", value);
 
          Messaging::send(reply);
-
-         Messaging::freeMessage(message);
       }
-
-      Messaging::freeMessage(message);
    }
    else if (message->getMessageId() == "digitalWrite")
    {
@@ -116,8 +106,6 @@ void ToastBotMessageHandler::handleMessage(
 
       Logger::logDebug("ToastBot::handleMessage: digitalWrite(%d, %d)", pin, value);
       Board::getBoard()->digitalWrite(pin, value);
-
-      Messaging::freeMessage(message);
    }
    else if (message->getMessageId() == "analogRead")
    {
@@ -138,11 +126,7 @@ void ToastBotMessageHandler::handleMessage(
          reply->set("value", value);
 
          Messaging::send(reply);
-
-         Messaging::freeMessage(message);
       }
-
-      Messaging::freeMessage(message);
    }
    else if (message->getMessageId() == "analogWrite")
    {
@@ -151,8 +135,6 @@ void ToastBotMessageHandler::handleMessage(
 
       Logger::logDebug("ToastBot::handleMessage: analogWrite(%d, %d)", pin, value);
       Board::getBoard()->analogWrite(pin, value);
-
-      Messaging::freeMessage(message);
    }
    else if (message->getMessageId() == "create")
    {
@@ -174,26 +156,6 @@ void ToastBotMessageHandler::handleMessage(
           ToastBot::addComponent(component);
         }
       }
-
-      Messaging::freeMessage(message);
-   }
-   else if (message->getMessageId() == "setLogger")
-   {
-      String adapterId = message->getString("adapter");
-
-      Logger::logDebug("ToastBot::handleMessage: setLogger(%s)", adapterId.c_str());
-
-      if (ToastBot::getComponent(adapterId))
-      {
-        Logger::setLogLevel(DEBUG);
-        Logger::setLogger(new RemoteLogger(adapterId));
-      }
-      else
-      {
-        Logger::logDebug("Robox::handleMessage: No adapter [%s] available.", adapterId.c_str());
-      }
-
-      Messaging::freeMessage(message);
    }
    else if (message->getMessageId() == "setLogLevel")
    {
@@ -202,8 +164,23 @@ void ToastBotMessageHandler::handleMessage(
       Logger::logDebug("ToastBot::handleMessage: setLogLevel(%s)", toString(logLevel).c_str());
 
       Logger::setLogLevel(logLevel);
+   }
+   else if (message->getMessageId() == "remoteLogging")
+   {
+      bool enable = message->getBool("enable");
 
-      Messaging::freeMessage(message);
+      String target = message->getSource();
+
+      Logger::logDebug("ToastBot::handleMessage: remoteLogging(%s, %s)", (enable ? "true" : "false"), target.c_str());
+
+      if (enable)
+      {
+         Logger::setLogger(new RemoteLogger(target));
+      }
+      else
+      {
+         Logger::setLogger(new SerialLogger());
+      }
    }
    else if (message->getMessageId() == "connectionMode")
    {
@@ -244,13 +221,13 @@ void ToastBotMessageHandler::handleMessage(
          reply->set("freeHeap", freeHeap);
 
          Messaging::send(reply);
-
-         Messaging::freeMessage(message);
       }
    }
    else
    {
       Component::handleMessage(message);
    }
+
+   Messaging::freeMessage(message);
 }
 

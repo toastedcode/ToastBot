@@ -44,6 +44,11 @@
          {
             document.getElementById("distance-sensor-value").value = message.value;
          }
+         else if (message.messageId == "logMessage")
+         {
+            var element = document.getElementById("logs");
+            element.value += message.logLevel + ": " + message.message + "\n";
+         }
       }
 
       function scout()
@@ -118,6 +123,12 @@
    
    Ping <input id="distance-sensor-value" type="number">
    <button onclick="myRobox.components['distanceSensor'].poll(2000)">On</button><button onclick="myRobox.components['distanceSensor'].poll(0)">Off</button>
+   
+   <br><br>
+   
+   Remote logging <input type="checkbox" onchange="if (this.checked){myRobox.remoteLogging(true);} else {myRobox.remoteLogging(false);}">
+   <br>
+   <textarea id="logs" rows="4" cols="50"></textarea>
    
    <br><br>
 

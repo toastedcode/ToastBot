@@ -147,6 +147,16 @@ function Robox()
 
       this.sendMessage(message);
    }
+   
+   Robox.prototype.remoteLogging = function(enable)
+   {
+      var message = new Message();
+      message.messageId = "remoteLogging";
+      message.name = name;
+      message.enable = enable;
+
+      this.sendMessage(message);
+   }
 
    Robox.prototype.setProperty = function(name, value)
    {
