@@ -59,7 +59,7 @@ void DistanceSensor::handleMessage(
    {
       DistanceUnits newUnits = parseDistanceUnits(message->getString("units"));
 
-      Logger::logDebug(F("Motor::handleMessage: setUnits(%s)"), newUnits);
+      Logger::logDebug(F("DistanceSensor::handleMessage: setUnits(%s)"), toString(newUnits).c_str());
 
       setUnits(newUnits);
 

@@ -94,7 +94,7 @@ function Robox()
 
    Robox.prototype.isConnected = function()
    {
-      return (this.adapter && this.adapter.isConnected());
+      return ((this.adapter != null) && this.adapter.isConnected());
    }
 
    // **************************************************************************

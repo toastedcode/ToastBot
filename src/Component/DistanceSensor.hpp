@@ -103,7 +103,7 @@ private:
 inline String DistanceSensor::toString(
    const DistanceSensor::DistanceUnits& units)
 {
-   static const String enumToString[]
+   static const String enumToString[] =
    {
       "MICROSECONDS",
       "CENTIMETERS",
@@ -120,9 +120,11 @@ inline DistanceSensor::DistanceUnits DistanceSensor::parseDistanceUnits(
 
    for (int i = DISTANCE_UNITS_FIRST; i < DISTANCE_UNITS_LAST; i++)
    {
-      if (unitsString == toString(static_cast<DistanceUnits>(i)))
+      DistanceUnits tempUnits = static_cast<DistanceUnits>(i);
+
+      if (unitsString == toString(tempUnits))
       {
-         units = static_cast<DistanceUnits>(i);
+         units = tempUnits;
          break;
       }
    }

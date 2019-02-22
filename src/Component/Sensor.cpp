@@ -37,7 +37,7 @@ void Sensor::handleMessage(
    // read
    if (message->getMessageId() == "read")
    {
-      Logger::logDebug(F("Motor::handleMessage: read()"));
+      Logger::logDebug(F("Sensor::handleMessage: read()"));
 
       sendReading(message->getSource());
    }
@@ -46,14 +46,14 @@ void Sensor::handleMessage(
    {
       int period = message->getInt("period");
 
-      Logger::logDebug(F("Motor::handleMessage: poll(%d)"), period);
+      Logger::logDebug(F("Sensor::handleMessage: poll(%d)"), period);
 
       poll(period);
    }
    // killSwitch
    else if (message->getMessageId() == "killSwitch")
    {
-      Logger::logDebug(F("Motor::handleMessage: killSwitch"));
+      Logger::logDebug(F("Sensor::handleMessage: killSwitch"));
 
       poll(0);
    }

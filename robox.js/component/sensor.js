@@ -31,4 +31,14 @@ function Sensor(id)
       
       this.parent.sendMessage(message);
    }
+   
+   Sensor.prototype.setUnits = function(units)
+   {
+      var message = new Message();
+      message.messageId = "setUnits";
+      message.destination = this.id;
+      message.units = units;
+      
+      this.parent.sendMessage(message);
+   }
 }
