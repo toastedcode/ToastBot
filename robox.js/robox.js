@@ -242,6 +242,47 @@ function Robox()
 
       this.sendMessage(message);
    }
+   
+   Robox.prototype.getWifiConfig = function()
+   {
+      var message = new Message();
+      message.messageId = "wifiConfig";
+      message.query = true;
+
+      this.sendMessage(message);      
+   }
+   
+   Robox.prototype.setWifiConfig = function(ssid, password)
+   {
+      var message = new Message();
+      message.messageId = "wifiConfig";
+      message.ssid = ssid;
+      message.password = password;
+
+      this.sendMessage(message);
+   }
+   
+   Robox.prototype.getServerConfig = function()
+   {
+      var message = new Message();
+      message.messageId = "serverConfig";
+      message.query = true;
+
+      this.sendMessage(message);      
+   }
+   
+   Robox.prototype.setServerConfig = function(host, port, userId, password, topic)
+   {
+      var message = new Message();
+      message.messageId = "serverConfig";
+      message.host = host;
+      message.port = port;
+      message.userId = userId;
+      message.password = password;
+      message.topic = topic;
+
+      this.sendMessage(message);
+   }
 
    // **************************************************************************
 
