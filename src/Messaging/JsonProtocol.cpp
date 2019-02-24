@@ -81,7 +81,7 @@ String JsonProtocol::serializeParameters(
             isNumeric &= isDigit(c);
          }
       }
-      isNumeric &= ((periodCount <= 1) && (dashCount <= 1));
+      isNumeric &= ((paramValue.length() > 0) && (periodCount <= 1) && (dashCount <= 1));
 
       if (isNumeric)
       {

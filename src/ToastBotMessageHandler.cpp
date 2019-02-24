@@ -320,7 +320,7 @@ MessagePtr ToastBotMessageHandler::pingReply(
 
    if (reply)
    {
-      reply->set("deviceId", ToastBot::getId());
+      reply->set("deviceName", ToastBot::getId());
 
       if (WifiBoard::getBoard())
       {
@@ -334,6 +334,7 @@ MessagePtr ToastBotMessageHandler::pingReply(
       }
 
       reply->set("apiKey", ToastBot::getProperties().getString("apiKey"));
+      reply->set("mode", ToastBot::getProperties().getString("mode"));
    }
 
    return (reply);

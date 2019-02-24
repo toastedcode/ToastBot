@@ -96,7 +96,7 @@ function WebSocketAdapter()
 
    WebSocketAdapter.prototype.sendMessage = function(message)
    {
-      if (this.protocol)
+      if (this.protocol && this.isConnected())
       {
          var serialized = this.protocol.serialize(message);
 
