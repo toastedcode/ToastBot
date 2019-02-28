@@ -86,7 +86,11 @@ function MqttAdapter()
 
    MqttAdapter.prototype.disconnect = function()
    {
-      this.mqttClient.disconnect();
+      if (this.mqttClient)
+      {
+         this.mqttClient.disconnect();
+         this.mqttClient = nulll
+      }
    }
 
    MqttAdapter.prototype.isConnected = function()

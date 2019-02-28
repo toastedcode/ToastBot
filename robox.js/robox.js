@@ -67,8 +67,7 @@ function Robox()
       this.adapter.connect(ipAddress, port);
    }
    
-   /*
-   Robox.prototype.connect = function(host, port, topic)
+   Robox.prototype.mqttConnect = function(host, port, topic)
    {
       if (this.adapter)
       {
@@ -80,7 +79,6 @@ function Robox()
       this.adapter.setProtocol(new JsonProtocol());
       this.adapter.connect(host, port, topic);
    }
-   */
 
    Robox.prototype.disconnect = function()
    {
