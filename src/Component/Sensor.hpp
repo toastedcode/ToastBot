@@ -32,19 +32,37 @@ public:
    // Destructor.
    virtual ~Sensor();
 
+   // **************************************************************************
+   //                         MessageHandler interface
+
+   // This operation handles a message directed to this component.
+   virtual void handleMessage(
+      // The message to handle.
+      MessagePtr message);
+
+   // **************************************************************************
+   //                         TimerListner interface
+
    virtual void timeout(
       Timer* timer);
+
+   // **************************************************************************
 
    virtual int read() = 0;
 
    // This operation sets up automatic polling on the sensor.
-   void poll(
+   virtual void poll(
       // The rate at which updates should be sent, in milliseconds.
       const int& period);
 
 protected:
 
-   virtual void onPoll() = 0;
+   virtual void onPoll();
+
+   virtual void sendReading(
+         const String& destination);
+
+   virtual void broadcastReading();
 
 private:
 

@@ -27,4 +27,9 @@ public:
    virtual void handleMessage(
       // The message to handle.
       MessagePtr message);
+
+protected:
+
+   virtual MessagePtr pingReply(
+      MessagePtr ping);
 };

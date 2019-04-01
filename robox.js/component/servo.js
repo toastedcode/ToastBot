@@ -39,7 +39,7 @@ function Servo(id)
       var message = new Message();
       message.messageId = "oscillate";
       message.destination = this.id;
-      message.startAngle = endAngle;
+      message.startAngle = startAngle;
       message.endAngle = endAngle;
       message.seconds = seconds;
       

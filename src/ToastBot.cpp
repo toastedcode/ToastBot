@@ -51,9 +51,6 @@ const int MESSAGE_POOL_SIZE = 10;
 // The number of simultaneous timers supported by the Timer framework.
 const int TIMER_POOL_SIZE = 10;
 
-// The GPIO pin used to control the status LED.
-const int STATUS_LED_PIN = 16;
-
 // *****************************************************************************
 //                               Public
 // *****************************************************************************
@@ -200,7 +197,10 @@ void ToastBot::setup()
    */
 
    // Status LED.
-   addComponent(new Led("statusLed", STATUS_LED_PIN));
+   if (properties.isSet("statusLedPin"))
+   {
+      addComponent(new Led("statusLed", properties.getInt("statusLedPin")));
+   }
 
 #ifdef ARDUINO
    yield();

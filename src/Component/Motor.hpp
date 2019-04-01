@@ -46,7 +46,7 @@ public:
 
    virtual void setup();
 
-   // This operation handles a message directed to this sensor.
+   // This operation handles a message directed to this component.
    virtual void handleMessage(
       // The message to handle.
       MessagePtr message);

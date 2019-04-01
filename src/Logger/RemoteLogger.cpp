@@ -13,18 +13,18 @@
 
 void RemoteLogger::log(
    const LogLevel& logLevel,
-   const String& string)
+   const String& logMessage)
 {
-   if (adapterId.length() != 0)
+   if (target.length() != 0)
    {
       Message* message = Messaging::newMessage();
       if (message)
       {
          message->setMessageId("logMessage");
          message->set("logLevel", toString(logLevel));
-         message->set("message", string);
+         message->set("message", logMessage);
 
-         message->setDestination(adapterId);
+         message->setDestination(target);
 
          Messaging::send(message);
 

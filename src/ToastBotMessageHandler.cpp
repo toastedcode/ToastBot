@@ -1,3 +1,4 @@
+#include "Address.hpp"
 #include "Connection/Connection.hpp"
 #include "Messaging/JsonProtocol.hpp"
 #include "Logger/RemoteLogger.hpp"
@@ -20,41 +21,10 @@ void ToastBotMessageHandler::handleMessage(
    MessagePtr message)
 {
    //  ping
-   if (message->getMessageId() == "ping")
-   {
-      Logger::logDebug(F("ToastBot::handleMessage: ping()"));
-
-      Message* reply = Messaging::newMessage();
-
-      if (reply)
-      {
-         reply->setMessageId("pong");
-         reply->setSource(getId());
-         reply->setDestination(message->getSource());
-         reply->set("deviceId", ToastBot::getId());
-
-         if (WifiBoard::getBoard())
-         {
-           unsigned char mac[6] = {0, 0, 0, 0, 0, 0};
-           WifiBoard::getBoard()->getMacAddress(mac);
-           char macAddress[18];
-           sprintf(macAddress, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
-
-           reply->set("macAddress", macAddress);
-           reply->set("ipAddress", WifiBoard::getBoard()->getIpAddress());
-         }
-
-         Messaging::send(reply);
-
-         Messaging::freeMessage(message);
-      }
-   }
-   else if (message->getMessageId() == "reset")
+   if (message->getMessageId() == "reset")
    {
       Logger::logDebug(F("ToastBot::handleMessage: reset()"));
       Board::getBoard()->reset();
-
-      Messaging::freeMessage(message);
    }
    else if (message->getMessageId() == "setProperty")
    {
@@ -80,8 +50,6 @@ void ToastBotMessageHandler::handleMessage(
 
          properties.save();
       }
-
-      Messaging::freeMessage(message);
    }
    else if (message->getMessageId() == "digitalRead")
    {
@@ -102,11 +70,7 @@ void ToastBotMessageHandler::handleMessage(
          reply->set("value", value);
 
          Messaging::send(reply);
-
-         Messaging::freeMessage(message);
       }
-
-      Messaging::freeMessage(message);
    }
    else if (message->getMessageId() == "digitalWrite")
    {
@@ -115,8 +79,6 @@ void ToastBotMessageHandler::handleMessage(
 
       Logger::logDebug("ToastBot::handleMessage: digitalWrite(%d, %d)", pin, value);
       Board::getBoard()->digitalWrite(pin, value);
-
-      Messaging::freeMessage(message);
    }
    else if (message->getMessageId() == "analogRead")
    {
@@ -137,11 +99,7 @@ void ToastBotMessageHandler::handleMessage(
          reply->set("value", value);
 
          Messaging::send(reply);
-
-         Messaging::freeMessage(message);
       }
-
-      Messaging::freeMessage(message);
    }
    else if (message->getMessageId() == "analogWrite")
    {
@@ -150,8 +108,6 @@ void ToastBotMessageHandler::handleMessage(
 
       Logger::logDebug("ToastBot::handleMessage: analogWrite(%d, %d)", pin, value);
       Board::getBoard()->analogWrite(pin, value);
-
-      Messaging::freeMessage(message);
    }
    else if (message->getMessageId() == "create")
    {
@@ -173,26 +129,6 @@ void ToastBotMessageHandler::handleMessage(
           ToastBot::addComponent(component);
         }
       }
-
-      Messaging::freeMessage(message);
-   }
-   else if (message->getMessageId() == "setLogger")
-   {
-      String adapterId = message->getString("adapter");
-
-      Logger::logDebug("ToastBot::handleMessage: setLogger(%s)", adapterId.c_str());
-
-      if (ToastBot::getComponent(adapterId))
-      {
-        Logger::setLogLevel(DEBUG);
-        Logger::setLogger(new RemoteLogger(adapterId));
-      }
-      else
-      {
-        Logger::logDebug("Robox::handleMessage: No adapter [%s] available.", adapterId.c_str());
-      }
-
-      Messaging::freeMessage(message);
    }
    else if (message->getMessageId() == "setLogLevel")
    {
@@ -201,8 +137,131 @@ void ToastBotMessageHandler::handleMessage(
       Logger::logDebug("ToastBot::handleMessage: setLogLevel(%s)", toString(logLevel).c_str());
 
       Logger::setLogLevel(logLevel);
+   }
+   else if (message->getMessageId() == "remoteLogging")
+   {
+      bool enable = message->getBool("enable");
 
-      Messaging::freeMessage(message);
+      String target = message->getSource();
+
+      Logger::logDebug("ToastBot::handleMessage: remoteLogging(%s, %s)", (enable ? "true" : "false"), target.c_str());
+
+      if (enable)
+      {
+         Logger::setLogger(new RemoteLogger(target));
+      }
+      else
+      {
+         Logger::setLogger(new SerialLogger());
+      }
+   }
+   else if (message->getMessageId() == "wifiConfig")
+   {
+      Properties& properties = ToastBot::getProperties();
+
+      String ssid = message->getString("ssid");
+      String password = message->getString("password");
+
+      if (message->getBool("query"))
+      {
+         Logger::logDebug("ToastBot::handleMessage: wifiConfig(query)");
+      }
+      else
+      {
+         Logger::logDebug("ToastBot::handleMessage: wifiConfig(%s, %s)", ssid.c_str(), password.c_str());
+
+         if (message->isSet("ssid"))
+         {
+            properties.set("wifi.ssid", message->getString("ssid"));
+         }
+
+         if (message->isSet("password"))
+         {
+            properties.set("wifi.password", message->getString("password"));
+         }
+
+         properties.save();
+      }
+
+      MessagePtr reply = Messaging::newMessage();
+
+      if (reply)
+      {
+         reply->setMessageId("wifiConfig");
+         reply->setSource(getId());
+         reply->setDestination(message->getSource());
+         reply->set("ssid", properties.getString("wifi.ssid"));
+         reply->set("password", properties.getString("wifi.password"));
+
+         Messaging::send(reply);
+      }
+   }
+   else if (message->getMessageId() == "serverConfig")
+   {
+      Properties& properties = ToastBot::getProperties();
+
+      String host = message->getString("host");
+      int port = message->getInt("port");
+      String userId = message->getString("userId");
+      String password = message->getString("password");
+      String topic = message->getString("topic");
+
+      if (message->getBool("query"))
+      {
+         Logger::logDebug("ToastBot::handleMessage: serverConfig(query)");
+      }
+      else
+      {
+         Logger::logDebug("ToastBot::handleMessage: serverConfig(%s, %d, %s, %s, %s)",
+                          host.c_str(),
+                          port,
+                          userId.c_str(),
+                          password.c_str(),
+                          topic.c_str());
+
+         if (message->isSet("host"))
+         {
+            properties.set("server.host", host);
+         }
+
+         if (message->isSet("port"))
+         {
+            properties.set("server.port", port);
+         }
+
+         if (message->isSet("userId"))
+         {
+            properties.set("server.userId", userId);
+         }
+
+         if (message->isSet("password"))
+         {
+            properties.set("server.password", password);
+         }
+
+         if (message->isSet("topic"))
+         {
+            properties.set("server.topic", topic);
+         }
+
+         properties.save();
+      }
+
+      MessagePtr reply = Messaging::newMessage();
+
+      if (reply)
+      {
+         reply->setMessageId("serverConfig");
+         reply->setSource(getId());
+         reply->setDestination(message->getSource());
+         reply->set("host", properties.getString("server.host"));
+         reply->set("port", properties.getInt("server.port"));
+         reply->set("userId", properties.getString("server.userId"));
+         reply->set("password", properties.getString("server.password"));
+         reply->set("topic", properties.getString("server.topic"));
+
+         Messaging::send(reply);
+      }
    }
    else if (message->getMessageId() == "connectionMode")
    {
@@ -214,7 +273,9 @@ void ToastBotMessageHandler::handleMessage(
    }
    else if (message->getMessageId() == "subscribe")
    {
-      String source = message->getSource();
+      Address sourceAddress(message->getSource());
+
+      String source = sourceAddress.getTop();
       String topic = message->getString("toTopic");
 
       Logger::logDebug("ToastBot::handleMessage: subscribe(%s, %s)", source.c_str(), topic.c_str());
@@ -241,13 +302,40 @@ void ToastBotMessageHandler::handleMessage(
          reply->set("freeHeap", freeHeap);
 
          Messaging::send(reply);
-
-         Messaging::freeMessage(message);
       }
    }
    else
    {
       Component::handleMessage(message);
    }
+
+   Messaging::freeMessage(message);
 }
 
+
+MessagePtr ToastBotMessageHandler::pingReply(
+   MessagePtr ping)
+{
+   MessagePtr reply = Component::pingReply(ping);
+
+   if (reply)
+   {
+      reply->set("deviceName", ToastBot::getId());
+
+      if (WifiBoard::getBoard())
+      {
+        unsigned char mac[6] = {0, 0, 0, 0, 0, 0};
+        WifiBoard::getBoard()->getMacAddress(mac);
+        char macAddress[18];
+        sprintf(macAddress, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+
+        reply->set("macAddress", macAddress);
+        reply->set("ipAddress", WifiBoard::getBoard()->getIpAddress());
+      }
+
+      reply->set("apiKey", ToastBot::getProperties().getString("apiKey"));
+      reply->set("mode", ToastBot::getProperties().getString("mode"));
+   }
+
+   return (reply);
+}

@@ -67,7 +67,7 @@ function Robox()
       this.adapter.connect(ipAddress, port);
    }
    
-   Robox.prototype.connect = function(host, port, topic)
+   Robox.prototype.mqttConnect = function(host, port, topic)
    {
       if (this.adapter)
       {
@@ -92,7 +92,7 @@ function Robox()
 
    Robox.prototype.isConnected = function()
    {
-      return (this.adapter && this.adapter.isConnected());
+      return ((this.adapter != null) && this.adapter.isConnected());
    }
 
    // **************************************************************************
@@ -142,6 +142,16 @@ function Robox()
       message.messageId = "setLogLevel";
       message.name = name;
       message.logLevel = logLevel;
+
+      this.sendMessage(message);
+   }
+   
+   Robox.prototype.remoteLogging = function(enable)
+   {
+      var message = new Message();
+      message.messageId = "remoteLogging";
+      message.name = name;
+      message.enable = enable;
 
       this.sendMessage(message);
    }
@@ -230,12 +240,54 @@ function Robox()
 
       this.sendMessage(message);
    }
+   
+   Robox.prototype.getWifiConfig = function()
+   {
+      var message = new Message();
+      message.messageId = "wifiConfig";
+      message.query = true;
+
+      this.sendMessage(message);      
+   }
+   
+   Robox.prototype.setWifiConfig = function(ssid, password)
+   {
+      var message = new Message();
+      message.messageId = "wifiConfig";
+      message.ssid = ssid;
+      message.password = password;
+
+      this.sendMessage(message);
+   }
+   
+   Robox.prototype.getServerConfig = function()
+   {
+      var message = new Message();
+      message.messageId = "serverConfig";
+      message.query = true;
+
+      this.sendMessage(message);      
+   }
+   
+   Robox.prototype.setServerConfig = function(host, port, userId, password, topic)
+   {
+      var message = new Message();
+      message.messageId = "serverConfig";
+      message.host = host;
+      message.port = port;
+      message.userId = userId;
+      message.password = password;
+      message.topic = topic;
+
+      this.sendMessage(message);
+   }
 
    // **************************************************************************
 
    this.addComponent(new Motor("motor1"));
    this.addComponent(new Motor("motor2"));
    this.addComponent(new MotorPair("motorPair"));
+   this.addComponent(new Sensor("distanceSensor"));
    this.addComponent(new Servo("servo1"));
    this.addComponent(new Servo("servo2"));
    this.addComponent(new Led("statusLed"));
