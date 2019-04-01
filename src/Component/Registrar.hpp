@@ -16,16 +16,20 @@ public:
    Registrar(
       MessagePtr message);
 
-   ~Registrar();
+   virtual ~Registrar();
 
    void setup();
 
    void timeout(
       Timer* timer);
 
+protected:
+
+   String getAdapterId();
+
 private:
 
-   void pingRegistry();
+   virtual void pingRegistry();
 
    String adapterId;
 
@@ -33,5 +37,10 @@ private:
 
    Timer* timer;
 };
+
+inline String Registrar::getAdapterId()
+{
+   return (adapterId);
+}
 
 REGISTER(Registrar, Registrar)
