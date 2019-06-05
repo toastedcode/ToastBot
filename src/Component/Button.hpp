@@ -35,6 +35,11 @@ public:
    // Destructor.
    virtual ~Button();
 
+   void setDebounce(
+      const int& debounceTime);
+
+   int getDebounce() const;
+
    void setLongPress(
       const int& longPressTime);
 
@@ -74,11 +79,22 @@ private:
    // A flag indicating if the pin should be configured with INPUT (false) or INPUT_PULLUP (true).
    bool inputPullup;
 
+   // A threshold used for implementing button "debounce".
+   // Basically, a button must remain in a steady state for this long to be considered changed.
+   int debounce;
+
    // The number of milliseconds the button must be held to be considered a "long" press.
    int longPressTime;
 
    // The current state of the button.
    int buttonState;
+
+   // The last read button state.  Used in debounce logic.
+   int lastButtonState;
+
+   // A system time (in millis) recording when the button state last changed.
+   // Note: Used in implementing button debounce.
+   unsigned long debounceTime;
 
    // A system time (in millis) recording when the button was pressed.
    // Note: Used in detecting long presses.

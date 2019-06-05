@@ -13,8 +13,11 @@ Button::Button(
       Sensor(id),
       pin(pin),
       inputPullup(inputPullup),
+      debounce(0),
       longPressTime(0),
       buttonState(0),
+      lastButtonState(0),
+      debounceTime(0),
       downTime(0)
 {
 
@@ -24,16 +27,30 @@ Button::Button(
    MessagePtr message) :
       Sensor(message),
       buttonState(0),
+      lastButtonState(0),
+      debounceTime(0),
       downTime(0)
 {
    pin = message->isSet("pin") ? message->getInt("pin") : 0;
    inputPullup = message->isSet("inputPullup") ? message->getBool("inputPullup") : false;
+   debounce = message->isSet("debounce") ? message->getInt("debounce") : 0;
    longPressTime = message->isSet("longPress") ? message->getInt("longPress") : 0;
 }
 
 Button::~Button()
 {
    // Nothing to do here.
+}
+
+void Button::setDebounce(
+   const int& debounceTime)
+{
+   this->debounce = debounce;
+}
+
+int Button::getDebounce() const
+{
+   return (debounce);
 }
 
 void Button::setLongPress(
@@ -127,7 +144,29 @@ int Button::read()
 
    if (board)
    {
-      buttonState = interpret(board->digitalRead(pin));
+      // If debounce is enabled ...
+      // https://www.arduino.cc/en/Tutorial/Debounce
+      if (debounce > 0)
+      {
+         int readButtonState = interpret(board->digitalRead(pin));
+
+         if (readButtonState != lastButtonState)
+         {
+            debounceTime = board->systemTime();
+         }
+
+         if ((board->systemTime() - debounceTime) >  debounce)
+         {
+            buttonState = readButtonState;
+         }
+
+         lastButtonState = readButtonState;
+      }
+      else
+      {
+         // No debounce.  Simply read the new button state.
+         buttonState = interpret(board->digitalRead(pin));
+      }
    }
 
    return (buttonState);
