@@ -10,9 +10,13 @@
 
 #include "Adapter.hpp"
 #include "ComponentFactory.hpp"
-#include "ESP8266WiFi.h"
+#include "EspWifi.hpp"
 #include "../Messaging/JsonProtocol.hpp"
+
+// TODO: Make portable between ESP8266 and ESP32
+#ifdef ESP8266
 #include "WebSocketServer.h"
+#endif
 
 class WebSocketAdapter : public Adapter
 {
@@ -44,7 +48,10 @@ private:
 
    WiFiClient client;
 
+// TODO: Make portable between ESP8266 and ESP32
+#ifdef ESP8266
    WebSocketServer webSocketServer;
+#endif
 
    bool isConnected;
 

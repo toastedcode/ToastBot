@@ -12,7 +12,7 @@
 
 #include "ClientAdapter.hpp"
 #include "ComponentFactory.hpp"
-#include "ESP8266WiFi.h"
+#include "EspWifi.hpp"
 #include "PubSubClient.h"
 #include "PubSubListener.h"
 

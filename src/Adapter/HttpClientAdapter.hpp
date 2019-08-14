@@ -1,9 +1,8 @@
 #pragma once
 
-#include <ESP8266HTTPClient.h>
-
 #include "Adapter.hpp"
 #include "ComponentFactory.hpp"
+#include "EspHttpClient.hpp"
 #include "../Messaging/RestfulProtocol.hpp"
 
 class HttpClientAdapter : public Adapter

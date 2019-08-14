@@ -1,8 +1,7 @@
-#include <FS.h>
-
 #include "../Messaging/JsonProtocol.hpp"
 #include "../Messaging/RestfulProtocol.hpp"
 #include "Board.hpp"
+#include "EspSpiffs.hpp"
 #include "Logger.hpp"
 #include "Messaging.hpp"
 #include "WebServerAdapter.hpp"
@@ -40,7 +39,7 @@ void WebServerAdapter::setup()
 {
    Adapter::setup();
 
-   server = new ESP8266WebServer(port);
+   server = new EspWebServer(port);
    server->addHandler(this);
    server->begin();
 }
@@ -85,7 +84,7 @@ bool WebServerAdapter::canHandle(
 }
 
 bool WebServerAdapter::handle(
-   ESP8266WebServer& server,
+   EspWebServer& server,
    HTTPMethod requestMethod,
    String requestUri)
 {
@@ -115,7 +114,7 @@ bool WebServerAdapter::handle(
 }
 
 void WebServerAdapter::handleNotFound(
-   ESP8266WebServer& server,
+   EspWebServer& server,
    HTTPMethod requestMethod,
    String requestUri)
 {
@@ -158,7 +157,7 @@ void WebServerAdapter::removePage(
 }
 
 bool WebServerAdapter::servePage(
-   ESP8266WebServer& server,
+   EspWebServer& server,
    HTTPMethod requestMethod,
    String requestUri)
 {
@@ -191,7 +190,7 @@ bool WebServerAdapter::servePage(
 }
 
 bool WebServerAdapter::serveFile(
-   ESP8266WebServer& server,
+   EspWebServer& server,
    HTTPMethod requestMethod,
    String requestUri)
 {
@@ -230,7 +229,7 @@ bool WebServerAdapter::serveFile(
 }
 
 bool WebServerAdapter::serveRestfulRequest(
-   ESP8266WebServer& server,
+   EspWebServer& server,
    HTTPMethod requestMethod,
    String requestUri)
 {

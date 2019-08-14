@@ -2,7 +2,7 @@
 
 #include "ClientAdapter.hpp"
 #include "ComponentFactory.hpp"
-#include "ESP8266WiFi.h"
+#include "EspWifi.hpp"
 
 class TcpClientAdapter : public ClientAdapter
 {

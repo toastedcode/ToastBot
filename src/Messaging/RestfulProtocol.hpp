@@ -1,7 +1,6 @@
 #pragma once
 
-#include <ESP8266WebServer.h>
-
+#include "EspWebServer.hpp"
 #include "Protocol.hpp"
 #include "ProtocolFactory.hpp"
 
@@ -19,7 +18,7 @@ public:
       MessagePtr message);
 
    bool parse(
-      ESP8266WebServer& server,
+      EspWebServer& server,
       MessagePtr message);
 
    String serialize(

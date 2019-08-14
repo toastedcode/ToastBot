@@ -72,7 +72,12 @@ void WebSocketAdapter::loop()
 
    if (isConnected && !isNegotiated)
    {
+// TODO: Make portable between ESP8266 and ESP32
+#ifdef ESP8266
       isNegotiated = webSocketServer.handshake(client);
+#else
+      isNegotiated = false;
+#endif
 
       if (!wasNegotiated && isNegotiated)
       {
@@ -103,14 +108,17 @@ bool WebSocketAdapter::sendRemoteMessage(
 
       if (serializedMessage != "")
       {
+// TODO: Make portable between ESP8266 and ESP32
+#ifdef ESP8266
          webSocketServer.sendData(serializedMessage);
+#endif
          isSuccess = true;
       }
    }
    else
    {
       Logger::logWarning(
-         F("IpServerAdapter::sendRemoteMessage: Failed to send message [%s] to remote host."),
+         F("WebSocketAdapter::sendRemoteMessage: Failed to send message [%s] to remote host."),
          message->getMessageId().c_str());
    }
 
@@ -123,7 +131,12 @@ MessagePtr WebSocketAdapter::getRemoteMessage()
 
    if (isConnected && isNegotiated)
    {
+// TODO: Make portable between ESP8266 and ESP32
+#ifdef ESP8266
       String serializedMessage = webSocketServer.getData();
+#else
+      String serializedMessage = "";
+#endif
 
       if (serializedMessage.length() > 0)
       {

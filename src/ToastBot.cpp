@@ -9,12 +9,11 @@
 // *****************************************************************************
 
 #include "Arduino.h"
-#include "FS.h"
-
 #include "BoardFactory.hpp"
 #include "Connection/Connection.hpp"
 #include "Component/FactoryResetButton.hpp"
 #include "Esp8266Board.hpp"
+#include "EspSpiffs.hpp"
 #include "Logger.hpp"
 #include "Messaging.hpp"
 #include "SerialLogger.hpp"

@@ -10,7 +10,11 @@
 
 #pragma once
 
-#include <Servo.h>
+#ifdef ESP32
+   #include <ESP32_Servo.h>
+#else
+   #include <Servo.h>
+#endif
 
 #include "Component.hpp"
 #include "ComponentFactory.hpp"

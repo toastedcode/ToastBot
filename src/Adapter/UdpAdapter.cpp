@@ -85,7 +85,13 @@ bool UdpAdapter::sendRemoteMessage(
       {
          if (server.beginPacket(remoteIpAddress, remotePort) != 0)
          {
-            server.write(serializedMessage.c_str(), serializedMessage.length());
+// TODO: Make this portable between ESP board types.
+#ifdef ESP8266
+            server.write(serializedMessage.c_str(), serializedMessage.length());  // ESP8266
+#else
+            server.print(serializedMessage.c_str());   // ESP32
+#endif
+
             isSuccess = server.endPacket();
          }
       }

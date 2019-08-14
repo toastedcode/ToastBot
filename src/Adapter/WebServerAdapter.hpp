@@ -1,10 +1,9 @@
 #pragma once
 
-#include <ESP8266WiFi.h>
-#include <ESP8266WebServer.h>
-
 #include "Adapter.hpp"
 #include "ComponentFactory.hpp"
+#include "EspWebServer.hpp"
+#include "EspWifi.hpp"
 #include "List.hpp"
 #include "Webpage.hpp"
 
@@ -45,7 +44,7 @@ public:
       String uri);
 
    virtual bool handle(
-      ESP8266WebServer& server,
+      EspWebServer& server,
       HTTPMethod requestMethod,
       String requestUri);
 
@@ -63,22 +62,22 @@ public:
 protected:
 
    bool servePage(
-      ESP8266WebServer& server,
+      EspWebServer& server,
       HTTPMethod requestMethod,
       String requestUri);
 
    bool serveFile(
-      ESP8266WebServer& server,
+      EspWebServer& server,
       HTTPMethod requestMethod,
       String requestUri);
 
    bool serveRestfulRequest(
-      ESP8266WebServer& server,
+      EspWebServer& server,
       HTTPMethod requestMethod,
       String requestUri);
 
    virtual void handleNotFound(
-      ESP8266WebServer& server,
+      EspWebServer& server,
       HTTPMethod requestMethod,
       String requestUri);
 
@@ -100,7 +99,7 @@ private:
 
    int port;
 
-   ESP8266WebServer* server;
+   EspWebServer* server;
 
    List<Webpage*> webpages;
 

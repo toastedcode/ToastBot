@@ -43,7 +43,7 @@ bool RestfulProtocol::parse(
 }
 
 bool RestfulProtocol::parse(
-   ESP8266WebServer& server,
+   EspWebServer& server,
    MessagePtr message)
 {
    bool success = false;
